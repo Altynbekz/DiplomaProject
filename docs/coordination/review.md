@@ -227,3 +227,24 @@ Verified on 2026-11-23 at baseline commit `a1b523d8ad25b170466a09e4d758e8afacc55
 - Final cleanup removed only resources scoped to the independent test project, including its exact image tags. Separate read-only Docker queries found no matching containers, networks, volumes or image tags afterward. No existing application data was modified.
 
 **Verdict:** checkpoint 14 independently verified at its recorded hashes. No findings. This closes the tested ARM64 Compose runtime gate. Hosted GitHub Actions and acceptance with a genuine authorized Juice Shop/ZAP report remain separate, unverified gates. No scanner was launched.
+
+## Independent verification — M1-20261123-15
+
+Verified on 2026-11-23 at baseline commit `5a1cd7427fbfca196d3dc59bea65555a256046e6`. All five frozen SHA-256 hashes matched.
+
+- Public GitHub API metadata confirmed run `45166744371`, attempt 1, on `main` at that SHA, updated `2026-11-23T11:42:06Z`, with status `completed` and conclusion `success`. Job `137665526785` and all 15 reported steps succeeded, including PostgreSQL integration and Chromium. The API returned one run for the exact commit. [Hosted GitHub Actions run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45166744371)
+- `python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` exited 0 with eight passing tests on Python 3.14.3. `python3 -B scripts/check-zap-fixture.py --help` and the scoped `git diff --check` exited 0. All 16 local links and anchors across the three checkpoint documents resolved.
+- A separate synthetic CLI invocation returned four aggregate counts on stdout with empty stderr. A before-and-after snapshot confirmed that all three inputs were byte-identical and the temporary directory gained no files. Implementation reads the inputs locally in binary mode under byte limits. The checklist separately calls for human review of authorization and sanitization, verification of matching alert order and fingerprint groups, and PostgreSQL and browser checks using the accepted derivative.
+- **V014 (P3), open.** `scripts/check-zap-fixture.py:143–147` uses the default `argparse` error handler. `python3 -B scripts/check-zap-fixture.py original.json derivative.json provenance.json /fictional/private-path-marker.json` exited 2 and echoed the synthetic path in stderr. This contradicts the checkpoint's fixed-diagnostics claim for invalid invocations. Use a fixed error diagnostic alongside usage and test that a malformed invocation does not disclose argument values.
+
+**Verdict:** verified the hosted CI result, documentation links and normal preflight path at checkpoint 15. The diagnostic privacy claim remains open under V014. The genuine-report acceptance gate still requires an existing authorized Juice Shop ZAP Traditional JSON report and its provenance, followed by the checklist checks. This verification used synthetic inputs and public metadata only.
+
+## Independent verification — M1-20261123-16
+
+Verified on 2026-11-23 at baseline commit `5a1cd7427fbfca196d3dc59bea65555a256046e6`. All five frozen SHA-256 hashes matched before and after the checks. The scoped `git diff --check` exited 0.
+
+- **V014 resolved.** Repeated the original invocation with the extra `/fictional/private-path-marker.json` positional argument. An unknown option with a synthetic value and an invocation missing two required arguments produced the same result. Each exited 2 with empty stdout and fixed stderr `Expected original, derivative and provenance file paths. Use --help.`. `--help` exited 0 with usage on stdout and empty stderr.
+- `python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` exited 0 with all nine tests passing on Python 3.14.3, including the new diagnostic regression.
+- The README and implementation status record the hosted CI success for the baseline commit and link to run `45166744371`, consistent with the independently observed metadata in checkpoint 15. The nine local Python tests are recorded separately from the hosted run. [Hosted GitHub Actions run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45166744371)
+
+**Verdict:** checkpoint 16 independently verified at its recorded hashes. No new findings. Genuine-report acceptance still requires a ZAP Traditional JSON report from an authorized Juice Shop lab and its provenance, followed by the checklist checks.

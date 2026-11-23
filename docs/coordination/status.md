@@ -2,9 +2,9 @@
 
 Role: main implementation agent. Scope: M0 and M1.
 
-Current milestone: M0/M1. The host foundation and synthetic offline workflow run locally. Guide, CI compatibility and ARM64 Compose slices passed independent verification. Hosted CI and the genuine authorized report remain separate gates.
+Current milestone: M0/M1. Hosted CI passed for `5a1cd74`. The host foundation and synthetic offline workflow have prior independent verification. Genuine-report acceptance still needs an authorized report and provenance.
 
-Current checkout baseline: `a1b523d8ad25b170466a09e4d758e8afacc55b39`. No application files are under edit. See checkpoint 14 for the frozen Compose changes and `review.md` for independent results. Earlier numbered checkpoints preserve the implementation history.
+Current checkout baseline: `5a1cd7427fbfca196d3dc59bea65555a256046e6`. No application files are under edit. See checkpoint 16 for the frozen CI record and fixture preflight, and `review.md` for independent results. Earlier checkpoints preserve the implementation history.
 
 ## Checkpoint 1 — M0 foundation — READY FOR REVIEW
 
@@ -237,3 +237,45 @@ b8177a4955a65d7e212e1460821688851dc97ca238de5b138bf42beba7acb034  docs/status.md
 Checkpoint 14 passed independent verification at all five frozen hashes. The verifier repeated startup, revision 4 migration, protected frontend/API checks, synthetic import, duplicate reuse, restart persistence and scoped cleanup in their own project. No findings were reported. See the [independent verification entry](review.md#independent-verification--m0-20261123-14).
 
 Final local checks: `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0, including three Vitest tests and byte-identical generated files. No scoped review findings remain open. Hosted CI has no observed run. Genuine-report acceptance needs an existing authorized Juice Shop ZAP Traditional JSON report and its provenance record.
+
+## M1-20261123-15 — Hosted CI result and genuine fixture preparation — READY FOR VERIFICATION
+
+Baseline commit: `5a1cd7427fbfca196d3dc59bea65555a256046e6`. Read-only GitHub comparison found `main` identical to this baseline, and the local checkout started clean.
+
+Observed CI: GitHub's run list showed one run for the commit. Run `45166744371`, attempt 1, initially reported `in_progress` and then `completed` with conclusion `success`. The `check` job (ID `137665526785`) and all its listed steps succeeded, including PostgreSQL integration and Chromium. No CI changes were needed. [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45166744371)
+
+Behavior: the checklist and read-only CLI check private original and sanitized derivative digests against supplied provenance, require authorization reference, scan time and a sanitization record, and compare site/alert/instance counts by position. Output is limited to aggregate counts and fixed diagnostics. The CLI rejects the repository's labeled synthetic report. Authorization, sanitization review, independent fingerprints, integration and browser persistence are separate checklist items for the genuine input.
+
+Checks: on Python 3.14.3, `python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` exited 0 with eight tests. `python3 scripts/check-zap-fixture.py --help` and `git diff --check` exited 0. A local link check resolved all 16 relative links in the three changed Markdown files. Existing app and Compose sources are unchanged. The search checked only the repository, its history and documented artifact locations and found only the synthetic fixture.
+
+Remaining gates: independent verification of these files and the genuine report gate. The missing input is the local path to an existing genuine ZAP Traditional JSON report from an authorized Juice Shop lab, plus its provenance record with the authorization reference, scan time and available tool/target/plan metadata.
+
+```text
+b018f4e806965bcea6c1872d8ccd47a887b72f3f1af23cf9c74affd1ed9298be  README.md
+d66cf4195dedfadecbb4126d95f9ae1f86aa2108e0535283850e5596658e4712  docs/status.md
+68c260cf6df4ea43e94d6cdd749d63e1d90fa7d22c7b0a699bcaaef387a01333  docs/fixture-provenance.md
+0bedc1dada3be3ed3939d46446e285e0e770cb8781d39e7aad5c28cde8300107  scripts/check-zap-fixture.py
+dc48c5edeb93fac571e84bcbbf030a45bc72d136b5933629751a394b1bdd7a0d  scripts/test_check_zap_fixture.py
+```
+
+Checkpoint 15 is superseded for the preflight CLI, its tests and the check record in `docs/status.md`. The verifier confirmed the hosted result and reproduced V014, which exposed an unexpected path in an argument error. The README and acceptance checklist hashes are unchanged.
+
+## M1-20261123-16 — Private preflight diagnostics — READY FOR VERIFICATION
+
+Baseline commit: `5a1cd7427fbfca196d3dc59bea65555a256046e6`. This checkpoint supersedes 15 for preflight verification. The verifier already confirmed the hosted result in the checkpoint 15 review. The README and checklist hashes match that review.
+
+V014 addressed. Passing an extra fictional path originally exited 2 and printed the path verbatim. The same invocation now exits 2, leaves stdout empty and prints a fixed diagnostic with a `--help` hint. The regression test verifies that the path stays private. Success counts and preflight validation remain covered by the eight prior tests.
+
+Checks: `python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` exited 0 with nine tests. `python3 scripts/check-zap-fixture.py --help`, the standalone privacy probe and `git diff --check` exited 0. The hosted CI success was verified separately for run `45166744371` on the baseline commit.
+
+Remaining gates: independent V014 recheck and a genuine authorized Juice Shop report plus provenance. A candidate-specific sanitization review, expected fingerprints and real-data integration and browser persistence depend on that report.
+
+```text
+b018f4e806965bcea6c1872d8ccd47a887b72f3f1af23cf9c74affd1ed9298be  README.md
+8ec839ac3649d11a36bc5e64e6e668b5769c8b5a31cd8c978a98d1b1f489871c  docs/status.md
+68c260cf6df4ea43e94d6cdd749d63e1d90fa7d22c7b0a699bcaaef387a01333  docs/fixture-provenance.md
+4bd930682ddf0e5b33a57d85c1aa38a92ec7e66e4dca2d73bc08308016dd7ad8  scripts/check-zap-fixture.py
+6fee1d4fd7a50d7b516c9005d301092a04af2db95eda4f736c82bab0d51a5af2  scripts/test_check_zap_fixture.py
+```
+
+Checkpoint 16 passed independent verification at all five frozen hashes. The verifier repeated the original V014 command, checked unknown-option and missing-argument diagnostics, and ran all nine tests. V014 is resolved and no new findings were reported. The only remaining acceptance gate requires the genuine authorized report and provenance. [Independent verification](review.md#independent-verification--m1-20261123-16)
