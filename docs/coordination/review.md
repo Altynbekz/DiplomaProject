@@ -122,3 +122,68 @@ The full 68-file manifest is in the reviewer's temp dir (`/tmp/review-99f0/hashe
 ---
 
 Reviewer note: I cannot watch for changes automatically. The last checkpoint reviewed is **3**, at the hashes above. A new invocation is needed to review later checkpoints.
+
+## Independent verification — M1-20261123-07
+
+Verified on 2026-11-23 at baseline commit `21a096f899ed43b340f26fbf6cceabf288f46530`. Scope: the five frozen backend files listed in checkpoint 07. All five SHA-256 values matched before and after verification. Frontend files were outside the frozen slice. PostgreSQL 15.19 and Go 1.27.1 on macOS arm64.
+
+### Independent checks
+
+- From `backend/`, `GOCACHE=/private/tmp/diploma-verifier-go-cache GOFLAGS=-mod=readonly go test -count=1 ./internal/zap ./internal/scope ./internal/httpapi ./internal/service ./internal/domain` exited 0. Service/domain are compilation checks. Database cases were run separately.
+- `GOFLAGS=-mod=readonly make test-integration` exited 0 against a disposable PostgreSQL cluster under the Go race detector. Applied migrations 1 through 4 in stages and confirmed a repeat upgrade was a no-op. All six escaped-NUL tests returned the expected 422 and pointer for finding title, parameter identity, private evidence, unlocated JSONB, provenance value and provenance key, with no partial rows. Existing import, exact bytes and audit, concurrent duplicate, provenance conflict, import scope, deterministic history and runtime privilege checks also passed.
+- `git diff --check` on the checkpoint files exited 0.
+- A second disposable integration run used a temporary Go test overlay to probe two adjacent PostgreSQL representability limits. The overlay asserted the observed generic 500 responses for the two inputs below, so its exit 0 reproduces the failures. It is not a fix or an acceptance pass.
+
+### Earlier findings recheck
+
+| ID | Current disposition | Evidence |
+| --- | --- | --- |
+| R001 | Verified resolved | Query names alone are decoded. Unit cases and the PostgreSQL variant import accepted raw semicolons and malformed percent text confined to private values. |
+| R002 | Verified resolved for new imports | The fixed-clock PostgreSQL test proved deterministic source and receipt order, distinct severities in one finding, and import-scoped severity. Legacy observation timestamps remain as stored. |
+| R003 | Verified resolved | The test proved operator version/template remain null when omitted and the report-declared version remains separate. |
+| R004 | Verified resolved | Conflicting provenance returns 409 with the existing record unchanged. Concurrent duplicates and matching provenance reuse the import. |
+| R005 | Verified resolved | Both the unit token limit test and the API test cover a 65,537-byte numeric token. |
+| R006 | Baseline fix present; current UI pending verification | Git baseline 21a096f reads finding verification, classification and both assessment fields from the API; current frontend edits were outside this checkpoint. Backend M1 default states are expected. |
+| R007 | Verified documented decision | README and the target registry example specify DNS-style service names without underscores. |
+| R008 | Verified resolved | Unit and PostgreSQL coverage now includes site-origin mismatch, missing instances, empty fingerprint entries, and atomic field/count/depth failures. |
+| R009 | Verified resolved | The golden fingerprint tests pass for nil, empty, unsorted and duplicate query names and verify caller data remains unchanged. |
+
+### New findings
+
+- **V010 (P2), open.** `backend/internal/zap/parser.go` preserves an unlocated alert’s entire decoded map in JSONB. A synthetic extra field containing the short numeric token `1e999999` passed scalar limits and then returned HTTP 500 during report creation. PostgreSQL JSONB represents numbers with its bounded numeric type. Validate JSONB representability for this path and return a typed field error, or use a reversible representation that keeps the full alert available. Add the reproducer to disposable integration coverage.
+- **V011 (P2), open.** `backend/internal/service/service.go` checks the byte length of compact Go JSON, while `00001_imports.sql` bounds `octet_length(source_metadata_json::text)`. PostgreSQL adds spaces in that rendering. A synthetic supplied authorization reference sized so the normalized Go JSON was exactly 65,536 bytes passed Go validation and then returned HTTP 500. Align the check with the stored representation or map this specific database constraint to the documented 413. Retain the database constraint and add a boundary test.
+
+### Verdict
+
+The escaped-NUL slice is independently verified at the recorded hashes. V010 and V011 remain open for import reliability. Genuine-report acceptance, the new frontend and Compose startup were outside this verification pass. No scanner was started and no existing database was accessed.
+
+## Independent verification — M1-20261123-09
+
+Verified on 2026-11-23 at baseline commit `21a096f899ed43b340f26fbf6cceabf288f46530`. The five backend file hashes matched the frozen checkpoint. `git diff --check -- backend` reported no whitespace errors.
+
+- `GOFLAGS=-mod=readonly make test-integration` exited 0 on macOS arm64 with Go 1.27.1, PostgreSQL 15.19 and the Go race detector. Applied migrations 1 through 4 in the disposable cluster and repeated the migration command successfully.
+- **V010 resolved.** The previously failing large numeric extension imported successfully. The stored unlocated alert retained the original numeric literal in its versioned JSON text field, and the independently executed test confirmed identical original bytes.
+- **V011 resolved.** PostgreSQL's provenance size constraint remains in place. The independently executed exact-size case returned the documented `413 limit_exceeded` and left no import row.
+- The six escaped-NUL cases still returned pointer-specific 422 with no partial import, finding or observation rows. The existing concurrency, provenance conflict, scope, ordering, raw download and least-privileged role checks passed.
+
+**Verdict:** independently verified for checkpoint 09. The genuine authorized report and Compose startup remain separate, unverified gates.
+
+## Independent verification — M1-20261123-08
+
+Verified on 2026-11-23 at baseline commit `21a096f899ed43b340f26fbf6cceabf288f46530`. All five frontend hashes matched before and after verification.
+
+- `npm --prefix frontend run fmt:check`, `npm --prefix frontend run lint` (TypeScript and ESLint), `npm --prefix frontend test` (three tests), and `git diff --check -- frontend` passed. The production Vite build to a disposable output directory passed.
+- `E2E_SCREENSHOTS=/private/tmp/diploma-verifier-ui-08 GOFLAGS=-mod=readonly make test-e2e` exited 0. Chromium and the separately created PostgreSQL cluster verified the protected unlock, target creation, synthetic import, exact duplicates and provenance conflict, safe evidence rendering, preserved severity filter on return, acknowledgement-gated byte-identical download, reload and restart persistence, and readiness during database outage.
+- Reviewed the captured 1280×900 unlock/findings and 390×844 findings/evidence layouts. The screens have white panels, gray page backgrounds and restrained controls. The narrow findings table has its own scroll region, and the evidence detail independently shows scanner severity, verification, OWASP category and CVSS. **R006 is resolved** on the verified UI.
+- **V012 (P3), open.** A cursor-only findings URL with an invalid or outdated cursor has no visible recovery action. A separate temporary Chromium probe against a fresh local API and PostgreSQL target opened the target URL with only `?cursor=stale-cursor`. The API returned `400 invalid_request` and the page displayed “Invalid or mismatched cursor.” Neither Clear filters nor First page was offered. `filtersActive` excludes cursor and the pager renders only after a successful response. Cursor links can become stale after token rotation, since the cursor signing key comes from the API token. Offer a First page action on a cursor error that clears cursor alone and preserves any filters, and cover this recovery in the browser test.
+
+**Verdict:** verified the light workspace and existing happy path at checkpoint 08. A superseding checkpoint should address V012. This pass used synthetic data only.
+
+## Independent verification — M1-20261123-10
+
+Verified on 2026-11-23 at baseline commit `21a096f899ed43b340f26fbf6cceabf288f46530`. The five frozen frontend SHA-256 values matched before and after the checks. `git diff --check -- frontend` passed.
+
+- `GOFLAGS=-mod=readonly make test-e2e` exited 0. Both Chromium phases passed against a separately created PostgreSQL database. The first exercised the real API 400 for a cursor-only findings URL, clicked **First page**, verified that the URL no longer included the cursor, and recovered all four original synthetic rows. The database outage check returned health 200, readiness 503, and authentication 401 where expected. The second Chromium phase verified persisted rows after PostgreSQL and API restart.
+- The findings recovery handler clears only cursor and retains other query filters. For targets and observations, the pagers are likewise outside the success-only rendering branches, and a First page action remains available whenever those views have an active cursor.
+
+**Verdict:** V012 resolved and frontend checkpoint 10 independently verified at its recorded hashes. Together with the independently verified backend checkpoint 09, no review findings remain open for the scoped changes. Genuine authorized report acceptance and Compose startup have not been verified.

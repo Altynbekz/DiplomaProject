@@ -10,6 +10,7 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"reflect"
 	"strings"
@@ -129,6 +130,14 @@ func (s *Service) Import(ctx context.Context, targetID, request string, raw []by
 	if len(meta) > 65536 {
 		return Import{}, domain.Fail(413, "limit_exceeded", "/provenance", "Provenance exceeds 64 KiB")
 	}
+	// Validate the exact shape persisted as JSONB, including nested keys.
+	var persistedMetadata map[string]any
+	if err := json.Unmarshal(meta, &persistedMetadata); err != nil {
+		return Import{}, err
+	}
+	if err := domain.ValidateStorageJSONText(persistedMetadata, "/provenance"); err != nil {
+		return Import{}, err
+	}
 	tx, q, e := s.Store.Begin(ctx)
 	if e != nil {
 		return Import{}, e
@@ -167,6 +176,14 @@ func (s *Service) Import(ctx context.Context, targetID, request string, raw []by
 	unlocated, _ := json.Marshal(r.Unlocated)
 	e = q.CreateImport(ctx, db.CreateImportParams{ID: id, TargetID: targetID, ReportSha256: r.Hash, ParserVersion: zap.Version, RawBytes: raw, SourceMetadataJson: meta, WarningsJson: warnings, UnlocatedAlertsJson: unlocated, FindingCount: int32(len(unique)), ObservationCount: int32(len(r.Observations)), CreatedAt: now, ReportDeclaredVersion: pgtype.Text{String: r.Version, Valid: declaredVersion != nil}})
 	if e != nil {
+		// The stored-size constraint uses PostgreSQL's JSONB text rendering,
+		// which may be larger than the compact client-side encoding.
+		var violation *pgconn.PgError
+		if errors.As(e, &violation) && violation.Code == "23514" &&
+			violation.TableName == "report_imports" &&
+			violation.ConstraintName == "report_imports_source_metadata_json_check" {
+			return Import{}, domain.Fail(413, "limit_exceeded", "/provenance", "Stored provenance exceeds 64 KiB")
+		}
 		return Import{}, e
 	}
 	// Hold the target lock while assigning receipt times. Preserve source

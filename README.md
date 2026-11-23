@@ -20,6 +20,10 @@ Setup generates ignored secret files. `.env` contains the local operator ID and 
 
 ## Import and inspect a report
 
+The workspace uses a light interface with findings and evidence kept on separate pages. Optional provenance and advanced filters open inline. On mobile, scroll the findings table sideways to reach the assessment columns. Return to findings from an observation to restore the filter and page.
+
+The importer rejects decoded NUL characters in database-bound fields with a field pointer. Private data kept only in the original report is preserved byte for byte. Unlocated alerts keep their full decoded JSON as reversible text in a versioned envelope, so large numeric literals in extensions survive storage. Oversized stored provenance receives a size error and leaves the existing data intact.
+
 1. Unlock the workspace and create a Juice Shop target. The server supplies the registered origin.
 2. Open the target and select your existing genuine ZAP Traditional JSON report. Supply available metadata in the provenance JSON field. See [fixture provenance](docs/fixture-provenance.md) for the fields and the distinction between original and sanitized hashes.
 3. Import the report. The UI shows its hash, parser version, finding and observation counts, unlocated-alert count, warnings and provenance. The report-declared ZAP version and parser-detected format appear separately from operator provenance. An identical upload reuses the existing import ID when provenance is omitted or matches the stored record. Different provenance receives a 409 conflict. Import provenance is immutable. For imports created before migration 4, the separately stored report version is unavailable and legacy provenance may include report-derived defaults. See [the provenance decision](docs/decisions/0001-immutable-import-provenance.md) for upgrade behavior.

@@ -199,6 +199,64 @@ func TestIntegrationImport(t *testing.T) {
 			}
 		})
 	}
+	// JSON escapes can carry a NUL even though the uploaded bytes are valid UTF-8.
+	const escapedNUL = `\u0000`
+	for _, tc := range []struct{ name, report, provenance, pointer string }{
+		{"NUL in finding title", strings.Replace(string(raw), "Synthetic <script>", "Synthetic "+escapedNUL+"<script>", 1), "", "/site/0/alerts/0/name"},
+		{"NUL in parameter identity", strings.Replace(string(raw), `"param": "q"`, `"param": "q`+escapedNUL+`"`, 1), "", "/site/0/alerts/0/instances/0/param"},
+		{"NUL in private evidence", strings.Replace(string(raw), "synthetic attack A", "synthetic "+escapedNUL+" attack A", 1), "", "/site/0/alerts/0/instances/0/attack"},
+		{"NUL in unlocated JSONB", strings.Replace(string(raw), "Synthetic unlocated alert", "Synthetic "+escapedNUL+" unlocated alert", 1), "", "/site/0/alerts/2/name"},
+		{"NUL in provenance value", string(raw), `{"authorization_ref":"reference` + escapedNUL + `"}`, "/provenance/authorization_ref"},
+		{"NUL in provenance key", string(raw), `{"addon_versions":{"addon` + escapedNUL + `":"1"}}`, "/provenance/addon_versions"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var response *httptest.ResponseRecorder
+			if tc.provenance != "" {
+				response = upload([]byte(tc.report), tc.provenance)
+			} else {
+				response = upload([]byte(tc.report))
+			}
+			var problem struct {
+				Code   string
+				Errors []struct{ Pointer string }
+			}
+			if response.Code != 422 || json.Unmarshal(response.Body.Bytes(), &problem) != nil || problem.Code != "validation_failed" ||
+				len(problem.Errors) != 1 || problem.Errors[0].Pointer != tc.pointer {
+				t.Errorf("wanted 422 validation_failed at %s, got %d %s", tc.pointer, response.Code, response.Body)
+			}
+			var imports, findings, observations int
+			err := pool.QueryRow(ctx, `SELECT
+    (SELECT count(id) FROM report_imports WHERE target_id=$1),
+    (SELECT count(id) FROM findings WHERE target_id=$1),
+    (SELECT count(id) FROM observations WHERE target_id=$1)`, target.ID).Scan(&imports, &findings, &observations)
+			if err != nil || imports != 0 || findings != 0 || observations != 0 {
+				t.Fatalf("partial import: counts %d/%d/%d: %v", imports, findings, observations, err)
+			}
+		})
+	}
+
+	t.Run("normalized provenance size limit", func(t *testing.T) {
+		value := ""
+		meta := service.Provenance{SchemaVersion: "report-provenance/v2", AuthorizationRef: &value, SanitizationSteps: []string{}}
+		base, err := json.Marshal(meta)
+		if err != nil {
+			t.Fatal(err)
+		}
+		value = strings.Repeat("a", 65536-len(base))
+		compact, err := json.Marshal(meta)
+		if err != nil || len(compact) != 65536 {
+			t.Fatal("test must exercise the exact compact size limit", len(compact), err)
+		}
+		response := upload(raw, `{"authorization_ref":"`+value+`"}`)
+		if response.Code != 413 || !strings.Contains(response.Body.String(), `"code":"limit_exceeded"`) {
+			t.Errorf("expected documented provenance size limit, got %d %s", response.Code, response.Body)
+		}
+		var count int
+		if err := pool.QueryRow(ctx, "SELECT count(id) FROM report_imports WHERE target_id=$1", target.ID).Scan(&count); err != nil || count != 0 {
+			t.Fatalf("oversized provenance left partial import: %d %v", count, err)
+		}
+	})
+
 	var wg sync.WaitGroup
 	results := make(chan *httptest.ResponseRecorder, 4)
 	for range 4 {
@@ -401,6 +459,23 @@ func TestIntegrationImport(t *testing.T) {
 	if !foundOriginal {
 		t.Fatal("the original import filter must ignore later observations", w.Body)
 	}
+
+	t.Run("unlocated alert retains a large exponent", func(t *testing.T) {
+		unlocated := []byte(`{"@version":"synthetic","site":[{"@name":"http://juice-shop:3000","alerts":[{"pluginid":"1","extra":1e999999}]}]}`)
+		response := upload(unlocated)
+		var imported service.Import
+		if response.Code != 201 || json.Unmarshal(response.Body.Bytes(), &imported) != nil ||
+			imported.UnlocatedCount != 1 || imported.ObservationCount != 0 {
+			t.Fatalf("expected a retained unlocated alert, got %d %s", response.Code, response.Body)
+		}
+		var encoded string
+		var rawBytes []byte
+		err := pool.QueryRow(ctx, `SELECT unlocated_alerts_json->0->>'alert_json', raw_bytes
+    FROM report_imports WHERE id=$1`, imported.ID).Scan(&encoded, &rawBytes)
+		if err != nil || !strings.Contains(encoded, `"extra":1e999999`) || !bytes.Equal(rawBytes, unlocated) {
+			t.Fatalf("unlocated alert or original bytes changed: %v", err)
+		}
+	})
 
 	// Composite FKs reject a report/finding combination from another target.
 	secondTarget := "11111111-1111-4111-8111-111111111111"

@@ -1,4 +1,10 @@
-import { StrictMode, createContext, useContext, useState } from "react";
+import {
+  StrictMode,
+  createContext,
+  useContext,
+  useState,
+  type FormEvent,
+} from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import {
@@ -7,53 +13,81 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Targets, TargetPage, FindingPage } from "../features/evidence";
+import { APIError, request } from "../api/client";
+import type { components } from "../api/schema";
 import "./style.css";
+
 const Session = createContext("");
 export function useToken() {
   return useContext(Session);
 }
+
 export function Workspace() {
   const [token, setToken] = useState("");
+  const [unlocking, setUnlocking] = useState(false);
+  const [unlockError, setUnlockError] = useState("");
   const client = useQueryClient();
+
+  async function unlock(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (unlocking) return;
+    const form = event.currentTarget;
+    const candidate = String(new FormData(form).get("token") ?? "").trim();
+    if (!candidate) {
+      setUnlockError("Enter the API token.");
+      return;
+    }
+    setUnlocking(true);
+    setUnlockError("");
+    try {
+      const targets = await request<components["schemas"]["TargetPage"]>(
+        candidate,
+        "/targets?limit=50&cursor=",
+      );
+      client.setQueryData(["targets", ""], targets);
+      form.reset();
+      setToken(candidate);
+    } catch (error) {
+      setUnlockError(
+        error instanceof APIError && error.problem.status === 401
+          ? "Token not accepted. Check it and try again."
+          : "Could not reach the workspace. Check that the API is running and try again.",
+      );
+    } finally {
+      setUnlocking(false);
+    }
+  }
+
   return (
     <>
-      <header>
-        <Link to="/">D / Evidence workspace</Link>
-        <span>Local lab · offline import</span>
-        {token && (
-          <button
-            onClick={() => {
-              setToken("");
-              client.clear();
-            }}
-          >
-            Lock workspace
-          </button>
-        )}
-      </header>
-      <main>
-        <p className="eyebrow">DIPLOMA RESEARCH PROTOTYPE / M1</p>
-        <h1>Scanner evidence, kept in context.</h1>
-        <p>
-          Review persisted observations from an authorized Juice Shop lab.
-          Scanning is disabled. Verification and CVSS assessment come later.
-        </p>
-        {!token ? (
-          <section className="panel">
-            <h2>Unlock the local workspace</h2>
-            <p>
-              Your API token stays in memory and clears when you reload or lock
-              this page.
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const value = new FormData(form).get("token");
-                if (typeof value === "string") setToken(value.trim());
-                form.reset();
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+      <header className="site-header">
+        <div className="header-inner">
+          <Link className="brand" to="/">
+            Vulnerability assessment
+          </Link>
+          {token && (
+            <button
+              type="button"
+              onClick={() => {
+                setToken("");
+                setUnlockError("");
+                client.clear();
               }}
             >
+              Lock workspace
+            </button>
+          )}
+        </div>
+      </header>
+      <main id="main-content" tabIndex={-1}>
+        {!token ? (
+          <section className="panel unlock-panel">
+            <h1>Unlock workspace</h1>
+            <p className="muted">The API token clears on reload or lock.</p>
+            <form className="stack" onSubmit={unlock}>
               <label>
                 API token
                 <input
@@ -62,9 +96,17 @@ export function Workspace() {
                   required
                   autoComplete="off"
                   spellCheck={false}
+                  aria-describedby={unlockError ? "unlock-error" : undefined}
                 />
               </label>
-              <button>Unlock</button>
+              {unlockError && (
+                <p id="unlock-error" className="error" role="alert">
+                  {unlockError}
+                </p>
+              )}
+              <button className="primary" disabled={unlocking}>
+                {unlocking ? "Checking token…" : "Unlock"}
+              </button>
             </form>
           </section>
         ) : (
@@ -76,22 +118,20 @@ export function Workspace() {
               <Route
                 path="*"
                 element={
-                  <p>
-                    Page not found. <Link to="/">Return to targets</Link>
-                  </p>
+                  <>
+                    <h1>Page not found</h1>
+                    <Link to="/">Return to targets</Link>
+                  </>
                 }
               />
             </Routes>
           </Session.Provider>
         )}
       </main>
-      <footer>
-        Evidence is a scanner assertion. Unreviewed does not mean confirmed.
-        CVSS: Not assessed.
-      </footer>
     </>
   );
 }
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: false, refetchOnWindowFocus: false },

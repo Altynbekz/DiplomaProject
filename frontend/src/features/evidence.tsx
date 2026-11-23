@@ -1,5 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   APIError,
@@ -24,7 +29,8 @@ export function ErrorState({ error }: { error: unknown }) {
           </small>
           {error.problem.errors.map((v, i) => (
             <p key={i}>
-              {v.pointer}: {v.message}
+              {v.pointer && <code>{v.pointer} · </code>}
+              {v.message}
             </p>
           ))}
         </>
@@ -38,10 +44,12 @@ export function AssessmentValue({
   assessment: Finding["latest_base"];
 }) {
   if (assessment === null) return <>Not assessed</>;
-  if (assessment.score === null) return <>Incomplete</>;
+  if (assessment.score === null)
+    return <>Incomplete{assessment.stale && " (historical)"}</>;
   return (
     <>
       {assessment.score}
+      {assessment.stale && " (historical)"}
       {assessment.vector && (
         <>
           {" "}
@@ -62,14 +70,19 @@ function Pager({
   onFirst: () => void;
   active: boolean;
 }) {
+  if (!active && !next) return null;
   return (
     <nav aria-label="Pagination">
-      <button disabled={!active} onClick={onFirst}>
-        First page
-      </button>
-      <button disabled={!next} onClick={() => next && onNext(next)}>
-        Next page
-      </button>
+      {active && (
+        <button type="button" onClick={onFirst}>
+          First page
+        </button>
+      )}
+      {next && (
+        <button type="button" onClick={() => onNext(next)}>
+          Next page
+        </button>
+      )}
     </nav>
   );
 }
@@ -79,6 +92,7 @@ export function Targets() {
   const [cursor, setCursor] = useState("");
   const query = useQuery({
     queryKey: ["targets", cursor],
+    staleTime: 5_000,
     queryFn: () =>
       request<components["schemas"]["TargetPage"]>(
         token,
@@ -95,61 +109,60 @@ export function Targets() {
     onSuccess: () => client.invalidateQueries({ queryKey: ["targets"] }),
   });
   return (
-    <>
-      <h2>Lab targets</h2>
-      <p>
-        Origins are resolved from the server registry; this screen cannot
-        schedule scans.
-      </p>
-      <section className="panel">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const name = new FormData(e.currentTarget).get("name");
-            if (typeof name === "string") create.mutate(name);
-          }}
-        >
-          <label>
-            Target name
-            <input
-              name="name"
-              required
-              maxLength={200}
-              placeholder="Juice Shop lab"
-            />
-          </label>
-          <button disabled={create.isPending}>
-            {create.isPending ? "Creating…" : "Create Juice Shop target"}
-          </button>
-        </form>
-        {create.error && <ErrorState error={create.error} />}
-      </section>
+    <div className="page-stack">
+      <h1>Lab targets</h1>
       {query.isPending && <p role="status">Loading targets…</p>}
       {query.error && <ErrorState error={query.error} />}
       {query.data && (
         <>
-          <ul className="targets">
-            {query.data.items.map((t) => (
-              <li className="panel" key={t.id}>
-                <Link to={`/targets/${t.id}`}>
-                  <h3>{t.name}</h3>
-                </Link>
-                <code>{t.canonical_origin}</code>
-              </li>
-            ))}
-          </ul>
-          {query.data.items.length === 0 && (
-            <p>No reports imported. Create a registered lab target to start.</p>
+          {query.data.items.length === 0 && !cursor ? (
+            <section className="panel stack">
+              <h2>Create Juice Shop target</h2>
+              <p className="muted">
+                No reports imported. Create a target using the registered lab
+                origin.
+              </p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const name = new FormData(e.currentTarget).get("name");
+                  if (typeof name === "string") create.mutate(name);
+                }}
+              >
+                <label>
+                  Target name
+                  <input
+                    name="name"
+                    required
+                    maxLength={200}
+                    placeholder="Juice Shop lab"
+                  />
+                </label>
+                <button className="primary" disabled={create.isPending}>
+                  {create.isPending ? "Creating…" : "Create Juice Shop target"}
+                </button>
+              </form>
+              {create.error && <ErrorState error={create.error} />}
+            </section>
+          ) : (
+            <ul className="targets stack">
+              {query.data.items.map((t) => (
+                <li className="panel target-row" key={t.id}>
+                  <Link to={`/targets/${t.id}`}>{t.name}</Link>
+                  <span className="muted">{t.canonical_origin}</span>
+                </li>
+              ))}
+            </ul>
           )}
-          <Pager
-            next={query.data.next_cursor}
-            onNext={setCursor}
-            onFirst={() => setCursor("")}
-            active={!!cursor}
-          />
         </>
       )}
-    </>
+      <Pager
+        next={query.data?.next_cursor ?? null}
+        onNext={setCursor}
+        onFirst={() => setCursor("")}
+        active={!!cursor}
+      />
+    </div>
   );
 }
 function PrivateEvidence({ id }: { id: string }) {
@@ -178,27 +191,34 @@ function PrivateEvidence({ id }: { id: string }) {
     },
   });
   return (
-    <details>
+    <details
+      className="evidence-info"
+      onToggle={(event) => {
+        if (!event.currentTarget.open) setAck(false);
+      }}
+    >
       <summary>Explicit private evidence access</summary>
-      <p>
-        The original report can contain credentials and personal data. Download
-        is audited. Review locally and retain it privately.
-      </p>
-      <label>
-        <input
-          type="checkbox"
-          checked={ack}
-          onChange={(e) => setAck(e.target.checked)}
-        />
-        I acknowledge this contains private lab data
-      </label>
-      <button
-        disabled={!ack || download.isPending}
-        onClick={() => download.mutate()}
-      >
-        Download original report
-      </button>
-      {download.error && <ErrorState error={download.error} />}
+      <div className="stack">
+        <p>
+          The original report can contain credentials and personal data.
+          Download is audited. Review locally and retain it privately.
+        </p>
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={ack}
+            onChange={(e) => setAck(e.target.checked)}
+          />
+          I acknowledge this contains private lab data
+        </label>
+        <button
+          disabled={!ack || download.isPending}
+          onClick={() => download.mutate()}
+        >
+          Download original report
+        </button>
+        {download.error && <ErrorState error={download.error} />}
+      </div>
     </details>
   );
 }
@@ -209,47 +229,62 @@ export function ImportCard({ id }: { id: string }) {
     queryFn: () => request<ImportResult>(token, `/imports/${id}`),
   });
   return (
-    <section className="panel">
-      <h3>Import provenance</h3>
-      {q.isPending && <p>Loading import…</p>}
+    <div className="stack">
+      {q.isPending && <p role="status">Loading report details…</p>}
       {q.error && <ErrorState error={q.error} />}
       {q.data && (
         <>
-          <dl>
-            <dt>SHA-256 of uploaded bytes</dt>
-            <dd>
-              <code>{q.data.report_sha256}</code>
-            </dd>
-            <dt>Parser</dt>
-            <dd>{q.data.parser_version}</dd>
-            <dt>Parser-detected report format</dt>
-            <dd>{q.data.parser_detected_format}</dd>
-            <dt>ZAP version declared by the report</dt>
-            <dd>{q.data.report_declared_version ?? "Unknown"}</dd>
-            <dt>Observations / findings / unlocated alerts</dt>
-            <dd>
-              {q.data.observation_count} / {q.data.finding_count} /{" "}
-              {q.data.unlocated_alert_count}
-            </dd>
-          </dl>
-          <details>
-            <summary>Recorded provenance (null means unknown)</summary>
-            {q.data.provenance.schema_version === "report-provenance/v1" && (
-              <p>
-                Legacy provenance may contain values copied from the report.
-              </p>
-            )}
-            <pre>{JSON.stringify(q.data.provenance, null, 2)}</pre>
+          {q.data.finding_count === 0 && (
+            <p>This report contains no located findings.</p>
+          )}
+          <p className="notice">
+            {q.data.observation_count} observations · {q.data.finding_count}{" "}
+            findings
+            {q.data.unlocated_alert_count > 0 &&
+              ` · ${q.data.unlocated_alert_count} unlocated`}
+            {q.data.warnings.some((w) => w.code === "incomplete_provenance") &&
+              " · Provenance incomplete"}
+          </p>
+          <details className="panel report-details">
+            <summary>Source report details</summary>
+            <div className="stack">
+              <dl>
+                <dt>SHA-256 of uploaded bytes</dt>
+                <dd>
+                  <code>{q.data.report_sha256}</code>
+                </dd>
+                <dt>Parser</dt>
+                <dd>{q.data.parser_version}</dd>
+                <dt>Parser-detected report format</dt>
+                <dd>{q.data.parser_detected_format}</dd>
+                <dt>ZAP version declared by the report</dt>
+                <dd>{q.data.report_declared_version ?? "Unknown"}</dd>
+                <dt>Import ID</dt>
+                <dd>
+                  <code>{q.data.id}</code>
+                </dd>
+              </dl>
+              <details className="evidence-info">
+                <summary>Recorded provenance (null means unknown)</summary>
+                {q.data.provenance.schema_version ===
+                  "report-provenance/v1" && (
+                  <p>
+                    Legacy provenance may contain values copied from the report.
+                  </p>
+                )}
+                <pre>{JSON.stringify(q.data.provenance, null, 2)}</pre>
+              </details>
+              <PrivateEvidence id={id} />
+              {q.data.warnings.map((w, i) => (
+                <p className="notice" key={i}>
+                  {w.code} · {w.pointer} · {w.message}
+                </p>
+              ))}
+            </div>
           </details>
-          <PrivateEvidence id={id} />
-          {q.data.warnings.map((w, i) => (
-            <p className="notice" key={i}>
-              {w.code} · {w.pointer} · {w.message}
-            </p>
-          ))}
         </>
       )}
-    </section>
+    </div>
   );
 }
 export function TargetPage() {
@@ -262,6 +297,14 @@ export function TargetPage() {
     queryKey: ["target", id],
     queryFn: () => request<Target>(token, `/targets/${id}`),
   });
+  const { search } = useLocation();
+  const importID = params.get("import_id");
+  const filtersActive = [
+    "import_id",
+    "category",
+    "verification",
+    "scanner_severity",
+  ].some((key) => Boolean(params.get(key)));
   const filter = new URLSearchParams(params);
   filter.set("limit", "50");
   const findings = useQuery({
@@ -281,6 +324,7 @@ export function TargetPage() {
       void client.invalidateQueries({ queryKey: ["import", im.id] });
     },
   });
+  const reportID = importID || upload.data?.id;
   function change(key: string, value: string) {
     const next = new URLSearchParams(params);
     next.delete("cursor");
@@ -290,6 +334,8 @@ export function TargetPage() {
   }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (upload.isPending) return;
+    upload.reset();
     setLocalError(null);
     const data = new FormData(e.currentTarget);
     const provenance = data.get("provenance");
@@ -304,178 +350,236 @@ export function TargetPage() {
     upload.mutate(data);
   }
   return (
-    <>
-      <Link to="/">← Targets</Link>
-      <h2>{t.data?.name ?? "Lab target"}</h2>
+    <div className="page-stack">
+      <div className="stack">
+        <Link to="/">← Targets</Link>
+        <h1>{t.data?.name ?? "Lab target"}</h1>
+        {t.data && <p className="muted">{t.data.canonical_origin}</p>}
+      </div>
+      {t.isPending && <p role="status">Loading target…</p>}
       {t.error && <ErrorState error={t.error} />}
-      <p>
-        <code>{t.data?.canonical_origin}</code>
-      </p>
-      <section className="panel">
-        <h3>Import ZAP Traditional JSON</h3>
-        <p>
-          Select a report from your authorized lab. Uploading does not contact
-          report URLs. Maximum total upload: 20 MiB.
-        </p>
-        <form onSubmit={submit}>
-          <label>
-            Report file
-            <input
-              name="report"
-              type="file"
-              accept=".json,application/json"
-              required
-            />
-          </label>
-          <label>
-            Provenance JSON (optional; unknown metadata stays null)
-            <textarea
-              name="provenance"
-              rows={4}
-              placeholder={'{"authorization_ref":null,"scan_time":null}'}
-            />
-          </label>
-          <button disabled={upload.isPending}>
-            {upload.isPending ? "Importing…" : "Import report"}
-          </button>
-        </form>
-        {localError != null && <ErrorState error={localError} />}{" "}
-        {upload.error && <ErrorState error={upload.error} />}{" "}
-        {upload.data && (
-          <p role="status">
-            {upload.data.duplicate
-              ? "Existing import reused."
-              : "Report persisted."}{" "}
-            {upload.data.observation_count} observations.
-          </p>
-        )}
-      </section>
-      {params.get("import_id") && <ImportCard id={params.get("import_id")!} />}
-      <section>
-        <h3>Persisted findings</h3>
-        <div className="filters">
-          <label>
-            Scanner severity
-            <select
-              aria-label="Scanner severity"
-              value={params.get("scanner_severity") ?? ""}
-              onChange={(e) => change("scanner_severity", e.target.value)}
-            >
-              <option value="">All severities</option>
-              {["informational", "low", "medium", "high", "unknown"].map(
-                (v) => (
-                  <option key={v}>{v}</option>
-                ),
-              )}
-            </select>
-          </label>
-          <label>
-            Verification
-            <select
-              aria-label="Verification"
-              value={params.get("verification") ?? ""}
-              onChange={(e) => change("verification", e.target.value)}
-            >
-              <option value="">All verification states</option>
-              {[
-                "unreviewed",
-                "confirmed",
-                "false_positive",
-                "inconclusive",
-              ].map((v) => (
-                <option key={v}>{v}</option>
+      {t.data && (
+        <>
+          <section className="panel stack">
+            <h2>Import report</h2>
+            <p className="muted">
+              ZAP Traditional JSON from an authorized lab. Maximum upload: 20
+              MiB.
+            </p>
+            <form onSubmit={submit}>
+              <label>
+                Report file
+                <input
+                  name="report"
+                  type="file"
+                  accept=".json,application/json"
+                  required
+                />
+              </label>
+              <button className="primary" disabled={upload.isPending}>
+                {upload.isPending ? "Importing…" : "Import report"}
+              </button>
+              <details className="subsection">
+                <summary>Optional report provenance</summary>
+                <label>
+                  Provenance JSON
+                  <textarea
+                    name="provenance"
+                    rows={4}
+                    placeholder={'{"authorization_ref":null,"scan_time":null}'}
+                  />
+                </label>
+              </details>
+            </form>
+            {localError != null && <ErrorState error={localError} />}
+            {upload.error &&
+              (upload.error instanceof APIError ? (
+                <ErrorState error={upload.error} />
+              ) : (
+                <p role="alert" className="error">
+                  Upload outcome is unknown. You can select the same report and
+                  submit again after checking the connection.
+                </p>
               ))}
-            </select>
-          </label>
-          <label>
-            OWASP category
-            <select
-              aria-label="OWASP category"
-              value={params.get("category") ?? ""}
-              onChange={(e) => change("category", e.target.value)}
-            >
-              <option value="">All categories (includes unmapped)</option>
-              {["A01:2025", "A02:2025", "A05:2025"].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Import ID filter
-            <input
-              value={params.get("import_id") ?? ""}
-              onChange={(e) => change("import_id", e.target.value)}
-            />
-          </label>
-          <button onClick={() => setParams({})}>Clear filters</button>
-        </div>
-        {findings.isPending && <p role="status">Loading persisted findings…</p>}
-        {findings.error && <ErrorState error={findings.error} />}
-        {findings.data && (
-          <>
-            {findings.data.items.length === 0 ? (
-              <p>
-                {params.size
-                  ? "No findings match these filters."
-                  : "No reports imported or no located findings. Upload a report to view observations."}
+            {upload.data && (
+              <p role="status">
+                {upload.data.duplicate
+                  ? "This report was already imported."
+                  : "Report imported."}
               </p>
-            ) : (
-              <div className="table-wrap">
-                <table>
-                  <caption>
-                    Scanner findings · latest observation within the import
-                    filter
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th>Finding / location</th>
-                      <th>Latest scanner severity</th>
-                      <th>Verification</th>
-                      <th>Classification</th>
-                      <th>CVSS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {findings.data.items.map((f) => (
-                      <tr key={f.id}>
-                        <td>
-                          <Link to={`/findings/${f.id}`}>{f.title}</Link>
-                          <br />
-                          <code>
-                            {f.method} {f.path}
-                          </code>
-                          <br />
-                          <small>
-                            Parameter: {f.parameter_name || "(none)"} ·{" "}
-                            {f.observation_count} observations
-                          </small>
-                        </td>
-                        <td>{f.scanner_severity}</td>
-                        <td>{f.verification}</td>
-                        <td>{f.classification.status}</td>
-                        <td>
-                          {f.latest_base === null &&
-                          f.latest_environmental === null ? (
-                            "Not assessed"
-                          ) : (
-                            <>
-                              CVSS-B{" "}
-                              <AssessmentValue assessment={f.latest_base} /> /
-                              CVSS-BE{" "}
-                              <AssessmentValue
-                                assessment={f.latest_environmental}
-                              />
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            )}
+          </section>
+          {reportID && <ImportCard key={reportID} id={reportID} />}
+          <section className="findings stack">
+            <div className="toolbar">
+              <h2 id="findings-title">Findings</h2>
+              <div className="filters">
+                <label>
+                  Scanner severity
+                  <select
+                    aria-label="Scanner severity"
+                    value={params.get("scanner_severity") ?? ""}
+                    onChange={(e) => change("scanner_severity", e.target.value)}
+                  >
+                    <option value="">All severities</option>
+                    {["informational", "low", "medium", "high", "unknown"].map(
+                      (v) => (
+                        <option key={v}>{v}</option>
+                      ),
+                    )}
+                  </select>
+                </label>
+                {filtersActive && (
+                  <button onClick={() => setParams({})}>Clear filters</button>
+                )}
               </div>
+            </div>
+            <details className="filter-panel">
+              <summary>More filters</summary>
+              <div className="filters">
+                <label>
+                  Verification
+                  <select
+                    aria-label="Verification"
+                    value={params.get("verification") ?? ""}
+                    onChange={(e) => change("verification", e.target.value)}
+                  >
+                    <option value="">All verification states</option>
+                    {[
+                      "unreviewed",
+                      "confirmed",
+                      "false_positive",
+                      "inconclusive",
+                    ].map((v) => (
+                      <option key={v}>{v}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  OWASP category
+                  <select
+                    aria-label="OWASP category"
+                    value={params.get("category") ?? ""}
+                    onChange={(e) => change("category", e.target.value)}
+                  >
+                    <option value="">All categories (includes unmapped)</option>
+                    {["A01:2025", "A02:2025", "A05:2025"].map((v) => (
+                      <option key={v}>{v}</option>
+                    ))}
+                  </select>
+                </label>
+                <form
+                  key={importID ?? ""}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const id = String(
+                      new FormData(event.currentTarget).get("import_id") ?? "",
+                    ).trim();
+                    change("import_id", id);
+                  }}
+                >
+                  <label>
+                    Import ID filter
+                    <input name="import_id" defaultValue={importID ?? ""} />
+                  </label>
+                  <button type="submit">Apply import ID</button>
+                </form>
+                <p className="notice">
+                  Unmapped findings have no reviewed OWASP category.
+                </p>
+              </div>
+            </details>
+            {findings.isPending && (
+              <p role="status">Loading persisted findings…</p>
+            )}
+            {findings.error && <ErrorState error={findings.error} />}
+            {findings.data && (
+              <>
+                {findings.data.items.length === 0 ? (
+                  <p>
+                    {filtersActive
+                      ? "No findings match these filters."
+                      : "No located findings yet. Import a report to get started."}
+                  </p>
+                ) : (
+                  <>
+                    <p className="notice scroll-hint">
+                      Scroll across the table for all columns.
+                    </p>
+                    <div
+                      className="table-wrap"
+                      role="region"
+                      aria-labelledby="findings-title"
+                      tabIndex={0}
+                    >
+                      <table>
+                        <caption>
+                          Latest scanner observation in this view.
+                        </caption>
+                        <thead>
+                          <tr>
+                            <th>Finding / location</th>
+                            <th>Latest scanner severity</th>
+                            <th>Verification</th>
+                            <th>OWASP category</th>
+                            <th>CVSS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {findings.data.items.map((f) => (
+                            <tr key={f.id}>
+                              <td>
+                                <Link
+                                  to={`/findings/${f.id}`}
+                                  state={{ targetSearch: search }}
+                                >
+                                  {f.title}
+                                </Link>
+                                <span className="location">
+                                  {f.method} {f.path}
+                                </span>
+                                <small>
+                                  Parameter: {f.parameter_name || "(none)"} ·{" "}
+                                  {f.observation_count}{" "}
+                                  {f.observation_count === 1
+                                    ? "observation"
+                                    : "observations"}
+                                </small>
+                              </td>
+                              <td>{f.scanner_severity}</td>
+                              <td>{f.verification}</td>
+                              <td>
+                                {f.classification.category ??
+                                  f.classification.status}
+                              </td>
+                              <td>
+                                {f.latest_base === null &&
+                                f.latest_environmental === null ? (
+                                  "Not assessed"
+                                ) : (
+                                  <>
+                                    CVSS-B{" "}
+                                    <AssessmentValue
+                                      assessment={f.latest_base}
+                                    />{" "}
+                                    / CVSS-BE{" "}
+                                    <AssessmentValue
+                                      assessment={f.latest_environmental}
+                                    />
+                                  </>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+              </>
             )}
             <Pager
-              next={findings.data.next_cursor}
+              next={findings.data?.next_cursor ?? null}
               onNext={(v) => {
                 const p = new URLSearchParams(params);
                 p.set("cursor", v);
@@ -484,13 +588,17 @@ export function TargetPage() {
               onFirst={() => change("cursor", "")}
               active={!!params.get("cursor")}
             />
-          </>
-        )}
-      </section>
-    </>
+          </section>
+        </>
+      )}
+    </div>
   );
 }
 export function FindingPage() {
+  const { id } = useParams();
+  return <FindingDetail key={id} />;
+}
+function FindingDetail() {
   const { id } = useParams();
   const token = useToken();
   const [cursor, setCursor] = useState("");
@@ -506,16 +614,39 @@ export function FindingPage() {
         `/findings/${id}/observations?limit=50&cursor=${encodeURIComponent(cursor)}`,
       ),
   });
+  const location = useLocation();
+  const savedSearch: unknown = location.state?.targetSearch;
+  const returnParams = new URLSearchParams();
+  if (typeof savedSearch === "string" && savedSearch.startsWith("?")) {
+    const prior = new URLSearchParams(savedSearch);
+    for (const name of [
+      "import_id",
+      "category",
+      "verification",
+      "scanner_severity",
+      "cursor",
+    ]) {
+      const value = prior.get(name);
+      if (value) returnParams.set(name, value);
+    }
+  }
+  const returnSearch = returnParams.toString();
   return (
-    <>
+    <div className="page-stack">
       {f.data && (
         <>
-          <Link to={`/targets/${f.data.target_id}`}>← Findings</Link>
-          <h2>{f.data.title}</h2>
-          <code>
-            {f.data.method} {f.data.origin}
-            {f.data.path}
-          </code>
+          <div className="stack">
+            <Link
+              to={`/targets/${f.data.target_id}${returnSearch ? `?${returnSearch}` : ""}`}
+            >
+              ← Findings
+            </Link>
+            <h1>{f.data.title}</h1>
+            <p className="muted">
+              {f.data.method} {f.data.origin}
+              {f.data.path}
+            </p>
+          </div>
           <dl className="panel">
             <dt>Latest scanner observation</dt>
             <dd>
@@ -524,31 +655,35 @@ export function FindingPage() {
             <dt>Verification</dt>
             <dd>{f.data.verification}</dd>
             <dt>Category mapping</dt>
-            <dd>{f.data.classification.status}</dd>
+            <dd>
+              {f.data.classification.category ?? f.data.classification.status}
+            </dd>
             <dt>CVSS-B / CVSS-BE</dt>
             <dd>
               <AssessmentValue assessment={f.data.latest_base} /> /{" "}
               <AssessmentValue assessment={f.data.latest_environmental} />
             </dd>
-            <dt>Fingerprint {f.data.fingerprint_version}</dt>
-            <dd>
-              <code>{f.data.fingerprint}</code>
-            </dd>
           </dl>
+          <details>
+            <summary>
+              Finding fingerprint ({f.data.fingerprint_version})
+            </summary>
+            <code>{f.data.fingerprint}</code>
+          </details>
         </>
       )}
       {f.isPending && <p>Loading finding…</p>}
       {f.error && <ErrorState error={f.error} />}
-      <h3>Source observations</h3>
+      <h2>Source observations</h2>
       {o.isPending && <p role="status">Loading observations…</p>}
       {o.error && <ErrorState error={o.error} />}{" "}
       {o.data && (
         <>
           {o.data.items.map((v) => (
-            <article className="panel" key={v.id}>
-              <h4>
+            <article className="panel stack" key={v.id}>
+              <h3>
                 {v.method} {v.path} · {v.scanner_severity}
-              </h4>
+              </h3>
               <dl>
                 <dt>Source JSON pointer</dt>
                 <dd>
@@ -571,20 +706,20 @@ export function FindingPage() {
                 </p>
               ))}
               <details>
-                <summary>Report hash and provenance</summary>
+                <summary>Report linked to this observation</summary>
                 <ImportCard id={v.import_id} />
               </details>
             </article>
           ))}
           {o.data.items.length === 0 && <p>No observations.</p>}
-          <Pager
-            next={o.data.next_cursor}
-            onNext={setCursor}
-            onFirst={() => setCursor("")}
-            active={!!cursor}
-          />
         </>
       )}
-    </>
+      <Pager
+        next={o.data?.next_cursor ?? null}
+        onNext={setCursor}
+        onFirst={() => setCursor("")}
+        active={!!cursor}
+      />
+    </div>
   );
 }

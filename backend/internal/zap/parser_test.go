@@ -129,3 +129,11 @@ func TestFingerprintCanonicalQueryNames(t *testing.T) {
 		t.Fatalf("canonical identity hash or caller slice: %s %v", got, o.QueryNames)
 	}
 }
+
+func TestUnusedReportFieldsMayContainNUL(t *testing.T) {
+	raw := []byte(`{"@version":"synthetic","extension":{"unused":"a\u0000b"},"site":[{"@name":"http://juice-shop:3000","alerts":[{"pluginid":"1","instances":[{"uri":"http://juice-shop:3000/","method":"GET","unused":"a\u0000b"}]}]}]}`)
+	report, err := Parse(raw, "target", "http://juice-shop:3000")
+	if err != nil || len(report.Observations) != 1 {
+		t.Fatalf("extension data retained only in raw bytes must not affect normalization: %v", err)
+	}
+}

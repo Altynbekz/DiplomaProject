@@ -10,10 +10,11 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 test("token stays in memory; empty workspace and lock state are explicit", async () => {
-  const fetchMock = vi.fn().mockResolvedValue(
-    new Response(JSON.stringify({ items: [], next_cursor: null }), {
-      headers: { "Content-Type": "application/json" },
-    }),
+  const fetchMock = vi.fn().mockImplementation(
+    async () =>
+      new Response(JSON.stringify({ items: [], next_cursor: null }), {
+        headers: { "Content-Type": "application/json" },
+      }),
   );
   vi.stubGlobal("fetch", fetchMock);
   render(

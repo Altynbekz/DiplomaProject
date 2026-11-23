@@ -32,11 +32,20 @@ type Observation struct {
 	Index                                                                                                                                       int32
 	Evidence                                                                                                                                    json.RawMessage
 }
+
+// UnlocatedAlert keeps report extensions reversible without coercing their
+// numbers into PostgreSQL JSONB's smaller numeric range.
+type UnlocatedAlert struct {
+	SchemaVersion string `json:"schema_version"`
+	SourcePointer string `json:"source_pointer"`
+	AlertJSON     string `json:"alert_json"`
+}
+
 type Report struct {
 	Hash               string
 	Observations       []Observation
 	Warnings           []Warning
-	Unlocated          []json.RawMessage
+	Unlocated          []UnlocatedAlert
 	Version, Generated string
 }
 
@@ -187,7 +196,7 @@ func Fingerprint(target string, o Observation) string {
 	return domain.Hash(sha256.Sum256(bytes.TrimSuffix(b.Bytes(), []byte("\n"))))
 }
 func Parse(raw []byte, target, origin string) (Report, error) {
-	r := Report{Observations: []Observation{}, Warnings: []Warning{}, Unlocated: []json.RawMessage{}}
+	r := Report{Observations: []Observation{}, Warnings: []Warning{}, Unlocated: []UnlocatedAlert{}}
 	if len(raw) > MaxBytes {
 		return r, domain.Fail(413, "limit_exceeded", "", "Report exceeds 20 MiB")
 	}
@@ -201,8 +210,8 @@ func Parse(raw []byte, target, origin string) (Report, error) {
 		return r, domain.Fail(422, "unsupported_report", "", "Expected ZAP Traditional JSON @version and site array")
 	}
 	r.Version = text(root, "@version")
-	if strings.ContainsRune(r.Version, 0) {
-		return r, domain.Fail(422, "validation_failed", "/@version", "Invalid report version")
+	if err := domain.ValidateStorageText(r.Version, "/@version"); err != nil {
+		return r, err
 	}
 	r.Generated = text(root, "@generated")
 	sites, e := array(root["site"], "/site", false)
@@ -240,10 +249,32 @@ func Parse(raw []byte, target, origin string) (Report, error) {
 				return r, e
 			}
 			if len(instances) == 0 {
-				b, _ := json.Marshal(map[string]any{"source_pointer": ap, "alert": a})
-				r.Unlocated = append(r.Unlocated, b)
+				if err := domain.ValidateStorageJSONText(a, ap); err != nil {
+					return r, err
+				}
+				encoded, err := json.Marshal(a)
+				if err != nil {
+					return r, fmt.Errorf("serialize unlocated alert: %w", err)
+				}
+				r.Unlocated = append(r.Unlocated, UnlocatedAlert{
+					SchemaVersion: "unlocated-alert/v2",
+					SourcePointer: ap,
+					AlertJSON:     string(encoded),
+				})
 				r.Warnings = append(r.Warnings, Warning{"unlocated_alert", ap, "Alert has no instances; retained at report level"})
 				continue
+			}
+			title := text(a, "name")
+			titleField := "name"
+			if title == "" {
+				title = text(a, "alert")
+				titleField = "alert"
+			}
+			if title == "" {
+				title = "Untitled scanner alert"
+			}
+			if err := validateStoredFields(a, ap, titleField, "pluginid", "riskcode", "confidence", "desc", "solution", "alertRef"); err != nil {
+				return r, err
 			}
 			plugin := text(a, "pluginid")
 			if plugin == "" {
@@ -292,12 +323,8 @@ func Parse(raw []byte, target, origin string) (Report, error) {
 				if len(rawMethod) != len(method) || !methodPattern.MatchString(method) || strings.IndexFunc(rawMethod, func(r rune) bool { return r > 127 }) >= 0 {
 					return r, domain.Fail(422, "validation_failed", ip+"/method", "Valid HTTP method is required")
 				}
-				title := text(a, "name")
-				if title == "" {
-					title = text(a, "alert")
-				}
-				if title == "" {
-					title = "Untitled scanner alert"
+				if err := validateStoredFields(in, ip, "param", "attack", "evidence", "otherinfo"); err != nil {
+					return r, err
 				}
 				evidence, _ := json.Marshal(map[string]any{"schema_version": "zap-evidence/v1", "alert_ref": text(a, "alertRef"), "attack": text(in, "attack"), "evidence": text(in, "evidence"), "other_info": text(in, "otherinfo")})
 				o := Observation{PluginID: plugin, Title: title, Method: method, Origin: l.Origin, Path: l.Path, QueryNames: l.QueryNames, Parameter: text(in, "param"), Pointer: ip, Index: int32(ii), RawURI: uri, SeverityRaw: text(a, "riskcode"), Severity: severity, Confidence: text(a, "confidence"), CWE: cwes, Evidence: evidence, Description: text(a, "desc"), Remediation: text(a, "solution")}
@@ -307,4 +334,13 @@ func Parse(raw []byte, target, origin string) (Report, error) {
 		}
 	}
 	return r, nil
+}
+
+func validateStoredFields(values map[string]any, pointer string, fields ...string) error {
+	for _, field := range fields {
+		if err := domain.ValidateStorageText(text(values, field), pointer+"/"+field); err != nil {
+			return err
+		}
+	}
+	return nil
 }
