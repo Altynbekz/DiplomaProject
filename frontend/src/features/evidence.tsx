@@ -16,6 +16,7 @@ import {
 } from "../api/client";
 import type { components } from "../api/schema";
 import { useToken } from "../app/main";
+import { VerificationPanel } from "./verification-panel";
 type Page<T> = { items: T[]; next_cursor: string | null };
 export function ErrorState({ error }: { error: unknown }) {
   return (
@@ -59,7 +60,7 @@ export function AssessmentValue({
     </>
   );
 }
-function Pager({
+export function Pager({
   next,
   onNext,
   onFirst,
@@ -664,6 +665,11 @@ function FindingDetail() {
               <AssessmentValue assessment={f.data.latest_environmental} />
             </dd>
           </dl>
+          <VerificationPanel
+            finding={f.data}
+            observations={o.data?.items ?? []}
+            token={token}
+          />
           <details>
             <summary>
               Finding fingerprint ({f.data.fingerprint_version})
@@ -685,6 +691,10 @@ function FindingDetail() {
                 {v.method} {v.path} · {v.scanner_severity}
               </h3>
               <dl>
+                <dt>Observation ID</dt>
+                <dd>
+                  <code>{v.id}</code>
+                </dd>
                 <dt>Source JSON pointer</dt>
                 <dd>
                   <code>{v.source_pointer}</code>

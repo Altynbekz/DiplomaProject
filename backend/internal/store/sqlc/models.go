@@ -77,3 +77,14 @@ type Target struct {
 	LabTargetKey    string
 	CreatedAt       time.Time
 }
+
+type VerificationReview struct {
+	ID               string
+	FindingID        string
+	State            string
+	Procedure        string
+	Rationale        string
+	EvidenceRefsJson []byte
+	Actor            string
+	CreatedAt        time.Time
+}

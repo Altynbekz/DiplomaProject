@@ -12,10 +12,10 @@ async function unlock(page: Page) {
   await page.getByRole("button", { name: "Unlock", exact: true }).click();
 }
 
-async function checkFindings(page: Page) {
+async function checkFindings(page: Page, state = "unreviewed") {
   const rows = page.locator("tbody tr");
   await expect(rows).toHaveCount(17);
-  await expect(rows.first()).toContainText("unreviewed");
+  await expect(rows.first()).toContainText(state);
   await expect(rows.first()).toContainText("Not assessed");
   await rows.first().getByRole("link").click();
   await expect(
@@ -66,6 +66,70 @@ test("genuine report survives reload", async ({ page }) => {
   await page.reload();
   await unlock(page);
   await checkFindings(page);
+  const stale = await page.context().newPage();
+  await stale.goto(page.url());
+  await unlock(stale);
+  await stale.getByText("Human verification", { exact: true }).click();
+  await expect(stale.getByText("No human reviews yet.")).toBeVisible();
+  await stale
+    .getByRole("combobox", { name: "Review state" })
+    .selectOption("inconclusive");
+  await stale
+    .getByLabel("Verification procedure")
+    .fill("Check the scanner assertion independently");
+  await stale
+    .getByLabel("Verification rationale")
+    .fill("Keep the draft when a predecessor changes");
+  await stale
+    .getByRole("group", { name: "Source evidence" })
+    .getByRole("checkbox")
+    .first()
+    .check();
+  await page.getByText("Human verification", { exact: true }).click();
+  await expect(page.getByText("No human reviews yet.")).toBeVisible();
+  const review = page.getByRole("combobox", { name: "Review state" });
+  await review.selectOption("inconclusive");
+  await page
+    .getByLabel("Verification procedure")
+    .fill("Inspect the stored test observation");
+  await page
+    .getByLabel("Verification rationale")
+    .fill("The scanner assertion needs human review");
+  await page
+    .getByRole("group", { name: "Source evidence" })
+    .getByRole("checkbox")
+    .first()
+    .check();
+  await page.getByRole("button", { name: "Save verification" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Verification saved." }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Verification history" })
+      .getByText("Inspect the stored test observation"),
+  ).toBeVisible();
+  await stale.getByRole("button", { name: "Save verification" }).click();
+  await expect(stale.getByRole("alert")).toContainText(
+    "The current revision changed",
+  );
+  await stale.getByRole("button", { name: "Load latest verification" }).click();
+  await expect(
+    stale.getByRole("status").filter({ hasText: "Latest revision loaded." }),
+  ).toBeVisible();
+  await expect(stale.getByLabel("Verification rationale")).toHaveValue(
+    "Keep the draft when a predecessor changes",
+  );
+  await stale.getByRole("button", { name: "Save verification" }).click();
+  await expect(
+    stale.getByRole("status").filter({ hasText: "Verification saved." }),
+  ).toBeVisible();
+  await expect(
+    stale
+      .getByRole("region", { name: "Verification history" })
+      .getByText("Check the scanner assertion independently"),
+  ).toBeVisible();
+  await stale.close();
   expect(external).toEqual([]);
 });
 
@@ -73,5 +137,11 @@ test("genuine findings survive restart", async ({ page }) => {
   await page.goto("/");
   await unlock(page);
   await page.getByRole("link", { name }).click();
-  await checkFindings(page);
+  await checkFindings(page, "inconclusive");
+  await page.getByText("Human verification", { exact: true }).click();
+  await expect(
+    page
+      .getByRole("region", { name: "Verification history" })
+      .getByText("Inspect the stored test observation"),
+  ).toBeVisible();
 });

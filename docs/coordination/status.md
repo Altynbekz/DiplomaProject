@@ -445,3 +445,54 @@ Baseline 5e90808ae4bc1fde6e3241df77313229f7e7ff4f. Checkpoint 22 passed independ
 ```
 
 Checkpoint 23 passed independent review. V017 is resolved. All ten unchanged files from checkpoint 22 matched their prior hashes. [Independent recheck](review.md#independent-verification--m1-20261123-23)
+
+M1 acceptance passed on commit `f5712a49b5676badb05486b30c73e0d4b916146b`. The exact [GitHub Actions run 45187645541](https://github.com/Altynbekz/DiplomaProject/actions/runs/45187645541) completed successfully, including genuine and synthetic database and browser suites. Checkpoints 22 and 23 independently verified the fixture and documentation.
+
+## M2 — Human verification — IN PROGRESS
+
+Editing the migration, sqlc queries, service and HTTP contracts, finding detail panel, and disposable tests. Classification and context follow this slice.
+
+## M2-20261123-24 — Human verification — READY FOR VERIFICATION
+
+Baseline f5712a49b5676badb05486b30c73e0d4b916146b. Migration 5, the API, finding summary filter and keyboard-accessible verification panel deliver immutable review histories, exact observation references, server actor and timestamps, audit, and stale predecessor conflicts. Classification and context are separate slices.
+
+GOFLAGS=-mod=readonly make check, make test-integration and make test-e2e, followed by npm run build --prefix frontend, exited 0 locally. Race-mode integration covered concurrent same-predecessor writes and runtime immutability. All four Chromium cases passed, including two-tab conflict recovery with the draft retained and evidence/review history after restart. Both fresh and v4-to-v5 migrations passed. git diff --check exited 0.
+
+Remaining gates: independent review of the human verification slice and hosted CI for its published commit, then classification and context.
+
+```text
+2789a54478eb993fbd71c38e781b8231259ca3d8c7e0b9cc3cb9d40f6433e525  README.md
+0ce5a9ab7fcd555594912aebbc3690233b7e4a17d55a8d43ba39b5e075b55adc  backend/db/migrations/00005_verification.sql
+1131cdf237b68b91d4b532a757827223c13e25bb135abd6162bb96e2a298af8f  backend/db/queries/imports.sql
+74019afb601a3ea9108b478aa121944f4a3ad706e834e32d999736b863b53d4e  backend/db/queries/reviews.sql
+3a0f633dd33ca83d28d4107d7c66ed14cf53943d157123265ec6b7c9f671136f  backend/internal/httpapi/api.go
+02d95eda385c232e2f3db96d2e98d3b7be2a3b69f01c0848e527eb18bd5c8aca  backend/internal/httpapi/genuine_test.go
+373de8de0880b626f73fae3684e1efac7dcf3e39e51044b50d91227785672f9b  backend/internal/httpapi/review_integration_test.go
+8a3d15d5f03eeac851916fcc0037778a1ea5cfcc82911cd203f35f29c67a6d37  backend/internal/httpapi/reviews.go
+180c146392b3dccbb6cfc0696b592002f9b550742725cd0fd1892ab539d6c917  backend/internal/service/reviews.go
+718b1224d60222a65615414e8ce7f0bd1b2d546c00d4e121fb5d440af6480c9e  backend/internal/service/service.go
+8920b53db4cdaa94d259422265e275fcf938f4253ba8135196d491517b266845  backend/internal/store/sqlc/imports.sql.go
+ee181f330b14534ef62eaf163fd4bebc76c7e91cbb3bdaaf29a8a586b8f371f3  backend/internal/store/sqlc/models.go
+ea28d8e68ebe915903d923564375e5e9d6068b34faea83706bf2ed10d1042bbb  backend/internal/store/sqlc/reviews.sql.go
+a208428d559fb4381c64ca64c266448888d43e4bf532ceca43d9f6c2abef5f85  contracts/openapi.yaml
+586bae0262f8ccd6fdc6a9cdf14a515379d0860eac4e625dff903fb8c193df53  docs/status.md
+9ea299eae89831494886922dd63b0f53b3bcdd0552fff0581d91be8a6f79f628  frontend/src/api/schema.d.ts
+766e39dca1e0ccf1ce81ee6fb1466d838fa623b9c5c5ab295eaa5b63de9dec58  frontend/src/features/evidence.tsx
+25a8dbdfbe3b5fee50eb7ecb72801133141cc8e25ce1cd1051f66d3ee433523b  frontend/src/features/verification-panel.tsx
+15cbace647f48c3ac64356adc1da520e3f2e150cd72969f57f3b5355fc6b6b33  frontend/tests/browser/genuine.spec.ts
+2fffde705ef0b6392d6ccccc899b51bf5906d9ff9f25a7679b9f665763fdc2cc  scripts/test-integration.sh
+```
+
+## M2-20261123-25 — Evidence reference labels — READY FOR VERIFICATION
+
+Baseline f5712a49b5676badb05486b30c73e0d4b916146b. V018 addressed by displaying each observation's import identifier in the selection label and its observation identifier in the history and evidence card. A regression test selects one of two checkboxes with the same pointer and different imports. All other checkpoint 24 files retain their hashes. The unused classification rules package is independent work outside this checkpoint.
+
+Frontend lint and four Vitest tests exited 0, including the two-import label regression. GOFLAGS=-mod=readonly ./scripts/test-e2e.sh genuine exited 0 with both Chromium cases, conflict recovery and restart. git diff --check exited 0. Hosted CI remains pending publication.
+
+```text
+a747946ec40d9264bf504b51bcac5049ddb24f5295785136cc133a8ca0d35d8c  frontend/src/features/verification-panel.tsx
+9b913b0d3c028d7970d015316a630f84d23429c73c7b6a5bfc73f4540d3006e8  frontend/src/features/evidence.tsx
+56da53598f42df9e1b903a4c6730355d99252f3b05bcabfe03d3dedd26bd43bb  frontend/tests/workspace.test.tsx
+```
+
+Checkpoint 25 passed independent review and resolves V018. The verifier used a second offline import at identical JSON positions, selected the intended source by keyboard, and traced the saved observation ID to its evidence card. [Independent recheck](review.md#independent-verification--m2-20261123-25)

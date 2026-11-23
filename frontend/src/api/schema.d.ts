@@ -165,6 +165,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/findings/{id}/verifications": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["listVerifications"];
+    put?: never;
+    post: operations["createVerification"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -290,9 +306,7 @@ export interface components {
       scanner_severity: "informational" | "low" | "medium" | "high" | "unknown";
       /** Format: uuid */
       severity_observation_id: string;
-      /** @enum {string} */
-      verification:
-        "unreviewed" | "confirmed" | "false_positive" | "inconclusive";
+      verification: components["schemas"]["VerificationState"];
       verification_review_id: string | null;
       classification: components["schemas"]["Classification"];
       latest_base: components["schemas"]["Assessment"] | null;
@@ -359,6 +373,39 @@ export interface components {
         [key: string]: string;
       } | null;
       sanitization_steps?: string[];
+    };
+    /** @enum {string} */
+    VerificationState:
+      "unreviewed" | "confirmed" | "false_positive" | "inconclusive";
+    EvidenceRef: {
+      /** Format: uuid */
+      observation_id: string;
+      source_pointer: string;
+      note: string;
+    };
+    VerificationInput: {
+      state: components["schemas"]["VerificationState"];
+      procedure: string;
+      rationale: string;
+      evidence_refs: components["schemas"]["EvidenceRef"][];
+      expected_previous_id: string | null;
+    };
+    Verification: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      finding_id: string;
+      state: components["schemas"]["VerificationState"];
+      procedure: string;
+      rationale: string;
+      evidence_refs: components["schemas"]["EvidenceRef"][];
+      actor: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    VerificationPage: {
+      items: components["schemas"]["Verification"][];
+      next_cursor: string | null;
     };
   };
   responses: never;
@@ -1398,6 +1445,233 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ObservationPage"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  listVerifications: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string;
+      };
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VerificationPage"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  createVerification: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VerificationInput"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      201: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Verification"];
         };
       };
       /** @description Problem response; see code and field errors */

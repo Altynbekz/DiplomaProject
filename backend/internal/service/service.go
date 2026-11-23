@@ -276,7 +276,7 @@ func finding(v db.ListFindingsRow) Finding {
 	title, _ := Redact(v.Title)
 	path, _ := Redact(v.Path)
 	param, _ := Redact(v.ParameterName)
-	return Finding{ID: v.ID, TargetID: v.TargetID, Title: title, Method: v.Method, Origin: v.CanonicalOrigin, Path: path, Parameter: param, QueryNames: v.QueryParameterNames, ObservationCount: v.ObservationCount, Severity: v.ScannerSeverity, SeverityObservationID: v.SeverityObservationID, Verification: "unreviewed", Classification: Classification{Status: "unmapped", Candidates: []string{}}, PluginID: v.PluginID, FingerprintVersion: v.FingerprintVersion, Fingerprint: v.Fingerprint, CreatedAt: v.CreatedAt.UTC()}
+	return Finding{ID: v.ID, TargetID: v.TargetID, Title: title, Method: v.Method, Origin: v.CanonicalOrigin, Path: path, Parameter: param, QueryNames: v.QueryParameterNames, ObservationCount: v.ObservationCount, Severity: v.ScannerSeverity, SeverityObservationID: v.SeverityObservationID, Verification: v.Verification, ReviewID: optionalString(v.VerificationID), Classification: Classification{Status: "unmapped", Candidates: []string{}}, PluginID: v.PluginID, FingerprintVersion: v.FingerprintVersion, Fingerprint: v.Fingerprint, CreatedAt: v.CreatedAt.UTC()}
 }
 func (s *Service) Findings(ctx context.Context, f FindingFilter, limit int, raw string) (Page[Finding], error) {
 	p := Page[Finding]{Items: []Finding{}}

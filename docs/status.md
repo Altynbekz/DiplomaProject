@@ -1,12 +1,13 @@
-# M0 and M1 implementation status
+# Implementation status
 
 Updated 2026-11-23, Asia/Almaty. This status covers the foundation and offline import. This continuation started from `94f431f479b7b707c84ee9d79ebf5f6710aa9ced`, which matched GitHub `main`.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
 | M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `94f431f`, including the Python tests in `make check`. [GitHub Actions run 45170314104](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) |
-| M1 | Offline Traditional JSON import, immutable evidence, provenance, duplicate handling, normalized observations, audited private downloads, filtered and paged UI, reusable genuine fixture | The synthetic and genuine automated suites passed locally and in an independent isolated copy. Hosted CI for the published fixture revision remains pending. [Independent verification](coordination/review.md#independent-verification--m1-20261123-22) |
-| M2–M6 | Planned | No implementation started. |
+| M1 | Offline Traditional JSON import, immutable evidence, provenance, duplicate handling, normalized observations, audited private downloads, filtered and paged UI, reusable genuine fixture | Acceptance passed, with synthetic and genuine automated suites passing locally, independently and in hosted CI for `f5712a49b5676badb05486b30c73e0d4b916146b`. [Independent verification](coordination/review.md#independent-verification--m1-20261123-22) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45187645541) |
+| M2 | Human verification and immutable history | Human verification passed local PostgreSQL and Chromium checks. Independent review and hosted CI are pending. Classification and context follow. |
+| M3–M6 | Planned | No implementation started. |
 
 ## Recorded checks
 
@@ -105,3 +106,9 @@ The ignored lab directory `artifacts/zap/diploma-m1-passive-cef3083eaa/` holds `
 Independent checkpoint 21 reran the disposable acceptance command successfully and matched all 17 fingerprints and 21 pointers, provenance, duplicate handling, and browser persistence across restart. [Independent replay](coordination/review.md#independent-verification--m1-20261123-21)
 
 The reviewed derivative, shareable provenance and independent fingerprint oracle are available under `backend/testdata/zap/`. Reproduction from the private original matched the fixture byte for byte. The normal integration command uses separate disposable databases for the synthetic and genuine imports. Its genuine test returned one creation and three duplicates under concurrency, reused the ID on a subsequent upload, rejected provenance changes, preserved the exact submitted bytes, and matched all 17 fingerprints and 21 pointers in the API and PostgreSQL. Both Chromium suites passed import, reload and independent API/database restart checks. `GOFLAGS=-mod=readonly make check`, `npm run build --prefix frontend`, `make test-integration` and `make test-e2e` exited 0 locally. [Fixture provenance](fixture-provenance.md)
+
+## Human verification
+
+Migration 5 adds append-only verification reviews. The runtime role can create and read reviews and can lock a finding through a narrow database function. The role cannot edit, delete or truncate review records or update evidence rows. Every accepted review validates its observation UUID and exact source pointer against the finding and writes an audit row in the same transaction. The finding's latest human review can be filtered separately from scanner severity.
+
+GOFLAGS=-mod=readonly `make check`, `make test-integration`, `make test-e2e` and `npm run build --prefix frontend` exited 0 locally. Goose upgraded through migration 4 to 5 and also migrated a fresh genuine-test database. The API suite checked all four review states, evidence-reference failures, newest-first history, stale predecessors, two concurrent requests sharing a predecessor, and runtime write restrictions. Chromium covered two tabs editing the same finding, preservation and recovery of a stale draft, and persisted history following restart. Tests used isolated databases and no scanner traffic.

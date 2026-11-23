@@ -4,7 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { Workspace } from "../src/app/main";
 import { AssessmentValue, ErrorState } from "../src/features/evidence";
-import { APIError } from "../src/api/client";
+import { APIError, type Observation } from "../src/api/client";
+import { EvidenceSelection } from "../src/features/verification-panel";
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
@@ -95,4 +96,48 @@ test("assessment display uses the API score and vector, including zero", () => {
     />,
   );
   expect(container).toHaveTextContent("Incomplete");
+});
+
+test("source evidence identifies different imports even when their pointers match", () => {
+  const observation: Observation = {
+    id: "observation-one",
+    import_id: "import-one",
+    source_pointer: "/site/0/alerts/0/instances/0",
+    method: "GET",
+    path: "/",
+    parameter_name: "",
+    scanner_severity: "low",
+    scanner_severity_raw: "1",
+    confidence_raw: "2",
+    cwe_ids: [],
+    description: "",
+    remediation: "",
+    evidence_excerpt: "[withheld]",
+    redactions: [],
+    created_at: "2026-01-01T00:00:00Z",
+  };
+  const second = {
+    ...observation,
+    id: "observation-two",
+    import_id: "import-two",
+  };
+  const onChange = vi.fn();
+  render(
+    <EvidenceSelection
+      observations={[observation, second]}
+      refs={[]}
+      onChange={onChange}
+    />,
+  );
+  expect(
+    screen.getByRole("checkbox", { name: /import-one/ }),
+  ).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("checkbox", { name: /import-two/ }));
+  expect(onChange).toHaveBeenCalledWith([
+    {
+      observation_id: second.id,
+      source_pointer: second.source_pointer,
+      note: "",
+    },
+  ]);
 });

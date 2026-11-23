@@ -242,6 +242,9 @@ func TestIntegrationGenuineReport(t *testing.T) {
 	if !reflect.DeepEqual(apiGroups, expected) {
 		t.Fatal("API fingerprint groups differed from the independent oracle")
 	}
+	t.Run("verification workflow", func(t *testing.T) {
+		checkVerificationWorkflow(t, ctx, pool, request, path)
+	})
 }
 
 func decodeFixtureJSON(t *testing.T, data []byte, value any) {
