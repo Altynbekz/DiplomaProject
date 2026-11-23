@@ -1,12 +1,12 @@
 # Implementation status
 
-Updated 2026-11-23, Asia/Almaty. This status covers the foundation, offline import, and M2 review workflow.
+Updated 2026-11-24, Asia/Almaty. This status covers the foundation, offline import, and M2 review workflow.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
 | M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `94f431f`, including the Python tests in `make check`. [GitHub Actions run 45170314104](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) |
 | M1 | Offline Traditional JSON import, immutable evidence, provenance, duplicate handling, normalized observations, audited private downloads, filtered and paged UI, reusable genuine fixture | Acceptance passed, with synthetic and genuine automated suites passing locally, independently and in hosted CI for `f5712a49b5676badb05486b30c73e0d4b916146b`. [Independent verification](coordination/review.md#independent-verification--m1-20261123-22) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45187645541) |
-| M2 | Human verification, OWASP mapping and immutable context history | Local automated acceptance passed. The independent review log and hosted workflow track results at their exact revisions. Live A01 role/object evidence requires separately authorized observations. [Independent review](coordination/review.md) · [Hosted workflow](https://github.com/Altynbekz/DiplomaProject/actions/workflows/ci.yml) |
+| M2 | Human verification, OWASP mapping and immutable context history | Software checks passed locally and independently. Hosted CI passed for `da9844eabb14c6c14646b407c652864afc0012e9`. M2 acceptance is open pending authorized A01 role/object evidence. [Independent software review](coordination/review.md#independent-verification--m2-20261123-29) · [Hosted run 45197471901](https://github.com/Altynbekz/DiplomaProject/actions/runs/45197471901) |
 | M3–M6 | Planned | No implementation started. |
 
 ## Recorded checks
@@ -130,3 +130,27 @@ Migration 7 adds immutable target-default and exact-method/path context revision
 `GOFLAGS=-mod=readonly make check`, `make test-integration`, `make test-e2e` and `npm run build --prefix frontend` passed locally. Goose upgraded through revision 6 to 7 and created a clean dedicated database. The race-mode API test checked missing provenance, invalid enums and scopes, foreign-target observations, exact-over-default precedence, unknowns, concurrent stale predecessors, pagination, immutable runtime permissions and audit rows. Chromium created target and endpoint contexts, preserved a stale draft through conflict recovery, displayed the exact source and unknown factors, and verified context, verification and classification after restart. The editor fit a 390-pixel viewport. Tests used disposable stacks. No new scans or live role/object checks were performed.
 
 The final context checks also verified HTTP 413 when PostgreSQL's rendered provenance exceeds 64 KiB, rejection of non-ASCII methods, and exact handling of an incompressible 3,841-byte path. A bounded SHA-256 index key supports the full path limit while the resolver compares the actual path. Chromium held scope controls stable during a delayed save. No production data or credentials were used. [Independent review](coordination/review.md)
+
+## M2 acceptance audit
+
+Audited against `AGENTS.md` §11 at `da9844eabb14c6c14646b407c652864afc0012e9`. GitHub `main` matched the checkout and run `45197471901` completed successfully for that SHA. The acceptance audit changed documentation only. [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45197471901)
+
+| Gate | Observed result |
+| --- | --- |
+| Genuine report import remains reproducible | Pass. PostgreSQL and the API matched 17 fingerprints and 21 observation pointers. Concurrent duplicates reused the import ID. Chromium showed the findings after reload and after restarting PostgreSQL and the API. The checked fixture SHA-256 was `036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7`. |
+| Confirmed, false-positive and inconclusive reviews remain in history | Pass. The disposable workflow appended each state, retained each prior revision and its evidence reference, and read them in order. The browser found the saved review and classification histories after restart. Test states are workflow assertions on disposable data. |
+| Wrong-finding evidence references fail | Pass. HTTP 422 for a foreign-finding reference and a mismatched source pointer in verification. Classification rejected evidence from a different finding, and context rejected an observation from another target. |
+| Stale predecessors return a recoverable 409 | Pass. API tests rejected stale verification, classification and context revisions. Concurrent verification and context requests sharing a predecessor produced one 201 and one 409 per pair. Chromium recovered the review and context drafts. |
+| Default and exact endpoint context resolve deterministically, including unknown values | Pass. A newer target default applied to unmatched endpoints. The exact method and path still used their own revision and retained unknown factors and their provenance. Chromium showed resolved context after restart. |
+| Histories are append-only and writes are audited | Pass. The runtime grants allow selection and insertion on all three revision tables. Tests exercised denied mutations, oldest and newest records retained their values, and accepted appends recorded audit events. Fresh and staged migrations reached revision 7. |
+| OWASP conflicts remain ambiguous and severity stays separate | Pass. Competing rules left both candidate categories with no mapped category. A manual classification survived a subsequent import, with scanner severity and human verification unchanged by the classification edit. |
+| A01 role/object claims have manual evidence | **Open.** The documented lab and artifact locations contain the passive capture and its authorization, with no matching role/object authorization or observed decisions. The genuine report's A01 CORS mapping does not establish the role/object access policy or any decision. M2 acceptance requires an independently reviewable, separately authorized scenario record. [Evidence protocol](../lab/scenarios/a01-role-object.md) |
+
+Local commands and exit status on macOS arm64 with Go 1.27.1, PostgreSQL 15.19, goose 3.30.1, sqlc 1.31.1, Node 26.13.0, npm 12.2.1 and Python 3.14.3.
+
+| Command | Result |
+| --- | --- |
+| `GOFLAGS=-mod=readonly make check` | Exit 0. Go formatting and vet, frontend formatting, TypeScript and ESLint, byte-identical generation, Go unit tests, nine Python tests and four Vitest tests passed. |
+| `npm run build --prefix frontend` | Exit 0. TypeScript and the Vite production build passed. |
+| `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` | Exit 0. Disposable PostgreSQL migrated from empty and through revision 6 to 7. Both import suites and all three M2 workflow subtests passed under the race detector. |
+| `GOFLAGS=-mod=readonly make test-e2e` | Exit 0. Four Chromium tests passed, including both restart cases. Both outage checks returned health 200, readiness 503 and missing bearer 401. |

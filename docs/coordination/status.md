@@ -606,3 +606,23 @@ f463ab98dc5db0dd196c5fa299373fcc24b03d8465e02c200841f5d3da9b725d  docs/status.md
 Additional local checks. The disposable ARM64 `python3 -u scripts/test-compose.py` run on checkpoint 28 exited 0, covering new-stack migrations/readiness, synthetic import and duplicate IDs, and cleanup after persistence across restart. The run used its own project and volume. After the checkpoint 29 UI fixes, `GOFLAGS=-mod=readonly ./scripts/test-e2e.sh synthetic` also exited 0 for both Chromium phases and outage checks.
 
 Checkpoint 29 passed independent review and resolves V021–V024. The isolated archive passed formatting, lint, generation, unit tests, frontend build, PostgreSQL and all Chromium cases. Supplemental checks confirmed the 413 and no partial writes, delayed-save controls, HTTP method handling, and full-path uniqueness and exact resolution. [Independent recheck](review.md#independent-verification--m2-20261123-29)
+
+## M2-20261124-30 — Acceptance audit and evidence handoff — READY FOR VERIFICATION
+
+Baseline `da9844eabb14c6c14646b407c652864afc0012e9`, identical to GitHub `main` at inspection. This checkpoint records the final software acceptance audit, demo guidance and the evidence requirements for the open A01 gate. The application, migrations, tests and workflow are baseline bytes. The artifact inventory found only the prior passive capture and no separately authorized role/object decision record. Tests contacted the disposable application only.
+
+- `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Go formatting and vet, frontend formatting, lint and strict TypeScript, byte-identical generation, Go tests, nine Python tests, four Vitest tests and production build passed.
+- `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` exited 0. Fresh and staged migrations reached 7, and the synthetic and genuine import suites plus verification, classification and context subtests passed under the race detector.
+- `GOFLAGS=-mod=readonly make test-e2e` exited 0. Four Chromium cases passed against disposable stacks, including restart, and both database outage checks passed.
+- `git diff --check` and a Python check of 24 relative links and anchors exited 0. The genuine fixture digest remains `036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7`.
+- GitHub reported run `45197471901` completed successfully for the exact baseline. This checkpoint's hosted CI awaits publication. [Hosted baseline run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45197471901)
+
+Frozen files, SHA-256.
+
+```text
+f7281eb14a2979a7d39cbd54305124db7f2a1aff45b65d1ae00015917a2f739d  README.md
+1961782408dfa4cab32fc1549f5cc45d101252c6369aa198f526dba2484e12e0  docs/status.md
+3fdd7edb74c746beead13b55411af221dc7bf8c0b41926fc729196e69b98f08b  lab/scenarios/a01-role-object.md
+```
+
+Open gate. Obtain a separately authorized record from the fixture operator with the exact target/build and documented policy, decisions and evidence hashes for the disposable role/object cases, isolation and chronology. Review whether it substantiates a particular finding or represents a standalone test.

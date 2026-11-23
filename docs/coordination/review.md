@@ -390,3 +390,22 @@ Verified on 2026-11-23 at baseline `20c6a76536c3b2d921ef3a27a36b96b119c0af13`. T
 - `GOFLAGS=-mod=readonly make check`, `npm run build --prefix frontend`, `make test-integration` and `make test-e2e` exited 0 from the frozen archive. Formatting, lint, generation, Go, nine Python and four Vitest tests passed. Staged and fresh migrations reached 7, both M1 fixtures and verification/classification/context integration passed under the race detector, and all four Chromium cases passed. Public GitHub metadata confirmed classification baseline run `45195527459` completed successfully at the exact commit. [Hosted baseline run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45195527459)
 
 **Verdict:** checkpoint 29 independently verified at its recorded hashes. No new findings. Hosted context CI and live role/object evidence remain separate gates. Only the disposable local application received test traffic.
+
+## Independent verification — M2-20261124-30
+
+Verified on 2026-11-24 at baseline `da9844eabb14c6c14646b407c652864afc0012e9`. The frozen manifest and all three documentation hashes matched before and after the review. The isolated archive matched all three hashes and the genuine fixture digest. The diff contains documentation only. All 24 relative links and anchors resolved and `git diff --check` passed. The 42 unchanged files from the latest hashes in checkpoints 24–29 matched, so their findings and fixes carry forward.
+
+| Acceptance criterion | Independent result |
+| --- | --- |
+| Append-only confirmed, false-positive and inconclusive review states | The disposable API retained prior states, ordered history and exact evidence references. These test assertions exercise persistence. |
+| Stale predecessors and evidence scope | Stale verification, classification and context predecessors returned 409. Verification and context same-predecessor races produced one 201 and one 409 each. Wrong findings, mismatched pointers and foreign context observations were rejected. Chromium recovered verification and context drafts. |
+| Deterministic context | Existing exact scopes took precedence over a later default. Unmatched endpoints used the default, and absent configuration presented four unknown factors with explicit provenance. History and resolved context survived restart. |
+| Classification, immutability and audit | Conflicting automatic inputs retained both candidates with no mapped category. An explicit manual revision remained current after a new import. Scanner severity and verification were preserved. All three revision tables grant runtime read and append access. The tests exercised denied mutations, immutable earlier revisions and audit entries for accepted appends. |
+| M1 regression | Genuine import matched 17 fingerprints and 21 pointers, with exact bytes, provenance and concurrent reuse of one import. The synthetic suite and both browser restart cases passed. |
+| A01 manual evidence | **Open.** The inventory was limited to the documented lab and artifact locations. It found the protocol and one expired passive authorization, with no `artifacts/a01/` evidence directory or observed role/object decisions. The proposed outcomes describe a fixture policy. An unrelated policy test record is standalone evidence and cannot validate the prior CORS finding. |
+
+On macOS arm64 with the stated tool versions, `GOFLAGS=-mod=readonly make check`, `npm run build --prefix frontend`, `make test-integration` with inherited database URLs unset, and `make test-e2e` exited 0 in the archive. Generation was byte-identical, nine Python and four Vitest tests passed, fresh and staged PostgreSQL reached migration 7, both import suites and all three M2 subtests passed under the race detector, and all four Chromium cases and two outage checks passed. The disposable archive was removed. Test traffic went to the local application only.
+
+Public GitHub metadata confirmed `main` at the exact baseline and run `45197471901` successfully completed all 17 steps, including PostgreSQL integration and Chromium. The README, status and handoff accurately distinguish those software results from the missing role/object evidence. [Hosted baseline run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45197471901)
+
+**Verdict:** checkpoint 30 independently verified at its recorded hashes. No new findings. M2 software gates passed. M2 acceptance remains open pending separately authorized, independently reviewable role/object evidence for the selected fixture and policy.

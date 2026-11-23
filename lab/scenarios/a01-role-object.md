@@ -1,10 +1,10 @@
 # A01 access-control evidence
 
-This is a test protocol for an operator-owned access-control test fixture. Record an authorization reference and the documented access policy before using a live lab. The genuine passive Juice Shop report and the automated workflow tests provide scanner assertions and application behavior. They contain no observed role or object authorization decision.
+This protocol defines the evidence required from an operator-owned access-policy test fixture. The registered Juice Shop origin is `http://juice-shop:3000`. The [passive report provenance](../../backend/testdata/zap/juice-shop-provenance.json) identifies the image used for the prior capture. A new scenario needs the operator's exact fixture, image or build digest, documented access policy and authorization for its own test interface. The passive report and the automated application tests supply no observed role or object decision.
 
 ## Fixture and expected decisions
 
-Create two disposable identities, **owner** and **peer**, in the fixture's ordinary user role. Assign a private object **A** to the owner and a private object **B** to the peer. Use fictitious contents and keep the fixture account secrets private. Configure the fixture policy to permit only the owner to see a private object. Use the fixture's supported object access interface with both identities and without a session. Where the fixture has an administrator role, document its privileges and assign a disposable administrator only if its policy permits the check.
+The proposed policy allows each ordinary user to read only objects they own. Use two disposable identities, **owner** and **peer**, with private objects **A** and **B** respectively. Use fictitious contents. If the selected fixture has a documented administrator exception, give that check a separate disposable identity. The matrix records the expected outcomes for the fixture owner's authorization-policy test interface. It is not a claim about the behavior of the registered Juice Shop build.
 
 | Identity and object | Expected decision |
 | --- | --- |
@@ -15,7 +15,12 @@ Create two disposable identities, **owner** and **peer**, in the fixture's ordin
 | Anonymous, A | Deny |
 | Authorized administrator, A | Follow the documented administrator policy |
 
-Record each actual decision with the scenario identifier, identity role, object label, time, and an evidence reference. A denial can be represented by a policy response, a lack of access through the supported interface, or another documented result. Record any mismatch as an observation with its own evidence. Separate legitimate role differences from unexpected access. Use an authorized operator's reproducible procedure and linked evidence before saving a confirmed review. Leave a finding inconclusive if its evidence is insufficient.
+## Scope and records
+
+1. **Authorize the fixture.** Identify the exact origin, build digest, policy reference, identities and objects, supported operations, operator and UTC start and expiry. Seed accounts and objects through the fixture's documented setup on a disposable stack. The previous passive authorization is expired and applies only to that capture.
+2. **Constrain traffic.** The proposed live observation scope is ordinary sign-in and read-only owner views of A and B at the named fixture origin, using the documented interface. Use the fixture owner's authorization-policy test record for the other matrix decisions. Bind the client to an isolated internal lab network with egress limited to the pinned fixture address and port. Verify scope and redirect enforcement with controlled sinks before target traffic. Stop on isolation failure, expiry, unexpected destination or unexpected changes to the fixture. Cap the live observation at 5 minutes and 60 total requests, whichever comes first. Use fresh accounts and browser sessions without retries outside the named window.
+3. **Preserve evidence.** Keep the private authorization, scope and isolation result, fixture version, UTC time window, operator procedure and original logs in ignored `artifacts/a01/<run-id>/`. Record each policy decision with the role and object aliases, expected and observed outcomes, UTC time and a SHA-256 digest of the policy log or response record. A denial or an unperformed case has its own outcome. Keep credentials, sessions and private payloads outside Git. Review and hash any shareable derivative separately.
+4. **Close the run.** Stop the dedicated lab services and verify they stopped. End the disposable sessions and retain evidence privately. Before linking the result to a finding, match the tested policy and object operation to that finding's target, endpoint and observation reference. Record unrelated policy results as a standalone scenario. A correct denial is a valid result. Record an inconclusive review if the evidence is insufficient to confirm the finding.
 
 ## Observed results
 
