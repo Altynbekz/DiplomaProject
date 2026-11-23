@@ -52,6 +52,8 @@ make test-e2e
 
 `make test-scripts` runs the fixture preflight unit tests with Python's standard-library `unittest`. Both `make test` and `make check` include these synthetic tests. CI pins Python 3.14.3.
 
+The root Go workspace points to the module in `backend/`. From the repository root, run `go test ./backend/...` for Go unit tests or `go build ./backend/...` to compile the Go packages. Inside `backend/`, use `go test ./...`.
+
 Database and browser suites create and remove their own disposable clusters. They require loopback sockets and PostgreSQL shared memory. `make migrate-up` uses an explicit `MIGRATION_DATABASE_URL` for the migration role. The API connects as a separate role with append-only permissions for evidence and audit records. For local evidence retention, back up the database privately before any operator-managed reset. A stack stop retains evidence.
 
 To exercise Compose on an ARM64 engine with Docker Compose 2.24.4 or newer, run `python3 scripts/test-compose.py`. It verifies startup, migrations, readiness, authentication, synthetic import, duplicate handling, and persistence across shutdown and restart. It creates a random project, disposable credentials and volume, and ephemeral loopback ports. Cleanup is scoped to that project. Use `--config-only` to validate the effective isolation settings without starting containers. The smoke test uses Compose’s port replacement syntax. [Compose merge reference](https://docs.docker.com/reference/compose-file/merge/#replace-value)

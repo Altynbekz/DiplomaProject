@@ -62,6 +62,10 @@ Locally on Python 3.14.3, `make test-scripts`, `GOFLAGS=-mod=readonly make test`
 
 `npm run build --prefix frontend`, `GOFLAGS=-mod=readonly make test-integration` and `GOFLAGS=-mod=readonly make test-e2e` exited 0. Disposable PostgreSQL applied migrations through revision 4 and passed the synthetic integration suite under the Go race detector. Both Chromium phases and the database outage check passed. Hosted run `45170314104` later verified the Python test wiring on `94f431f`.
 
+## Go workspace
+
+The root `go.work` selects the module in `backend/`. From the repository root, `go test ./backend/...`, `go build ./backend/...`, and `go vet ./backend/...` exited 0 with Go 1.27.1. `make check` also exited 0 with byte-identical generated files. The local guard and canary build as separate packages in their own ignored workspace, where `go test ./...` and `go vet ./...` passed.
+
 ## Container startup fixes
 
 - The original frontend image denied write access to `node_modules` as its non-root runtime user. Vite reproduced the cache write error in a disposable checkout. With the build and application files owned by `node`, the same image probe passed as that runtime user with networking disabled.
