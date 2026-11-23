@@ -1,0 +1,7 @@
+# Documentation of the fixed M1 registry; runtime origin is server-configured.
+# This is an offline import identity, never scan authorization.
+# Register the DNS-style service hostname, without underscores.
+juice-shop:
+  canonical_origin: http://juice-shop:3000
+  allowed_path_prefixes: [/]
+  scanning_enabled: false

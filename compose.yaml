@@ -1,0 +1,69 @@
+name: diploma
+services:
+  db:
+    platform: linux/arm64
+    build:
+      context: .
+      dockerfile: scripts/db.Dockerfile
+    environment:
+      POSTGRES_USER: diploma_migrate
+      POSTGRES_DB: diploma
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password, runtime_password]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    networks: [storage]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U diploma_migrate -d diploma]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    platform: linux/arm64
+    build: ./backend
+    command: [migrate]
+    secrets: [db_password]
+    networks: [storage]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: 'no'
+  api:
+    platform: linux/arm64
+    build: ./backend
+    environment:
+      APP_OPERATOR_ID: ${APP_OPERATOR_ID:-local-operator}
+      JUICE_SHOP_ORIGIN: ${JUICE_SHOP_ORIGIN:-http://juice-shop:3000}
+      APP_LISTEN: 0.0.0.0:8080
+      APP_CONTAINER: 'true'
+    secrets: [runtime_password, api_token]
+    ports: [127.0.0.1:8080:8080]
+    networks: [storage, app]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, /app/api, -healthcheck]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  frontend:
+    platform: linux/arm64
+    build: ./frontend
+    environment:
+      API_PROXY_URL: http://api:8080
+    ports: [127.0.0.1:5173:5173]
+    networks: [app]
+    depends_on:
+      api: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:5173').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+networks:
+  storage: {internal: true}
+  app: {internal: true}
+volumes:
+  pgdata:
+secrets:
+  db_password: {file: .secrets/compose/db_password}
+  runtime_password: {file: .secrets/compose/runtime_password}
+  api_token: {file: .secrets/compose/api_token}

@@ -1,0 +1,6 @@
+artifacts
+.secrets
+.env
+.git
+**/node_modules
+**/dist

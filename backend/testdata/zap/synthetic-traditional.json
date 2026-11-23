@@ -1,0 +1,68 @@
+{
+  "@version": "SYNTHETIC-TEST-ONLY",
+  "@generated": "not a scan",
+  "site": [
+    {
+      "@name": "http://juice-shop:3000",
+      "@host": "juice-shop",
+      "@port": 3000,
+      "@ssl": "false",
+      "alerts": [
+        {
+          "pluginid": 40018,
+          "alertRef": "40018-1",
+          "name": "Synthetic <script>window.pwned=1</script>",
+          "riskcode": "3",
+          "confidence": 2,
+          "cweid": "89",
+          "desc": "<script>window.pwned=1</script> =SUM(1,2) token=synthetic-private-value",
+          "solution": "Synthetic remediation only",
+          "instances": [
+            {
+              "uri": "http://juice-shop:3000/rest/products/search?q=secret1",
+              "method": "get",
+              "param": "q",
+              "attack": "synthetic attack A",
+              "evidence": "synthetic-private-value"
+            },
+            {
+              "uri": "http://juice-shop:3000/rest/products/search?q=secret2",
+              "method": "GET",
+              "param": "q",
+              "attack": "synthetic attack B",
+              "evidence": "synthetic-private-value"
+            },
+            {
+              "uri": "http://juice-shop:3000/rest/products/search?q=secret2",
+              "method": "post",
+              "param": "q"
+            },
+            {
+              "uri": "http://juice-shop:3000/rest/products/search?q=secret2",
+              "method": "GET",
+              "param": "other"
+            }
+          ]
+        },
+        {
+          "pluginid": "99999",
+          "name": "Synthetic unknown severity",
+          "riskcode": 9,
+          "confidence": "1",
+          "instances": [
+            {
+              "uri": "http://juice-shop:3000/",
+              "method": "GET"
+            }
+          ]
+        },
+        {
+          "pluginid": 123,
+          "name": "Synthetic unlocated alert",
+          "riskcode": 0,
+          "instances": []
+        }
+      ]
+    }
+  ]
+}
