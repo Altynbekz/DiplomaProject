@@ -2,9 +2,9 @@
 
 Role: main implementation agent. Scope: M0 and M1.
 
-Current milestone: M0/M1. Hosted CI passed for `4d0240c`. The new Python test wiring awaits hosted verification after publication. Genuine-report acceptance still needs an authorized report and provenance.
+Current milestone: M0/M1. Hosted CI verified the Python test wiring on `94f431f`. Genuine-report acceptance awaits an authorized collection and its provenance. Lab preparation is separate from the frozen documentation checkpoint.
 
-Current checkout baseline: `4d0240c4f50559b0e21feeeead7348c03cd74a7f`. No application files are under edit. See checkpoint 17 for the frozen test wiring and CI evidence, and `review.md` for independent results. Earlier checkpoints preserve the implementation history.
+Current checkout baseline: `94f431f479b7b707c84ee9d79ebf5f6710aa9ced`. No application files are under edit. See checkpoint 19 for the frozen documentation and CI evidence, and `review.md` for independent results. Earlier checkpoints preserve the implementation history.
 
 ## Checkpoint 1 — M0 foundation — READY FOR REVIEW
 
@@ -303,3 +303,41 @@ d8ac3e8710c4b12586cc73fd35edc5351ca113aeaee4debe72f6f10f93411fb2  tools.versions
 ```
 
 Checkpoint 17 passed independent verification at all five frozen hashes. The verifier ran all three Make targets in a separate archive, confirmed the deliberate failure exits from `make test` and `make check`, and checked the Python and action pins. The observed hosted success applies to the baseline only. No findings remain open. [Independent verification](review.md#independent-verification--m0-20261123-17)
+
+## M1-20261123-18 — Hosted CI evidence and passive collection plan — READY FOR VERIFICATION
+
+Baseline commit: `94f431f479b7b707c84ee9d79ebf5f6710aa9ced`. The local checkout was clean and GitHub `main` matched the baseline. The three files below are frozen for review.
+
+Hosted evidence: run `45170314104`, attempt 1, went from `in_progress` to `completed` with conclusion `success` on the exact baseline. GitHub reported one run for that commit, last updated `2026-11-23T12:07:24Z`. Job `137677821087` and all 17 listed steps passed. Its log includes `python3 -B -m unittest -v test_check_zap_fixture` in `make check`. PostgreSQL integration and Chromium passed in the same workflow. [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104)
+
+Changes: recorded the hosted result, updated the README, and documented a scoped passive collection plan for the disposable `http://juice-shop:3000` lab. The plan covers prior authorization, verified isolation and request limits, ordinary browser traffic in ZAP Safe mode, a private Traditional JSON export and provenance, and shutdown. It does not treat the plan as executed or use the preflight as proof of a genuine report. No application, test, or workflow files changed.
+
+Local checks: `git diff --check` exited 0. A Python relative-link and anchor check resolved all 18 links in `README.md`, `docs/status.md` and `docs/fixture-provenance.md`. `git check-ignore artifacts/zap/example/original.json` exited 0 and confirmed the proposed private report path is ignored. The repository and documented artifact location search found only the labeled synthetic fixture, and the operator confirmed a new report is needed.
+
+Remaining gates: independent review of this documentation checkpoint, a hosted run of the eventual pushed commit, completion of lab isolation verification, explicit authorization for the collection, and genuine-report acceptance after collection. No scan was launched.
+
+```text
+75e1110ca71464a000e7b4c5e498502acd0dc70b02c5ab1195aeb3fa2714be2c  README.md
+1429e22eaaa725541aadae5d862d3d31f0368d9855eaae0a5ab3ec08b79a8107  docs/status.md
+c6d85d1f08e1ec3cab27f8a2ce5352710c6fdde57195a0dbe3cd9258c071cc00  docs/fixture-provenance.md
+```
+
+Checkpoint 18 is superseded for the collection plan and CI check detail. The verifier confirmed the exact hosted run and all nine Python tests. V015 requests version and digest pins for every selected lab image. The plan is being amended before retesting.
+
+## M1-20261123-19 — Pinned lab image provenance — READY FOR VERIFICATION
+
+Baseline commit: `94f431f479b7b707c84ee9d79ebf5f6710aa9ced`. This checkpoint supersedes 18 for the three frozen documentation files.
+
+V015 addressed. Before isolation tests, the plan requires lab container versions and SHA-256 digests plus exact ZAP and add-on versions. The resolved platform image identities stay with private run evidence. The plan spells out the browser-to-ZAP-to-allowlisting-proxy boundary. `docs/status.md` records nine passing Python tests from the separately reviewed hosted job log.
+
+Checks: `git diff --check` exited 0, all 18 local links and anchors resolved, and `git check-ignore` confirmed that the private lab work and proposed original report path are excluded. No workflow or application code was edited. The independent verifier confirmed run `45170314104` on the exact baseline, all 17 successful steps, and the nine Python tests. [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104)
+
+Remaining gates: independent recheck of V015, hosted CI of the commit after push, completed isolation verification on the local lab, a named authorization, and the genuine report and acceptance evidence. Private lab work continues outside the frozen files. No scan was launched.
+
+```text
+75e1110ca71464a000e7b4c5e498502acd0dc70b02c5ab1195aeb3fa2714be2c  README.md
+3cd52ac68edf27dec0f69a1e6472398d2f5ec602f67ecb1fd907e2316630a0b3  docs/status.md
+533a982b58ac1b07922335cbce5fb2a29c2738e9a34618c035baf5611d74232e  docs/fixture-provenance.md
+```
+
+Checkpoint 19 passed independent verification at all three frozen hashes. V015 is resolved. The verifier found no new issues in the CI record, scoped passive plan, private path exclusion or documentation links. Actual lab isolation and collection are separate gates. [Independent verification](review.md#independent-verification--m1-20261123-19)
