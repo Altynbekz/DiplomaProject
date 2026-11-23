@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"diploma/internal/classify"
 	"diploma/internal/domain"
 	"diploma/internal/store"
 	db "diploma/internal/store/sqlc"
@@ -21,6 +22,7 @@ type Service struct {
 	Store                    *store.Store
 	Origin, Actor, CursorKey string
 	Now                      func() time.Time
+	Mapping                  classify.Ruleset
 }
 
 func (s *Service) audit(ctx context.Context, q *db.Queries, request, action, kind, id string) error {
@@ -197,6 +199,7 @@ func (s *Service) Import(ctx context.Context, targetID, request string, raw []by
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return Import{}, err
 	}
+	eligible := map[string]string{}
 	for _, o := range r.Observations {
 		fid, e := q.FindFinding(ctx, db.FindFindingParams{TargetID: targetID, Fingerprint: o.Fingerprint})
 		if errors.Is(e, pgx.ErrNoRows) {
@@ -210,7 +213,16 @@ func (s *Service) Import(ctx context.Context, targetID, request string, raw []by
 		if e != nil {
 			return Import{}, e
 		}
+		for _, rule := range s.Mapping.Rules {
+			if rule.Matches(o.PluginID, o.CWE) {
+				eligible[fid] = o.PluginID
+				break
+			}
+		}
 		observationTime = observationTime.Add(time.Microsecond)
+	}
+	if e := s.classifyImported(ctx, q, eligible, request); e != nil {
+		return Import{}, e
 	}
 	if e = s.audit(ctx, q, request, "report.import", "import", id); e != nil {
 		return Import{}, e
@@ -276,7 +288,7 @@ func finding(v db.ListFindingsRow) Finding {
 	title, _ := Redact(v.Title)
 	path, _ := Redact(v.Path)
 	param, _ := Redact(v.ParameterName)
-	return Finding{ID: v.ID, TargetID: v.TargetID, Title: title, Method: v.Method, Origin: v.CanonicalOrigin, Path: path, Parameter: param, QueryNames: v.QueryParameterNames, ObservationCount: v.ObservationCount, Severity: v.ScannerSeverity, SeverityObservationID: v.SeverityObservationID, Verification: v.Verification, ReviewID: optionalString(v.VerificationID), Classification: Classification{Status: "unmapped", Candidates: []string{}}, PluginID: v.PluginID, FingerprintVersion: v.FingerprintVersion, Fingerprint: v.Fingerprint, CreatedAt: v.CreatedAt.UTC()}
+	return Finding{ID: v.ID, TargetID: v.TargetID, Title: title, Method: v.Method, Origin: v.CanonicalOrigin, Path: path, Parameter: param, QueryNames: v.QueryParameterNames, ObservationCount: v.ObservationCount, Severity: v.ScannerSeverity, SeverityObservationID: v.SeverityObservationID, Verification: v.Verification, ReviewID: optionalString(v.VerificationID), Classification: Classification{RevisionID: optionalString(v.ClassificationID), Status: v.ClassificationStatus, Category: optionalString(v.ClassificationCategory), Candidates: v.ClassificationCandidates, MappingVersion: optionalString(v.ClassificationVersion)}, PluginID: v.PluginID, FingerprintVersion: v.FingerprintVersion, Fingerprint: v.Fingerprint, CreatedAt: v.CreatedAt.UTC()}
 }
 func (s *Service) Findings(ctx context.Context, f FindingFilter, limit int, raw string) (Page[Finding], error) {
 	p := Page[Finding]{Items: []Finding{}}

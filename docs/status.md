@@ -1,12 +1,12 @@
 # Implementation status
 
-Updated 2026-11-23, Asia/Almaty. This status covers the foundation and offline import. This continuation started from `94f431f479b7b707c84ee9d79ebf5f6710aa9ced`, which matched GitHub `main`.
+Updated 2026-11-23, Asia/Almaty. This status covers the foundation, offline import, and M2 review workflow.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
 | M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `94f431f`, including the Python tests in `make check`. [GitHub Actions run 45170314104](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) |
 | M1 | Offline Traditional JSON import, immutable evidence, provenance, duplicate handling, normalized observations, audited private downloads, filtered and paged UI, reusable genuine fixture | Acceptance passed, with synthetic and genuine automated suites passing locally, independently and in hosted CI for `f5712a49b5676badb05486b30c73e0d4b916146b`. [Independent verification](coordination/review.md#independent-verification--m1-20261123-22) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45187645541) |
-| M2 | Human verification and immutable history | Human verification passed local PostgreSQL and Chromium checks. Independent review and hosted CI are pending. Classification and context follow. |
+| M2 | Human verification and OWASP mapping histories | Human verification passed local, independent and hosted checks. Classification passed local checks and awaits final independent recheck. Context follows. [Verification CI](https://github.com/Altynbekz/DiplomaProject/actions/runs/45193568143) |
 | M3–M6 | Planned | No implementation started. |
 
 ## Recorded checks
@@ -112,3 +112,12 @@ The reviewed derivative, shareable provenance and independent fingerprint oracle
 Migration 5 adds append-only verification reviews. The runtime role can create and read reviews and can lock a finding through a narrow database function. The role cannot edit, delete or truncate review records or update evidence rows. Every accepted review validates its observation UUID and exact source pointer against the finding and writes an audit row in the same transaction. The finding's latest human review can be filtered separately from scanner severity.
 
 GOFLAGS=-mod=readonly `make check`, `make test-integration`, `make test-e2e` and `npm run build --prefix frontend` exited 0 locally. Goose upgraded through migration 4 to 5 and also migrated a fresh genuine-test database. The API suite checked all four review states, evidence-reference failures, newest-first history, stale predecessors, two concurrent requests sharing a predecessor, and runtime write restrictions. Chromium covered two tabs editing the same finding, preservation and recovery of a stale draft, and persisted history following restart. Tests used isolated databases and no scanner traffic.
+
+
+## Reviewed OWASP classification
+
+Migration 6 adds immutable classification revisions. The versioned data file is embedded in the backend for host and container builds. The existing path under configs links to that canonical file. The rules match only plugin and CWE identifiers. A matched rule set records its sources, rationale, supporting observations, and the independent policy review bound to the exact policy digest. Conflicts preserve all candidate study categories and an ambiguous state. An unmatched historical finding stays unmapped until it receives an operator revision or a new distinct report supplies usable evidence. Exact report duplicates retain their existing identity. A manual head takes precedence over subsequent automatic rules.
+
+The genuine fixture maps five findings to A01:2025 and one to A02:2025, places one diagnostic outside study scope, and leaves ten findings unmapped. These are classifications of scanner assertions. The disposable integration test uses a separately authored contradictory CWE to verify that both categories survive in ambiguity and neither enters category-filtered results. It also checks audit history, same-finding references, stale predecessors, runtime immutability, and manual precedence. No live role/object validation was performed. [A01 test protocol](../lab/scenarios/a01-role-object.md) · [Mapping rules](../configs/owasp-mapping.v1.yaml)
+
+`GOFLAGS=-mod=readonly make check`, `npm run build --prefix frontend`, `make test-integration` and `make test-e2e` exited 0 locally for this slice. Goose applied migration 6 on clean and upgraded schemas. Both Chromium suites passed, including the genuine classification form and retained history after restart.

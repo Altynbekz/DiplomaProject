@@ -21,6 +21,20 @@ type AuditEvent struct {
 	CreatedAt            time.Time
 }
 
+type ClassificationRevision struct {
+	ID                  string
+	FindingID           string
+	Status              string
+	Category            pgtype.Text
+	CandidateCategories []string
+	MappingVersion      string
+	RuleRefsJson        []byte
+	Rationale           string
+	EvidenceRefsJson    []byte
+	Actor               string
+	CreatedAt           time.Time
+}
+
 type Finding struct {
 	ID                  string
 	TargetID            string

@@ -17,6 +17,7 @@ import {
 import type { components } from "../api/schema";
 import { useToken } from "../app/main";
 import { VerificationPanel } from "./verification-panel";
+import { ClassificationPanel } from "./classification-panel";
 type Page<T> = { items: T[]; next_cursor: string | null };
 export function ErrorState({ error }: { error: unknown }) {
   return (
@@ -658,6 +659,11 @@ function FindingDetail() {
             <dt>Category mapping</dt>
             <dd>
               {f.data.classification.category ?? f.data.classification.status}
+              {f.data.classification.status === "ambiguous" && (
+                <small className="location">
+                  {f.data.classification.candidate_categories.join(", ")}
+                </small>
+              )}
             </dd>
             <dt>CVSS-B / CVSS-BE</dt>
             <dd>
@@ -666,6 +672,11 @@ function FindingDetail() {
             </dd>
           </dl>
           <VerificationPanel
+            finding={f.data}
+            observations={o.data?.items ?? []}
+            token={token}
+          />
+          <ClassificationPanel
             finding={f.data}
             observations={o.data?.items ?? []}
             token={token}

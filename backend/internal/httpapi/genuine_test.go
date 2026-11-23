@@ -17,6 +17,7 @@ import (
 	"testing"
 	"time"
 
+	"diploma/internal/classify"
 	"diploma/internal/service"
 	"diploma/internal/store"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -46,8 +47,12 @@ func TestIntegrationGenuineReport(t *testing.T) {
 		genuineFixtureTargetID, "Genuine fixture", origin, "juice-shop"); err != nil {
 		t.Fatal(err)
 	}
+	rules, err := classify.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
 	api := API{
-		Service: &service.Service{Store: store.New(pool), Origin: origin, Actor: "fixture-operator", CursorKey: testToken, Now: time.Now},
+		Service: &service.Service{Mapping: rules, Store: store.New(pool), Origin: origin, Actor: "fixture-operator", CursorKey: testToken, Now: time.Now},
 		Token:   testToken, Log: slog.New(slog.NewTextHandler(io.Discard, nil)),
 	}
 	handler := api.Handler()
@@ -245,6 +250,7 @@ func TestIntegrationGenuineReport(t *testing.T) {
 	t.Run("verification workflow", func(t *testing.T) {
 		checkVerificationWorkflow(t, ctx, pool, request, path)
 	})
+	t.Run("classification workflow", func(t *testing.T) { checkClassificationWorkflow(t, ctx, pool, request, path, raw) })
 }
 
 func decodeFixtureJSON(t *testing.T, data []byte, value any) {

@@ -3,7 +3,7 @@
   "info": {
     "title": "Diploma offline evidence API",
     "version": "0.1.0",
-    "description": "Local evidence import and human verification. Scanner assertions and review results are separate. CVSS is absent."
+    "description": "Local evidence import, human verification and reviewed OWASP classification. CVSS is absent."
   },
   "security": [
     {
@@ -1899,6 +1899,317 @@
           }
         }
       }
+    },
+    "/api/v1/findings/{id}/classifications": {
+      "get": {
+        "operationId": "listClassifications",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassificationPage"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createClassification",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassificationRevision"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClassificationInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2278,23 +2589,12 @@
             ]
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "mapped",
-              "unmapped",
-              "ambiguous",
-              "out_of_scope"
-            ]
+            "$ref": "#/components/schemas/ClassificationStatus"
           },
           "category": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "A01:2025",
-                  "A02:2025",
-                  "A05:2025"
-                ]
+                "$ref": "#/components/schemas/StudyCategory"
               },
               {
                 "type": "null"
@@ -2304,12 +2604,7 @@
           "candidate_categories": {
             "type": "array",
             "items": {
-              "type": "string",
-              "enum": [
-                "A01:2025",
-                "A02:2025",
-                "A05:2025"
-              ]
+              "$ref": "#/components/schemas/StudyCategory"
             }
           },
           "mapping_version": {
@@ -2972,6 +3267,231 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Verification"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ]
+      },
+      "ClassificationStatus": {
+        "type": "string",
+        "enum": [
+          "mapped",
+          "unmapped",
+          "ambiguous",
+          "out_of_scope"
+        ]
+      },
+      "StudyCategory": {
+        "type": "string",
+        "enum": [
+          "A01:2025",
+          "A02:2025",
+          "A05:2025"
+        ]
+      },
+      "ClassificationRule": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "plugin_id": {
+            "type": "string"
+          },
+          "cwe_id": {
+            "type": "integer"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudyCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "review_record": {
+            "type": "string"
+          },
+          "policy_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "rationale",
+          "sources",
+          "review_record",
+          "policy_sha256"
+        ]
+      },
+      "ClassificationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ClassificationStatus"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudyCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidate_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StudyCategory"
+            },
+            "maxItems": 3,
+            "uniqueItems": true
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceRef"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "expected_previous_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "category",
+          "candidate_categories",
+          "rationale",
+          "evidence_refs",
+          "expected_previous_id"
+        ]
+      },
+      "ClassificationRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "finding_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ClassificationStatus"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudyCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidate_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StudyCategory"
+            },
+            "maxItems": 3,
+            "uniqueItems": true
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceRef"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "mapping_version": {
+            "type": "string"
+          },
+          "rule_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassificationRule"
+            }
+          },
+          "actor": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "finding_id",
+          "status",
+          "category",
+          "candidate_categories",
+          "rationale",
+          "evidence_refs",
+          "mapping_version",
+          "rule_refs",
+          "actor",
+          "created_at"
+        ]
+      },
+      "ClassificationPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassificationRevision"
             }
           },
           "next_cursor": {

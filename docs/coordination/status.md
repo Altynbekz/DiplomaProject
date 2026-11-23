@@ -496,3 +496,59 @@ a747946ec40d9264bf504b51bcac5049ddb24f5295785136cc133a8ca0d35d8c  frontend/src/f
 ```
 
 Checkpoint 25 passed independent review and resolves V018. The verifier used a second offline import at identical JSON positions, selected the intended source by keyboard, and traced the saved observation ID to its evidence card. [Independent recheck](review.md#independent-verification--m2-20261123-25)
+
+## M2-20261123-26 — Reviewed OWASP classification — READY FOR VERIFICATION
+
+Baseline 948351c45008048c601a827594d3ddf84d1a1cd8. Migration 6, embedded versioned rule data, append-only operator and automatic classification, independent verification status, summary filters, keyboard-accessible editor and history. The root rule path is a relative symlink to the single embedded source; its hash below is of its target content. The A01 protocol describes expected role/object outcomes and records no live observations.
+
+GOFLAGS=-mod=readonly make check, make test-integration, make test-e2e and npm run build --prefix frontend each exited 0 locally. Integration covered genuine rule results, a separate authored conflicting assertion with both candidate categories, existing filters, source references, manual precedence, audit and immutable runtime privileges. Both Chromium phases show saved review and classification after restart. Goose applied migration 6 on clean and upgraded schemas. git diff --check exited 0. Human verification CI is running at the exact baseline; classification CI awaits publication.
+
+Remaining work: independent classification review and hosted CI, then verified context history. No new scan or live role/object observation.
+
+```text
+a571e52ae2990383a0c7767be2f47f0fb64fa59944a71493cb480d365f16a422  README.md
+0b731dc9ad65874850f0b39a732eb2e7b93629a16200711e51c2215225dec350  backend/cmd/api/main.go
+52d856f63fba56ce734d7b815a57ff676a9fe45c319288deba6d4edd5e17e94a  backend/db/migrations/00006_classification.sql
+5b945c68d7c103966cab4aa08501ebe5127766587f29f3617cbf07aea5317de4  backend/db/queries/classifications.sql
+bfee6b69da6e38215441ea3b1763488e10094e621325f113924a6dcdcff17f02  backend/db/queries/imports.sql
+2afd53f4f59e12672b2914e96310806f6cc0fce4c7180e5debfae7d4e550ced3  backend/internal/classify/owasp-mapping.v1.yaml
+1d932fb4fcc7c6059853ff191bc24381fd1d04e6f0402ae904c32ee1145047d9  backend/internal/classify/rules.go
+c0d4edae0f0d6820a2239b3c009b82529b9448496f1c0ecb5d9c3f7896d4d59f  backend/internal/classify/rules_test.go
+ec5958d826750591827ddb3e2a9ea8f0e34c9de53fb500953ae6095cc1966087  backend/internal/httpapi/api.go
+23a075a19c1250b9460c4b78852b55790a2b250ee6100ccce80f81405794918d  backend/internal/httpapi/classification_integration_test.go
+83b4e64f20a1380b1af7eb10ef95c18093ebe28c65c8acfd325fbdf499bc27d7  backend/internal/httpapi/genuine_test.go
+e5e1a44c631934a07ba9c97dc1d522757b6cf96a2bb3724fa51f13c1d2ebd49d  backend/internal/httpapi/reviews.go
+a291a72e9c5ae1f5b46b65f453e4beedb2c30b323b2921d5fc3ec256f8ddc656  backend/internal/service/classifications.go
+503db8baea631db83f376a38b860b3bb02e87f3b21ed1ee53a5defcb6b098d33  backend/internal/service/service.go
+cf7c5a9cb9bc26da5c95d64448f86f7dc869b1bdc03bafd89c6973aa3d7d9291  backend/internal/store/sqlc/classifications.sql.go
+4197d9f6148dee89fd08e8d5447e3e48c49ef921a782570cfadea1ee81375703  backend/internal/store/sqlc/imports.sql.go
+22e6565c876f0eab95221abada29154323d9b616ee032300cee22866f2da9f1f  backend/internal/store/sqlc/models.go
+2afd53f4f59e12672b2914e96310806f6cc0fce4c7180e5debfae7d4e550ced3  configs/owasp-mapping.v1.yaml
+13dfe8d15ea19b87c9fe2495641e51918bf033a6f4b16c38b5755670a5b013c2  contracts/openapi.yaml
+54177c7596dd1e41a7780ad021c19df6f8a517ef4f2501f6a5638573224f18e2  docs/status.md
+8025d803d4e36ae412e12b83ac3622fce99cef2a0acde7de1c7ad2dd1764f330  frontend/src/api/schema.d.ts
+10635e0edcec9ca9fb9f994d64d8268450e8166a2f4d982d837848fba3e66559  frontend/src/features/classification-panel.tsx
+e01eae4507a5c45eef07dddf9fd4099947f2306f05e526f99eb92cbbede5522f  frontend/src/features/evidence.tsx
+a3560a2d5475b641b97056410f0520900af3cc0bdb5b8720b36be656b8454c6d  frontend/tests/browser/genuine.spec.ts
+34d1d757f4f7099f693e44bd07817154856b8984c0951b99a884e3e34298452f  lab/scenarios/a01-role-object.md
+c71135fe1e0467c28b1c5d9a7237f9b809c10661a04537d6644ca8dd1eb128dc  scripts/test-integration.sh
+```
+
+## M2-20261123-27 — Classification contract and review record — READY FOR VERIFICATION
+
+Baseline 948351c45008048c601a827594d3ddf84d1a1cd8. V019 addressed by distinguishing omitted category from explicit null. The disposable test checks the former fails and the latter creates a valid revision. V020 addressed with version- and digest-bound local review metadata pointing to the actual independent review of the canonical data at checkpoint 26. The startup loader checks policy bytes and the revision and UI expose the recorded review reference and digest. The rule data and remaining files retain checkpoint 26 hashes.
+
+GOFLAGS=-mod=readonly make check, make test-integration, ./scripts/test-e2e.sh genuine and npm run build --prefix frontend exited 0 after fixes. The exact human verification commit 948351c45008048c601a827594d3ddf84d1a1cd8 passed [hosted CI](https://github.com/Altynbekz/DiplomaProject/actions/runs/45193568143) including PostgreSQL and Chromium. Classification CI awaits publication. git diff --check exited 0.
+
+```text
+dc254bbe9f6790907388708cd43c0bf5056f178f0663e91b673d6e30b6e8b47a  backend/internal/classify/owasp-mapping.v1.review.json
+707e9881b62a72d606574443f1a5e90d8e61ee0f2764752f09250849f9575f86  backend/internal/classify/rules.go
+16acc902efc9bfacc53e30fdb3d2e5518acf72bc03fe2fba71791d08f168d686  backend/internal/service/classifications.go
+63dd8ba8f36a573eec5a0f801d263fb079a1a437f29f3f8ad45dae7ba303b6d7  backend/internal/httpapi/classification_integration_test.go
+e09c65d2a9b585e64e9722fb51a19ab9e27adbf7df7f895e1ac4635a50983790  contracts/openapi.yaml
+ad83cd264f045187ba66eb45e800aa1dfadaf831acc0deffb7e96e1b94ef380b  frontend/src/api/schema.d.ts
+f80722ee5ec981cdeee1a8d5ee12a27cddb090124c8527bf6ca178c9553b49a6  frontend/src/features/classification-panel.tsx
+824feb815f4b42458adc256bfb9b758710ad5b630f7d677afa79ad0da3eb3ecc  docs/status.md
+```
+
+Checkpoint 27 passed independent review. V019 and V020 are resolved. The reviewer confirmed exact category shape, policy review metadata, and both database and browser behavior. [Independent recheck](review.md#independent-verification--m2-20261123-27)

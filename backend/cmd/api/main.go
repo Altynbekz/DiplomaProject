@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"diploma/internal/classify"
 	"diploma/internal/config"
 	"diploma/internal/httpapi"
 	"diploma/internal/service"
@@ -34,7 +35,11 @@ func run() error {
 		return errors.New("database configuration failed")
 	}
 	defer pool.Close()
-	svc := &service.Service{Store: store.New(pool), Origin: c.Origin, Actor: c.Actor, CursorKey: c.Token, Now: time.Now}
+	rules, e := classify.Load()
+	if e != nil {
+		return e
+	}
+	svc := &service.Service{Mapping: rules, Store: store.New(pool), Origin: c.Origin, Actor: c.Actor, CursorKey: c.Token, Now: time.Now}
 	a := &httpapi.API{Service: svc, Token: c.Token, Log: slog.Default()}
 	server := &http.Server{Addr: c.Listen, Handler: a.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 45 * time.Second, WriteTimeout: 60 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16384}
 	done := make(chan error, 1)

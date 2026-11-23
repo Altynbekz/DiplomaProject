@@ -130,6 +130,35 @@ test("genuine report survives reload", async ({ page }) => {
       .getByText("Check the scanner assertion independently"),
   ).toBeVisible();
   await stale.close();
+  const classificationSummary = page.getByText("OWASP classification", {
+    exact: true,
+  });
+  await classificationSummary.click();
+  const classification = classificationSummary.locator("xpath=..");
+  await classification
+    .getByLabel("Classification status")
+    .selectOption("out_of_scope");
+  await classification
+    .getByLabel("Classification rationale")
+    .fill("Keep the classification history for the offline fixture");
+  await classification
+    .getByRole("group", { name: "Source evidence" })
+    .getByRole("checkbox")
+    .first()
+    .check();
+  await classification
+    .getByRole("button", { name: "Save classification" })
+    .click();
+  await expect(
+    classification
+      .getByRole("status")
+      .filter({ hasText: "Classification saved." }),
+  ).toBeVisible();
+  await expect(
+    classification
+      .getByRole("region", { name: "Classification history" })
+      .getByText("Keep the classification history for the offline fixture"),
+  ).toBeVisible();
   expect(external).toEqual([]);
 });
 
@@ -138,6 +167,12 @@ test("genuine findings survive restart", async ({ page }) => {
   await unlock(page);
   await page.getByRole("link", { name }).click();
   await checkFindings(page, "inconclusive");
+  await page.getByText("OWASP classification", { exact: true }).click();
+  await expect(
+    page
+      .getByRole("region", { name: "Classification history" })
+      .getByText("Keep the classification history for the offline fixture"),
+  ).toBeVisible();
   await page.getByText("Human verification", { exact: true }).click();
   await expect(
     page

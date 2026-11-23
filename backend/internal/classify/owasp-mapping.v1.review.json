@@ -1,0 +1,5 @@
+{
+  "version": "owasp-2025-v1",
+  "policy_sha256": "2afd53f4f59e12672b2914e96310806f6cc0fce4c7180e5debfae7d4e550ced3",
+  "review_record": "docs/coordination/review.md#independent-verification--m2-20261123-26"
+}

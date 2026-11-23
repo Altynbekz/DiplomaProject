@@ -13,7 +13,7 @@ createdb -h 127.0.0.1 -p "$port" -U diploma_migrate diploma_test
 export TEST_DATABASE_URL="postgres://diploma_migrate@127.0.0.1:$port/diploma_test?sslmode=disable"
 # Exercise empty database, previous revision upgrade, and no-op upgrade.
 goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up-to 1
-goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up-to 4
+goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up-to 5
 goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up
 goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up
 createdb -h 127.0.0.1 -p "$port" -U diploma_migrate diploma_genuine

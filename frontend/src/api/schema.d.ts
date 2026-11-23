@@ -181,6 +181,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/findings/{id}/classifications": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["listClassifications"];
+    put?: never;
+    post: operations["createClassification"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -271,10 +287,9 @@ export interface components {
     };
     Classification: {
       revision_id: string | null;
-      /** @enum {string} */
-      status: "mapped" | "unmapped" | "ambiguous" | "out_of_scope";
-      category: ("A01:2025" | "A02:2025" | "A05:2025") | null;
-      candidate_categories: ("A01:2025" | "A02:2025" | "A05:2025")[];
+      status: components["schemas"]["ClassificationStatus"];
+      category: components["schemas"]["StudyCategory"] | null;
+      candidate_categories: components["schemas"]["StudyCategory"][];
       mapping_version: string | null;
     };
     Assessment: {
@@ -405,6 +420,48 @@ export interface components {
     };
     VerificationPage: {
       items: components["schemas"]["Verification"][];
+      next_cursor: string | null;
+    };
+    /** @enum {string} */
+    ClassificationStatus: "mapped" | "unmapped" | "ambiguous" | "out_of_scope";
+    /** @enum {string} */
+    StudyCategory: "A01:2025" | "A02:2025" | "A05:2025";
+    ClassificationRule: {
+      id: string;
+      plugin_id?: string;
+      cwe_id?: number;
+      category: components["schemas"]["StudyCategory"] | null;
+      rationale: string;
+      sources: string[];
+      review_record: string;
+      policy_sha256: string;
+    };
+    ClassificationInput: {
+      status: components["schemas"]["ClassificationStatus"];
+      category: components["schemas"]["StudyCategory"] | null;
+      candidate_categories: components["schemas"]["StudyCategory"][];
+      rationale: string;
+      evidence_refs: components["schemas"]["EvidenceRef"][];
+      expected_previous_id: string | null;
+    };
+    ClassificationRevision: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      finding_id: string;
+      status: components["schemas"]["ClassificationStatus"];
+      category: components["schemas"]["StudyCategory"] | null;
+      candidate_categories: components["schemas"]["StudyCategory"][];
+      rationale: string;
+      evidence_refs: components["schemas"]["EvidenceRef"][];
+      mapping_version: string;
+      rule_refs: components["schemas"]["ClassificationRule"][];
+      actor: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    ClassificationPage: {
+      items: components["schemas"]["ClassificationRevision"][];
       next_cursor: string | null;
     };
   };
@@ -1672,6 +1729,233 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Verification"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  listClassifications: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string;
+      };
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClassificationPage"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  createClassification: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClassificationInput"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      201: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClassificationRevision"];
         };
       };
       /** @description Problem response; see code and field errors */

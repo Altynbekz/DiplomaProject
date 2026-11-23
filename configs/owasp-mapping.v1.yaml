@@ -1,4 +1,1 @@
-version: unmapped-m1
-# No reviewed rules available. Every finding remains unmapped.
-# Official category source: https://top10.owasp.org/
-rules: []
+../backend/internal/classify/owasp-mapping.v1.yaml

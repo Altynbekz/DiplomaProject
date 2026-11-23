@@ -1,5 +1,5 @@
 -- name: Ready :one
-SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready;
+SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.classification_revisions') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready;
 -- name: CreateTarget :one
 INSERT INTO targets (id,name,canonical_origin,lab_target_key,created_at) VALUES ($1,$2,$3,$4,$5)
 RETURNING id,name,canonical_origin,lab_target_key,created_at;
@@ -29,15 +29,21 @@ INSERT INTO audit_events(id,request_id,actor,action,entity_type,entity_id,metada
 SELECT f.id,f.target_id,f.fingerprint_version,f.fingerprint,f.plugin_id,f.method,f.canonical_origin,f.path,f.query_parameter_names,f.parameter_name,f.title,f.created_at,
  o.id AS severity_observation_id,o.scanner_severity,
  coalesce(v.state,'unreviewed')::text AS verification,coalesce(v.id::text,'')::text AS verification_id,
+ coalesce(c.status,'unmapped')::text AS classification_status,
+ coalesce(c.id::text,'')::text AS classification_id,coalesce(c.category,'')::text AS classification_category,
+ coalesce(c.mapping_version,'')::text AS classification_version,
+ coalesce(c.candidate_categories,ARRAY[]::text[])::text[] AS classification_candidates,
  (SELECT count(*) FROM observations n WHERE n.finding_id=f.id AND (sqlc.arg(import_id)::text='' OR n.report_import_id::text=sqlc.arg(import_id))) AS observation_count
 FROM findings f
 JOIN LATERAL (SELECT ob.id,ob.scanner_severity FROM observations ob WHERE ob.finding_id=f.id AND (sqlc.arg(import_id)::text='' OR ob.report_import_id::text=sqlc.arg(import_id)) ORDER BY ob.created_at DESC,ob.id DESC LIMIT 1) o ON true
 LEFT JOIN LATERAL (SELECT vr.id,vr.state FROM verification_reviews vr WHERE vr.finding_id=f.id ORDER BY vr.created_at DESC,vr.id DESC LIMIT 1) v ON true
+LEFT JOIN LATERAL (SELECT cr.id,cr.status,cr.category,cr.candidate_categories,cr.mapping_version
+ FROM classification_revisions cr WHERE cr.finding_id=f.id ORDER BY cr.created_at DESC,cr.id DESC LIMIT 1) c ON true
 WHERE f.target_id=sqlc.arg(target_id) AND f.id::text>sqlc.arg(after_id)::text
  AND (sqlc.arg(finding_id)::text='' OR f.id::text=sqlc.arg(finding_id))
  AND (sqlc.arg(severity)::text='' OR o.scanner_severity=sqlc.arg(severity))
  AND (sqlc.arg(verification)::text='' OR sqlc.arg(verification)::text=coalesce(v.state,'unreviewed'))
- AND sqlc.arg(category)::text=''
+ AND (sqlc.arg(category)::text='' OR c.category=sqlc.arg(category))
 ORDER BY f.id LIMIT sqlc.arg(page_limit);
 -- name: ListObservations :many
 SELECT id,report_import_id,source_pointer,scanner_severity_raw,scanner_severity,confidence_raw,cwe_ids,evidence_json,description,remediation,created_at

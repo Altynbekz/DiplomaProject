@@ -336,15 +336,21 @@ const listFindings = `-- name: ListFindings :many
 SELECT f.id,f.target_id,f.fingerprint_version,f.fingerprint,f.plugin_id,f.method,f.canonical_origin,f.path,f.query_parameter_names,f.parameter_name,f.title,f.created_at,
  o.id AS severity_observation_id,o.scanner_severity,
  coalesce(v.state,'unreviewed')::text AS verification,coalesce(v.id::text,'')::text AS verification_id,
+ coalesce(c.status,'unmapped')::text AS classification_status,
+ coalesce(c.id::text,'')::text AS classification_id,coalesce(c.category,'')::text AS classification_category,
+ coalesce(c.mapping_version,'')::text AS classification_version,
+ coalesce(c.candidate_categories,ARRAY[]::text[])::text[] AS classification_candidates,
  (SELECT count(*) FROM observations n WHERE n.finding_id=f.id AND ($1::text='' OR n.report_import_id::text=$1)) AS observation_count
 FROM findings f
 JOIN LATERAL (SELECT ob.id,ob.scanner_severity FROM observations ob WHERE ob.finding_id=f.id AND ($1::text='' OR ob.report_import_id::text=$1) ORDER BY ob.created_at DESC,ob.id DESC LIMIT 1) o ON true
 LEFT JOIN LATERAL (SELECT vr.id,vr.state FROM verification_reviews vr WHERE vr.finding_id=f.id ORDER BY vr.created_at DESC,vr.id DESC LIMIT 1) v ON true
+LEFT JOIN LATERAL (SELECT cr.id,cr.status,cr.category,cr.candidate_categories,cr.mapping_version
+ FROM classification_revisions cr WHERE cr.finding_id=f.id ORDER BY cr.created_at DESC,cr.id DESC LIMIT 1) c ON true
 WHERE f.target_id=$2 AND f.id::text>$3::text
  AND ($4::text='' OR f.id::text=$4)
  AND ($5::text='' OR o.scanner_severity=$5)
  AND ($6::text='' OR $6::text=coalesce(v.state,'unreviewed'))
- AND $7::text=''
+ AND ($7::text='' OR c.category=$7)
 ORDER BY f.id LIMIT $8
 `
 
@@ -360,23 +366,28 @@ type ListFindingsParams struct {
 }
 
 type ListFindingsRow struct {
-	ID                    string
-	TargetID              string
-	FingerprintVersion    string
-	Fingerprint           string
-	PluginID              string
-	Method                string
-	CanonicalOrigin       string
-	Path                  string
-	QueryParameterNames   []string
-	ParameterName         string
-	Title                 string
-	CreatedAt             time.Time
-	SeverityObservationID string
-	ScannerSeverity       string
-	Verification          string
-	VerificationID        string
-	ObservationCount      int64
+	ID                       string
+	TargetID                 string
+	FingerprintVersion       string
+	Fingerprint              string
+	PluginID                 string
+	Method                   string
+	CanonicalOrigin          string
+	Path                     string
+	QueryParameterNames      []string
+	ParameterName            string
+	Title                    string
+	CreatedAt                time.Time
+	SeverityObservationID    string
+	ScannerSeverity          string
+	Verification             string
+	VerificationID           string
+	ClassificationStatus     string
+	ClassificationID         string
+	ClassificationCategory   string
+	ClassificationVersion    string
+	ClassificationCandidates []string
+	ObservationCount         int64
 }
 
 func (q *Queries) ListFindings(ctx context.Context, arg ListFindingsParams) ([]ListFindingsRow, error) {
@@ -414,6 +425,11 @@ func (q *Queries) ListFindings(ctx context.Context, arg ListFindingsParams) ([]L
 			&i.ScannerSeverity,
 			&i.Verification,
 			&i.VerificationID,
+			&i.ClassificationStatus,
+			&i.ClassificationID,
+			&i.ClassificationCategory,
+			&i.ClassificationVersion,
+			&i.ClassificationCandidates,
 			&i.ObservationCount,
 		); err != nil {
 			return nil, err
@@ -537,7 +553,7 @@ func (q *Queries) LockTarget(ctx context.Context, id string) (string, error) {
 }
 
 const ready = `-- name: Ready :one
-SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready
+SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.classification_revisions') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready
 `
 
 func (q *Queries) Ready(ctx context.Context) (pgtype.Bool, error) {

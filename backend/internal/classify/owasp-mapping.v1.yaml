@@ -1,0 +1,45 @@
+{
+  "version": "owasp-2025-v1",
+  "rules": [
+    {
+      "id": "zap-cors-access-control",
+      "plugin_id": "10098",
+      "cwe_id": 264,
+      "category": "A01:2025",
+      "rationale": "The ZAP cross-domain rule identifies potentially overly permissive CORS. OWASP includes unauthorized cross-origin access in this category.",
+      "sources": [
+        "https://www.zaproxy.org/docs/alerts/10098/",
+        "https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/"
+      ]
+    },
+    {
+      "id": "zap-csp-header-configuration",
+      "plugin_id": "10038",
+      "cwe_id": 693,
+      "category": "A02:2025",
+      "rationale": "ZAP's CSP header configuration rule is tagged as OWASP 2025 security misconfiguration. The plugin restriction avoids mapping other CWE-693 observations by CWE alone.",
+      "sources": [
+        "https://www.zaproxy.org/docs/alerts/10038/",
+        "https://www.zaproxy.org/docs/alerts/10038-1/",
+        "https://top10.owasp.org/2025/A02_2025-Security_Misconfiguration/"
+      ]
+    },
+    {
+      "id": "cwe-sql-injection",
+      "cwe_id": 89,
+      "category": "A05:2025",
+      "rationale": "CWE-89 describes SQL injection, listed by OWASP under the 2025 injection category.",
+      "sources": [
+        "https://cwe.mitre.org/data/definitions/89.html",
+        "https://top10.owasp.org/2025/A05_2025-Injection/"
+      ]
+    },
+    {
+      "id": "zap-modern-app-diagnostic",
+      "plugin_id": "10109",
+      "category": null,
+      "rationale": "ZAP reports this informational diagnostic to guide exploration. It does not describe a weakness in the study categories.",
+      "sources": ["https://www.zaproxy.org/docs/alerts/10109/"]
+    }
+  ]
+}
