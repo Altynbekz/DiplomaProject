@@ -2,7 +2,7 @@
 
 A local research prototype using React and TypeScript, Go `net/http`, sqlc and PostgreSQL. The app imports an existing [ZAP Traditional JSON report](https://www.zaproxy.org/docs/desktop/addons/report-generation/report-traditional-json/), records its original bytes and SHA-256, and displays normalized findings and their source observations. Scanner severity, confidence, OWASP classification, verification and CVSS are separate. M1 findings start unmapped and unreviewed, with both assessment fields null.
 
-The offline workflow has been exercised against PostgreSQL using an explicitly synthetic fixture. M1 acceptance still requires a genuine report from an authorized local Juice Shop lab and a sanitized derivative with recorded provenance. See [status and verification](docs/status.md).
+The offline workflow has passed PostgreSQL and Chromium checks with the synthetic fixture and a genuine report from an authorized local Juice Shop session. The genuine report, its sanitized derivative and provenance are available in the private lab artifacts. See [status and verification](docs/status.md) for acceptance progress.
 
 ## Start locally
 

@@ -1,6 +1,8 @@
 # Fixture provenance
 
-The only fixture currently available is [synthetic-traditional.json](../backend/testdata/zap/synthetic-traditional.json). It was authored to exercise the Traditional JSON schema, grouping, unknown severity and escaped display. Its version field identifies it as synthetic. It was never produced by a scanner. See [status](status.md) for its hash and observed counts.
+The repository fixture [synthetic-traditional.json](../backend/testdata/zap/synthetic-traditional.json) was authored to exercise the Traditional JSON schema, grouping, unknown severity and escaped display. Its version field identifies it as synthetic. A genuine report and its sanitized derivative are held in private local lab artifacts. See [status](status.md) for the collection and verification results.
+
+For the recorded local run, select `sanitized-traditional.json` from the private lab artifact directory on the target's import form. Paste the contents of the adjacent `provenance.json` into **Optional report provenance**. Preserve `original.json` separately as the untouched private export.
 
 ## M1 acceptance checklist
 
@@ -19,7 +21,7 @@ The only fixture currently available is [synthetic-traditional.json](../backend/
 
 ## Collect a report in an isolated lab
 
-This plan is for an operator who needs a new report. Collection is pending a named authorization and an isolation check. The application remains in offline import mode.
+Each new collection requires a named authorization and fresh isolation checks. The application imports reports offline.
 
 1. **Authorize the target.** Use one disposable local `juice-shop` instance at `http://juice-shop:3000`, with paths under `/` on that origin. Record the operator, the lab instance and its fixed network identity, the Juice Shop image digest and version, the passive-only mode, and the UTC validity window in the private authorization record. Use its non-secret reference in provenance.
 2. **Verify isolation.** Pin every lab container image by version and SHA-256 digest, and pin the ZAP and add-on versions. Keep the exact platform image identities with the private run evidence. Put the lab on a dedicated internal network without host-published ports or routes to the app, database or Internet. Restrict browser connections to the private ZAP proxy; restrict ZAP connections to an allowlisting proxy that serves only `http://juice-shop:3000` through the pinned Juice Shop IP on TCP 3000. Disable the ZAP management API, external telemetry and callbacks. Block external DNS, alternate addresses and ports, host and metadata routes, and out-of-scope redirects and subresources. Disable IPv6 if it is untested. Use controlled local sinks to check the actual browser and ZAP paths before collection. Record that the allowed path works, denied sinks receive zero requests, and request limits are enforced. Stop if any check fails. [Project isolation requirements](../AGENTS.md#10-mandatory-lab-authorization-ssrf-controls-and-secrets)

@@ -5,7 +5,7 @@ Updated 2026-11-23, Asia/Almaty. This status covers the foundation and offline i
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
 | M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `94f431f`, including the Python tests in `make check`. [GitHub Actions run 45170314104](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) |
-| M1 | Offline Traditional JSON import, immutable original bytes, SHA-256, typed provenance, duplicate handling, normalized findings and observations, audited private downloads, filtered and paged UI | Executed using the labeled synthetic fixture. Acceptance is blocked by the absence of a genuine, provenance-backed Juice Shop report and its sanitized derivative. |
+| M1 | Offline Traditional JSON import, immutable original bytes, SHA-256, typed provenance, duplicate handling, normalized findings and observations, audited private downloads, filtered and paged UI | Collection and the genuine derivative passed independent review. The disposable API, PostgreSQL and Chromium restart replay passed locally and independently. Repeatable verification with a checked-in genuine fixture remains open. |
 | M2–M6 | Planned | No implementation started. |
 
 ## Recorded checks
@@ -76,7 +76,7 @@ The root `go.work` selects the module in `backend/`. From the repository root, `
 
 The URL validation follow-up passed `make check`, `make test-integration` and `make test-e2e`. The regression test first reproduced acceptance of percent-decoded NUL and invalid UTF-8 query names. The fixed parser returned `422 validation_failed` at the instance URI pointer for both cases. The integration test verified zero import, finding and observation rows after each rejected request. The same bounded URL fuzz command above passed again with 288,782 executions.
 
-The browser and PostgreSQL tests used authored data and observed **5 observations**, **4 findings**, **1 unlocated alert**, and an unknown severity warning. The fixture's run involved no scanner. Scan authorization, times, versions and sanitized hashes for genuine data are unavailable. See [fixture provenance](fixture-provenance.md).
+The synthetic browser and PostgreSQL tests used authored data and observed **5 observations**, **4 findings**, **1 unlocated alert**, and an unknown severity warning. The fixture's run involved no scanner. See [fixture provenance](fixture-provenance.md).
 
 | Artifact | SHA-256 |
 | --- | --- |
@@ -87,6 +87,19 @@ The browser and PostgreSQL tests used authored data and observed **5 observation
 
 ## Genuine-report acceptance readiness
 
-The checkout and documented `artifacts/` and `backend/testdata/zap/` locations yielded only the labeled synthetic fixture. The operator confirmed no genuine report is available and requested an isolated local lab. M1 acceptance needs a genuine ZAP Traditional JSON report and its provenance, including the authorization reference, scan time, and scanner, target and plan details. The collection plan requires a named authorization and isolation evidence before collection. [Collection plan](fixture-provenance.md#collect-a-report-in-an-isolated-lab)
+One passive session observed ordinary browser traffic for `http://juice-shop:3000` in the isolated local lab. The named authorization `M1-20261123T132231Z-cef3083eaa` was valid from `2026-11-23T13:22:31.466198Z` through `2026-11-23T13:52:31.466198Z`. The isolation recheck passed before collection. The allowed Chromium → ZAP → guard path worked, and the denied canaries received zero requests. Three concurrent allowed canary requests took 1.084 seconds. The guard unit tests covered the request limit, rate and deadline.
 
-`python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` exited 0 with nine tests for the offline preflight. They use synthetic inputs to check digest agreement, structure and source positions, required provenance, rejection of the repository's synthetic fixture, and preservation of both input files. The verifier found V014, an argument error that exposed an unexpected path. The revised CLI uses a fixed diagnostic, and the regression test checks that the path stays private. Candidate-specific sanitization, expected fingerprints, integration coverage and browser restart await the genuine input. [Acceptance checklist](fixture-provenance.md)
+The capture ran from `2026-11-23T13:25:43.520670Z` through `2026-11-23T13:26:59.738124Z`. ZAP 2.17.0 completed its passive queue wait and Traditional JSON export. Docker confirmed that all lab containers stopped. The report contains one site, eight scanner alerts, 21 observations and zero unlocated alerts. The site and all observation URI origins match `http://juice-shop:3000`. Three observations describe browser POST attempts to `/socket.io/`. The origin guard forwards only GET and HEAD. The session did not record a total forwarded request count.
+
+The ignored lab directory `artifacts/zap/diploma-m1-passive-cef3083eaa/` holds `original.json`, `sanitized-traditional.json` and the import `provenance.json`. The private original matched the stopped ZAP container export byte for byte. The sanitizer reproduced the derivative and provenance, removed query values and private scanner text, and preserved alert and instance order and grouping inputs. The offline `scripts/check-zap-fixture.py` check exited 0 for the three files. A separate derivation from the report found 17 expected finding groups across the 21 source pointers.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `original.json` | `121e82b36df0b343f43015b9faed851e3bc8fc78c6dc91e3caed867ea8406bad` |
+| `sanitized-traditional.json` | `036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7` |
+
+`python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` previously exited 0 with nine synthetic preflight tests. The CLI checks digests, shape, and source positions. Review finding V014 led to a fixed diagnostic that keeps unexpected argument values private, with a regression test. Independent checkpoint 20 matched the original to the stopped container, verified authorization and chronology, and confirmed the sanitized report structure and grouping. [Independent verification](coordination/review.md#independent-verification--m1-20261123-20)
+
+`env -u TEST_DATABASE_URL GOFLAGS=-mod=readonly sh artifacts/zap/diploma-m1-passive-cef3083eaa/verify-offline.sh` exited 0 on a disposable PostgreSQL cluster. Migrations reached revision 4. Four concurrent genuine uploads returned one creation and three duplicates with one import ID. A later duplicate reused that ID and conflicting provenance returned 409. The stored provenance and audited download matched the derivative submission exactly. The API and PostgreSQL matched all 17 independently derived fingerprints and their 21 observation pointers. Chromium selected the derivative and submitted its provenance, saw the duplicate result, and displayed 17 findings and source evidence after both reload and API/database restart. Browser page requests stayed on loopback. The database outage check returned health 200, readiness 503 and missing-bearer 401.
+
+Independent checkpoint 21 reran the disposable acceptance command successfully and matched all 17 fingerprints and 21 pointers, provenance, duplicate handling, and browser persistence across restart. The local replay uses the ignored private artifact directory. The checked-in verification suite still uses the synthetic test fixture. A reusable genuine repository fixture and its repeatable integration coverage remain open. [Independent replay](coordination/review.md#independent-verification--m1-20261123-21) · [Acceptance checklist](fixture-provenance.md)

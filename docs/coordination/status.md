@@ -341,3 +341,70 @@ Remaining gates: independent recheck of V015, hosted CI of the commit after push
 ```
 
 Checkpoint 19 passed independent verification at all three frozen hashes. V015 is resolved. The verifier found no new issues in the CI record, scoped passive plan, private path exclusion or documentation links. Actual lab isolation and collection are separate gates. [Independent verification](review.md#independent-verification--m1-20261123-19)
+
+
+## M1-20261123-20 — Genuine passive collection and derivative — READY FOR VERIFICATION
+
+Baseline commit `0c193d51c989866e8d49932454803853cb16df11`. The three documentation files and the ignored local artifacts listed below are frozen. The private original and authorization stay outside Git. Review report contents locally and record aggregate results.
+
+The authorized passive session for `http://juice-shop:3000` ran from `2026-11-23T13:25:43.520670Z` through `2026-11-23T13:26:59.738124Z`. Actual Chromium and ZAP passed the allowed canary, with eleven forbidden-request checks and zero requests on denied sinks. ZAP reported passive queue and export completion. Docker reported zero running lab containers. The Traditional JSON contains one site and eight alerts with 21 observations. Offline identity grouping yields 17 expected findings. The session did not record a total forwarded request count.
+
+Checks executed:
+
+- In the private lab module, `go test ./...` exited 0, covering the guard request limit, rate and duration.
+- `python3 -B artifacts/zap/diploma-m1-passive-cef3083eaa/collect-once.py` exited 0 after two preflight-only attempts stopped before target traffic. The final isolation recheck passed before the single capture began.
+- `cmp` of the private original and a new copy of the stopped ZAP export exited 0. Deployed guard and pinned helper SHA-256 hashes matched.
+- `python3 -B artifacts/zap/diploma-m1-passive-cef3083eaa/sanitize-report.py --check` exited 0 and reproduced both the derivative and provenance byte for byte.
+- `python3 -B scripts/check-zap-fixture.py "$ORIGINAL_REPORT" "$SANITIZED_REPORT" "$PROVENANCE"` exited 0, with one site, eight alerts, 21 observations and zero unlocated alerts. A separate offline review checked registered origin, unchanged grouping inputs and source positions, and disclosure risks in the derivative. `git diff --check` exited 0 and `git check-ignore` matched all three local report/provenance artifacts.
+
+Remaining gates are independent review of collection evidence and the derivative, genuine API and database import and duplicate checks, and browser persistence after restart. No genuine fixture has been added to Git.
+
+```text
+fa919f70d1c9da55e54cb8731278400ae3d4f044eaa647f4d6bb89cb5f0492c6  README.md
+bcbc17523c09518e71625d1143fbe0d11dbc4fe6bb4da37e576707f0e9582a4e  docs/status.md
+bdffc77f7cf7c49913d29d3d13ecfae29062ded8294be05c9a2307e5cd434733  docs/fixture-provenance.md
+121e82b36df0b343f43015b9faed851e3bc8fc78c6dc91e3caed867ea8406bad  artifacts/zap/diploma-m1-passive-cef3083eaa/original.json
+036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7  artifacts/zap/diploma-m1-passive-cef3083eaa/sanitized-traditional.json
+fa18726990acdb2857247bb3a46a2495fb2df59b470faa41a18d8dde81fd0cbe  artifacts/zap/diploma-m1-passive-cef3083eaa/provenance.json
+882c37ed199b743bb385a3eca97ad15a586b20bf0044d024ad02229c4a4329fd  artifacts/zap/diploma-m1-passive-cef3083eaa/authorization.json
+40f8e410d9976736b6ef02db543569f76f5c41af153b184505f30983d6283a22  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-isolation.json
+e1d0e8f2cdbcf9e9622853d09f1cc6d97f22635d23f3492a6a9cf72fb5252833  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-start.json
+a60df522dedc9ea17a766fa831ed2b35a12f45d44ae94b86b42106dbedb1d29d  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-end.json
+b0c2058b40f4655a885ac1ba96799a2c1efc74b3ca739da4b7618474bcd2e0ee  artifacts/zap/diploma-m1-passive-cef3083eaa/passive-capture.yaml
+b562ab54b9e50e000cd2ac2a7aabc33c8df37d3e19e9358248d5096f2167242b  artifacts/zap/diploma-m1-passive-cef3083eaa/sanitize-report.py
+e581a400b7de2ab2648d39a84c10ef79ec2866075fdce8cd312dcf0017b77e27  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-zap.log
+49fdfb4fa6aff32fba68f78ed5ff778c9333da4dfcf55d6be613d5411e1eef5e  artifacts/zap/diploma-m1-passive-cef3083eaa/collect-once.py
+```
+
+
+## M1-20261123-21 — Genuine offline application replay — READY FOR VERIFICATION
+
+Baseline commit `0c193d51c989866e8d49932454803853cb16df11`. This checkpoint supersedes 20 for the three tracked documentation files, resolves V016 by removing the stale unavailable-provenance sentence, and retains the previously verified collection artifacts unchanged. The three disposable replay scripts are frozen in addition to the documentation and collection artifacts. No application code or workflow changed.
+
+`env -u TEST_DATABASE_URL GOFLAGS=-mod=readonly sh artifacts/zap/diploma-m1-passive-cef3083eaa/verify-offline.sh` exited 0. Goose applied migrations 1–4. API and PostgreSQL matched 17 independently derived fingerprints and 21 observation pointers. Four first submissions returned one creation and three concurrent duplicates with one import ID. A sequential duplicate reused the ID, conflicting provenance returned 409, and the stored metadata and audited bytes matched the derivative submission. Chromium selected the derivative with its provenance, displayed the duplicate result, and displayed 17 persisted unreviewed findings and source evidence before and after API and PostgreSQL restart. The browser saw no external page requests. The outage check returned health 200, readiness 503 and missing-bearer 401. `git diff --check` exited 0 and a local check resolved all 18 relative links and anchors in the three documentation files.
+
+Remaining gates are independent replay of the offline acceptance and adding the reviewed genuine fixture with repeatable repository coverage if approved for inclusion. Hosted CI covers the baseline without these local artifacts. The original and authorization remain out of Git.
+
+```text
+301e6a3c57b2b886b9ba4f219fa507115b2c60d85855b6105ee0d6c38e0b8e25  README.md
+329ced9a03dd0c7c20aede6b17a14be39e2daf8095f8c335fa59fce3b92a2467  docs/status.md
+830785925282a00af1cee8801a1aa3c631a410020902059819209094ad2ddf3d  docs/fixture-provenance.md
+121e82b36df0b343f43015b9faed851e3bc8fc78c6dc91e3caed867ea8406bad  artifacts/zap/diploma-m1-passive-cef3083eaa/original.json
+036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7  artifacts/zap/diploma-m1-passive-cef3083eaa/sanitized-traditional.json
+fa18726990acdb2857247bb3a46a2495fb2df59b470faa41a18d8dde81fd0cbe  artifacts/zap/diploma-m1-passive-cef3083eaa/provenance.json
+882c37ed199b743bb385a3eca97ad15a586b20bf0044d024ad02229c4a4329fd  artifacts/zap/diploma-m1-passive-cef3083eaa/authorization.json
+40f8e410d9976736b6ef02db543569f76f5c41af153b184505f30983d6283a22  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-isolation.json
+e1d0e8f2cdbcf9e9622853d09f1cc6d97f22635d23f3492a6a9cf72fb5252833  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-start.json
+a60df522dedc9ea17a766fa831ed2b35a12f45d44ae94b86b42106dbedb1d29d  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-end.json
+b0c2058b40f4655a885ac1ba96799a2c1efc74b3ca739da4b7618474bcd2e0ee  artifacts/zap/diploma-m1-passive-cef3083eaa/passive-capture.yaml
+b562ab54b9e50e000cd2ac2a7aabc33c8df37d3e19e9358248d5096f2167242b  artifacts/zap/diploma-m1-passive-cef3083eaa/sanitize-report.py
+e581a400b7de2ab2648d39a84c10ef79ec2866075fdce8cd312dcf0017b77e27  artifacts/zap/diploma-m1-passive-cef3083eaa/collection-zap.log
+49fdfb4fa6aff32fba68f78ed5ff778c9333da4dfcf55d6be613d5411e1eef5e  artifacts/zap/diploma-m1-passive-cef3083eaa/collect-once.py
+6c056db68f87bca6bc6d1a1f34b0dfff6e36e42933d80663c3879c20b84128b4  artifacts/zap/diploma-m1-passive-cef3083eaa/verify-offline.sh
+4f3c08a988787e79679d0280c53d3547b9952f264a537f4cff0ec7e2d3e63907  artifacts/zap/diploma-m1-passive-cef3083eaa/verify-import.py
+8c290f79d00e94d1866240a87034e561d12da2aab6603f33fe696cd218fb7e5b  artifacts/zap/diploma-m1-passive-cef3083eaa/verify-browser.cjs
+```
+
+Checkpoint 21 passed independent verification at all 17 frozen hashes. V016 is resolved. The verifier reran the disposable API, PostgreSQL and Chromium replay successfully. The reusable genuine repository fixture and repeatable coverage remain open. [Independent replay](review.md#independent-verification--m1-20261123-21)
+
+After the checkpoint closed, `docs/status.md` was updated to cite the verifier's result. Its refreshed SHA-256 is `77ecf347b33d8a0e7ee17e9c3f9b74440d1c72e912dc7c1a72eb9851bd07abcc`. The application, replay scripts and lab artifacts retain their checkpoint hashes.
