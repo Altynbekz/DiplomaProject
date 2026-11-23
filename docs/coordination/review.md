@@ -187,3 +187,43 @@ Verified on 2026-11-23 at baseline commit `21a096f899ed43b340f26fbf6cceabf288f46
 - The findings recovery handler clears only cursor and retains other query filters. For targets and observations, the pagers are likewise outside the success-only rendering branches, and a First page action remains available whenever those views have an active cursor.
 
 **Verdict:** V012 resolved and frontend checkpoint 10 independently verified at its recorded hashes. Together with the independently verified backend checkpoint 09, no review findings remain open for the scoped changes. Genuine authorized report acceptance and Compose startup have not been verified.
+
+## Independent verification — M0-20261123-11
+
+Verified on 2026-11-23. Both `HEAD` and the local `refs/remotes/origin/main` resolved to checkpoint baseline `a1b523d8ad25b170466a09e4d758e8afacc55b39`. The three SHA-256 values matched the frozen checkpoint.
+
+- An independent Python check found 13 relative Markdown links across `AGENTS.md`, `frontend/FRONTEND.md`, and `backend/BACKEND.md`. All resolved to files from the linking document's directory. No relative link used an anchor.
+- `git diff --check -- AGENTS.md frontend/FRONTEND.md backend/BACKEND.md` exited 0. The scoped diff contains only guide links and status wording. The root contract keeps its milestone evidence rule and directs readers to the implementation and independent verification logs. Both layer guides reference the current checkout and its API contract.
+- The documentation does not claim hosted CI, a running Compose stack, or a genuine report acceptance pass. I checked the local tracking ref and did not query GitHub again. No application check was rerun for this docs-only checkpoint.
+
+**Verdict:** checkpoint 11 independently verified at its recorded hashes. No findings.
+
+## Independent verification — M0-20261123-12
+
+Verified on 2026-11-23 at baseline commit `a1b523d8ad25b170466a09e4d758e8afacc55b39`. The SHA-256 values for the CI workflow and PostgreSQL bootstrap matched the frozen checkpoint before and after verification.
+
+- `GOCACHE=/private/tmp/diploma-verifier-go-cache go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7 .github/workflows/ci.yml` exited 0 when the Go module proxy was available. `sh -n` passed separately for the installer and both disposable test scripts. The installer was executable and rejected a relative prefix and an existing directory before downloading anything.
+- Read-only upstream tag lookups matched all three full GitHub Action pins. The PostgreSQL project's published SHA-256 for its 15.19 source archive matched the installer. Go 1.27.1 in `backend/go.mod` and the locally reported Node 26.13.0, npm 12.2.1, sqlc 1.31.1, goose 3.30.1, and lockfile Playwright 1.65.1 align with the workflow and tool manifest.
+- Workflow permissions are `contents: read`, checkout does not persist credentials, and the workflow references no repository secrets. Both suites provision separate temporary, loopback-only clusters. The installer refuses UID 0 and the workflow separately checks for a non-root runner. No source archive build or container run was repeated in this verification.
+- **V013 (P2), open.** The workflow's `make check` indirectly invokes `rg -q` in `Makefile:21`, yet the workflow never provisions ripgrep. The [official Ubuntu 24.04 runner software manifest](https://raw.githubusercontent.com/actions/runner-images/main/images/ubuntu/Ubuntu2404-Readme.md) does not list it. Independently reproduced `make tools-check` with pinned sqlc and goose on a constrained PATH containing only those tool links and system utilities. It exited 2 with `rg: command not found` and Make error 127. Remove the dependency from the version check with an exact shell comparison, or explicitly provision ripgrep in the workflow.
+
+**Verdict:** the syntax, pins and test isolation checks passed at checkpoint 12. CI verification is pending V013 and an observed hosted run. No workflow was dispatched and no application data was accessed.
+
+## Independent verification — M0-20261123-13
+
+Verified on 2026-11-23 at baseline commit `a1b523d8ad25b170466a09e4d758e8afacc55b39`. The three frozen SHA-256 values matched the checkpoint. The workflow and installer match their independently reviewed checkpoint 12 hashes. `git diff --check -- Makefile .github/workflows/ci.yml scripts/install-test-postgres.sh` exited 0.
+
+- **V013 resolved.** Repeated the restricted-PATH probe with a temporary directory containing symlinks to pinned goose and sqlc, followed by only `/usr/bin:/bin`. Verified that `command -v rg` failed. Goose emitted `goose version: v3.30.1`, sqlc emitted `v1.31.1`, and `PATH="$probe_path" make tools-check` exited 0. The only Makefile change replaces the ripgrep pipeline with an exact shell builtin comparison.
+
+**Verdict:** checkpoint 13 independently verified for the CI compatibility fix. No hosted workflow, source archive build, application test or Compose stack was run for this narrow recheck. Hosted CI and the separate runtime and acceptance gates remain unverified by this pass.
+
+## Independent verification — M0-20261123-14
+
+Verified on 2026-11-23 at baseline commit `a1b523d8ad25b170466a09e4d758e8afacc55b39`. All five frozen file hashes matched. `python3 scripts/test-compose.py --config-only`, `docker compose config --quiet` and the scoped `git diff --check` exited 0. The README's Compose 2.24.4 minimum for the port replacement tag agrees with the [official Compose merge reference](https://docs.docker.com/reference/compose-file/merge/#replace-value).
+
+- `python3 -u scripts/test-compose.py` exited 0 independently on Apple Silicon with Docker Desktop Engine 29.7.2 aarch64 and Compose 5.5.1. It provisioned project `diploma-smoke-4e62a840fdca1b400abf` with fresh credentials and a fresh volume.
+- The effective configuration and smoke run verified ephemeral API/frontend bindings on loopback, no published PostgreSQL port, and separate internal storage networking for PostgreSQL and the migration service. The running stack reached Goose revision 4 and passed readiness, health, non-root frontend cache write access, frontend HTML and TypeScript-entry serving, and the missing-bearer rejection.
+- One synthetic upload produced four findings, five observations and one unlocated alert. The digest matched the exact fixture bytes, the duplicate reused the original import ID, and PostgreSQL contained one report and five observations. Shutdown retained the test volume. After restarting, the same digest and all four findings were returned.
+- Final cleanup removed only resources scoped to the independent test project, including its exact image tags. Separate read-only Docker queries found no matching containers, networks, volumes or image tags afterward. No existing application data was modified.
+
+**Verdict:** checkpoint 14 independently verified at its recorded hashes. No findings. This closes the tested ARM64 Compose runtime gate. Hosted GitHub Actions and acceptance with a genuine authorized Juice Shop/ZAP report remain separate, unverified gates. No scanner was launched.

@@ -2,9 +2,9 @@
 
 Role: main implementation agent. Scope: M0 and M1.
 
-Current milestone: M1. The host foundation and synthetic offline workflow run locally. The genuine authorized report gate and Compose startup remain unverified.
+Current milestone: M0/M1. The host foundation and synthetic offline workflow run locally. Guide, CI compatibility and ARM64 Compose slices passed independent verification. Hosted CI and the genuine authorized report remain separate gates.
 
-Current checkout baseline: `21a096f899ed43b340f26fbf6cceabf288f46530`. See M1-20261123-07 onward for current slices and `review.md` for independent results. Earlier numbered checkpoints below preserve the initial history.
+Current checkout baseline: `a1b523d8ad25b170466a09e4d758e8afacc55b39`. No application files are under edit. See checkpoint 14 for the frozen Compose changes and `review.md` for independent results. Earlier numbered checkpoints preserve the implementation history.
 
 ## Checkpoint 1 — M0 foundation — READY FOR REVIEW
 
@@ -162,3 +162,78 @@ bbf9786d71f148974dcdc7afeb794e230c169e136e41d555f0da0a2ca4ca0d94  frontend/tests
 ```
 
 Independent verification completed for checkpoints 09 and 10. The verifier matched both sets of file hashes and recorded passing disposable PostgreSQL and Chromium checks in `review.md`. V010, V011 and V012 are resolved. No application files are under edit. Genuine-report acceptance and Compose startup still require the external report and a running Docker daemon, respectively.
+
+## M0-20261123-11 — Repository guidance — READY FOR VERIFICATION
+
+Baseline commit: `a1b523d8ad25b170466a09e4d758e8afacc55b39` on `main`. GitHub main matched through read-only inspection.
+
+Behavior: the root contract links to both layer guides and the status/verification logs. Guide links resolve from their own directories, and both guides describe guidance for the current checkout. Implemented and unverified states remain in docs/status.md.
+
+Checks: the Python relative-link check for the three Markdown files passed, and git diff --check exited 0. No application code changed.
+
+Remaining gates: GitHub Actions setup and hosted run, disposable Compose startup, and genuine report acceptance. The three files below are frozen for review.
+
+```text
+6f6def7d685dfb81dc408f615abe13c2acaeb0f335cebebd5b80cd97b0a1d193  AGENTS.md
+27cf216aa6557c8d98b6f647b0b7b6110bf2c9d5ca595fcb519805b4d9f3d60e  frontend/FRONTEND.md
+af84ab8c056d4c12162658d0549d4b9e929ba002716e7cbb69569b9299b8f3a6  backend/BACKEND.md
+```
+
+## M0-20261123-12 — GitHub Actions — READY FOR VERIFICATION
+
+Baseline commit: `a1b523d8ad25b170466a09e4d758e8afacc55b39`. The workflow and PostgreSQL bootstrap are frozen below.
+
+Behavior: GitHub Actions is configured for main pushes, pull requests and manual runs on Ubuntu 24.04. Actions use full release hashes, checkout does not persist credentials, and permissions are read-only. Go follows go.mod and Node, npm, sqlc, goose, and the npm lockfile use repository pins. PostgreSQL 15.19 is built from a checksum-pinned release and both PostgreSQL and Chromium suites use separate disposable clusters under the non-root runner. No scan jobs or real credentials are part of the workflow.
+
+Local checks: `GOCACHE=/private/tmp/diploma-go-cache go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7 .github/workflows/ci.yml`, `sh -n scripts/install-test-postgres.sh`, `GOFLAGS=-mod=readonly make check`, `npm run build --prefix frontend`, `GOFLAGS=-mod=readonly make test-integration`, and `GOFLAGS=-mod=readonly make test-e2e` exited 0. Go and frontend checks included three Vitest tests and byte-identical generation. Disposable PostgreSQL applied revisions 1 through 4 and passed the import suite with the race detector. Both Chromium phases passed, including outage and restart. Local pinned Homebrew PostgreSQL 15.19 powered these runs. The additional archive-build exercise is underway. Go 1.27.1, Node 26.13.0, npm 12.2.1, sqlc 1.31.1, goose 3.30.1 and lockfile Playwright 1.65.1 were confirmed locally.
+
+Remaining gates: hosted Ubuntu GitHub Actions run, completion of the local fresh source bootstrap check, runtime Compose validation, and the genuine authorized report. No workflow was pushed or dispatched.
+
+```text
+7e256e9a1150ce101c25622fafada3026d12b9040d78a138a9a3ac473666355f  .github/workflows/ci.yml
+0d547dff5283fef8db5982b86795f77b70e1349933dc8ba1883068e318c00656  scripts/install-test-postgres.sh
+```
+
+Checkpoint 12 is superseded for CI compatibility changes. The verifier reproduced V013, an undeclared dependency on ripgrep in make tools-check. The workflow and source bootstrap are unchanged. Makefile is being edited for the replacement checkpoint.
+
+## M0-20261123-13 — CI runner compatibility — READY FOR VERIFICATION
+
+Baseline commit: `a1b523d8ad25b170466a09e4d758e8afacc55b39`. This checkpoint supersedes checkpoint 12. Only disjoint Compose and acceptance-documentation work continues while the three files below are frozen.
+
+V013 addressed. The goose version check now compares the complete pinned version string with a shell builtin. `make tools-check` passed with a restricted PATH containing only system locations and links to the pinned sqlc and goose binaries. The same environment had reproduced the missing-ripgrep exit 127 under checkpoint 12.
+
+Checks: `GOFLAGS=-mod=readonly make check` exited 0 after the fix, covering format, vet, strict TypeScript, ESLint, byte-identical regeneration, Go tests and three Vitest tests. `git diff --check` exited 0. The unchanged workflow and PostgreSQL bootstrap passed the actionlint and shell syntax checks recorded in checkpoint 12. The local build, isolated PostgreSQL integration and isolated Chromium runs there also passed. The fresh PostgreSQL source build has started after the archive matched its pinned checksum.
+
+Remaining gates: independent V013 recheck, hosted Ubuntu GitHub Actions run, local fresh-source integration, disposable Compose runtime, and a genuine authorized report. No workflow has been pushed or dispatched.
+
+```text
+7e256e9a1150ce101c25622fafada3026d12b9040d78a138a9a3ac473666355f  .github/workflows/ci.yml
+0d547dff5283fef8db5982b86795f77b70e1349933dc8ba1883068e318c00656  scripts/install-test-postgres.sh
+4a0e60a3a0c9b2da1d00e50a18a1e3734825f76a57bed4200651c65aff265031  Makefile
+```
+
+Checkpoint 13 passed independent verification. The verifier matched all three hashes and repeated the restricted-PATH check without ripgrep. V013 is resolved. The PostgreSQL 15.19 archive matched its pinned checksum, built and installed in a temporary prefix, and both `GOFLAGS=-mod=readonly make test-integration` and `GOFLAGS=-mod=readonly make test-e2e` exited 0 on that build. Chromium passed both phases and the outage check. Hosted CI still awaits an actual GitHub run.
+
+## M0-20261123-14 — Disposable Compose startup and persistence — READY FOR VERIFICATION
+
+Baseline commit: `a1b523d8ad25b170466a09e4d758e8afacc55b39`. The five files below are frozen for verification.
+
+Behavior: the frontend installs dependencies and runs Vite as `node`. The project app bridge publishes only loopback ports for the API and frontend. Migrations and PostgreSQL use the internal storage network and PostgreSQL publishes no port. The new smoke test uses a generated project name, disposable credentials, ephemeral ports and a separate volume. Following the persistence check, cleanup is limited to that project and its exact image tags.
+
+Observed regressions: with networking disabled, a direct cache-write probe against the original frontend image returned EACCES. The same probe passed on the corrected image. With the corrected image and the previous Compose networks, both containers were healthy, but `docker inspect` reported empty effective port bindings and the smoke test exited 1 with `invalid IP:0`. The project app bridge fixed both loopback bindings.
+
+Checks: `python3 scripts/test-compose.py --config-only`, `docker compose config --quiet`, and `git diff --check` exited 0. `python3 -u scripts/test-compose.py` exited 0 in project `diploma-smoke-667b49d98d434dbab875` on Apple Silicon with Docker Engine 29.7.2 and Compose 5.5.1. It verified clean setup through Goose revision 4, health/readiness 200, missing bearer 401, frontend HTML and TypeScript entry, one synthetic report with four findings, five observations and one unlocated alert, exact digest, HTTP 200 duplicate reuse, and the same digest and four findings after shutdown and restart. A separate Docker query confirmed no containers, networks, volume or tagged images remained for this test project.
+
+Remaining gates: independent Compose recheck, the hosted CI run, and an existing genuine report with authorization and provenance. The repository, Git history and local report filename search yielded only the synthetic fixture.
+
+```text
+b670b08ba300cce25e74242806b0c59b145243d95a0333f4846cd4e633cec909  compose.yaml
+3fe9859cf70e74f5b27ddf964fecbcba3748796fcfa60191a620fc7ed78c4ad2  frontend/Dockerfile
+4becdbecff0a5b130072e8390f1d4cafeb61afa0dc3b56501e93b20d734845dd  scripts/test-compose.py
+6c0cc248216f162ee5ec6d4b43d5576574ba87365dd6066a3a962e051750575c  README.md
+b8177a4955a65d7e212e1460821688851dc97ca238de5b138bf42beba7acb034  docs/status.md
+```
+
+Checkpoint 14 passed independent verification at all five frozen hashes. The verifier repeated startup, revision 4 migration, protected frontend/API checks, synthetic import, duplicate reuse, restart persistence and scoped cleanup in their own project. No findings were reported. See the [independent verification entry](review.md#independent-verification--m0-20261123-14).
+
+Final local checks: `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0, including three Vitest tests and byte-identical generated files. No scoped review findings remain open. Hosted CI has no observed run. Genuine-report acceptance needs an existing authorized Juice Shop ZAP Traditional JSON report and its provenance record.

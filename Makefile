@@ -18,7 +18,7 @@ migrate-up:
 
 tools-check:
 	@test "$$(sqlc version)" = "v1.31.1"
-	@goose -version | rg -q 'v3.30.1'
+	@test "$$(goose -version)" = "goose version: v3.30.1"
 
 generate: tools-check
 	cd backend && sqlc generate -f db/sqlc.yaml

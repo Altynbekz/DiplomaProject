@@ -1,16 +1,16 @@
 # M0 and M1 implementation status
 
-Updated 2026-11-23, Asia/Almaty. The workspace initially held only the root contract and had no Git metadata, application source or report. Work is limited to the foundation and offline import.
+Updated 2026-11-23, Asia/Almaty. This status covers the existing foundation and offline import. The current continuation started from `a1b523d8ad25b170466a09e4d758e8afacc55b39` on `main`.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
-| M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets and reproducible setup | The host setup and M0 behavioral gates passed. Compose config validated. Container boot remains unverified because the Docker daemon socket is unavailable. |
+| M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. The configured GitHub Actions workflow awaits a hosted run. |
 | M1 | Offline Traditional JSON import, immutable original bytes, SHA-256, typed provenance, duplicate handling, normalized findings and observations, audited private downloads, filtered and paged UI | Executed using the labeled synthetic fixture. Acceptance is blocked by the absence of a genuine, provenance-backed Juice Shop report and its sanitized derivative. |
 | M2–M6 | Planned | No implementation started. |
 
 ## Recorded checks
 
-Executed on macOS arm64 with Go 1.27.1, PostgreSQL 15.19, goose 3.30.1, sqlc 1.31.1, Node 26.13.0, npm 12.2.1, Playwright 1.65.1 and Chromium 159.0.8154.6. Docker CLI 29.7.2 and Compose 5.5.1 were available. The engine socket connection failed.
+Executed on macOS arm64 with Go 1.27.1, PostgreSQL 15.19, goose 3.30.1, sqlc 1.31.1, Node 26.13.0, npm 12.2.1, Playwright 1.65.1 and Chromium 159.0.8154.6. The current continuation also observed Docker Engine 29.7.2 on ARM64 and Compose 5.5.1 after starting Docker Desktop.
 
 | Command | Result |
 | --- | --- |
@@ -19,7 +19,8 @@ Executed on macOS arm64 with Go 1.27.1, PostgreSQL 15.19, goose 3.30.1, sqlc 1.3
 | `cd frontend && npm run build` | Exit 0. TypeScript check and Vite production build passed. |
 | `make test-integration` | Exit 0 under the Go race detector. Migrated empty PostgreSQL to revision 1, upgraded to revision 3 and then revision 4, and repeated with no migration pending. Four concurrent uploads returned one creation and three duplicates of the same import. Stored bytes matched the upload. Verified finding and observation pagination and filters, invalid input without partial inserts, runtime write restrictions, target consistency and audit on private downloads. |
 | `make test-e2e` | Exit 0. Two Chromium tests passed against disposable PostgreSQL and the same-origin Vite proxy. Import and duplicate reuse, filtering, token cleared on reload, escaped scanner text, acknowledgement-gated download with bytes matching the original, and persisted rows after API and database restart passed. With PostgreSQL stopped, health was 200, readiness was 503, and missing bearer credentials returned 401. |
-| `docker compose config --quiet` | Exit 0. `docker info --format '{{.ServerVersion}}'` failed to connect to Docker's local socket, so no Compose startup was observed. |
+| `python3 scripts/test-compose.py --config-only` | Exit 0. Validated a random project name, isolated networks and volume, disposable credentials, ephemeral loopback bindings and no published PostgreSQL port. |
+| `python3 -u scripts/test-compose.py` | Exit 0 on Docker Desktop with ARM64 Docker Engine 29.7.2 and Compose 5.5.1. Applied migrations through revision 4, served the frontend and its TypeScript entry, returned health and readiness 200 and missing-token 401, and imported synthetic data through the frontend proxy. The exact duplicate returned the same import ID and the database held one report and five observations. Shutdown preserved the volume. Restart returned the same digest and four findings. Final cleanup removed the disposable project resources. |
 
 Both bounded Go fuzz runs exited 0 on 2026-11-23. From `backend/`, run `GOCACHE=/private/tmp/diploma-go-cache go test ./internal/zap -run '^$' -fuzz '^FuzzDecode$' -fuzztime=3s -parallel=2` for the report decoder (23,459 executions) and `GOCACHE=/private/tmp/diploma-go-cache go test ./internal/scope -run '^$' -fuzz '^FuzzParse$' -fuzztime=3s -parallel=2` for URL parsing (276,635 executions). The first attempts could not write into the default user cache and were rerun with the temporary cache.
 
@@ -27,7 +28,7 @@ An earlier integration run found that PostgreSQL requires column-level UPDATE pe
 
 ## Review follow-up
 
-Review pass 1 withheld approval on checkpoints 1–3. Checkpoints 5 and 6 record the implementation responses to R001–R009 and await reviewer recheck.
+Review pass 1 withheld approval on checkpoints 1–3. Checkpoints 5 and 6 record the implementation responses to R001–R009. Subsequent independent checks are recorded below.
 
 On 2026-11-23, `make check`, `cd frontend && npm run build`, `make test-integration`, `make test-e2e` and `docker compose config --quiet` exited 0 after the review fixes. The PostgreSQL suite verified migration 4, all ten malformed report cases without partial writes, a successful import with unusual query values, ordered observation history across two reports with the clock fixed, import-scoped severity, and unchanged provenance after a rejected duplicate. Chromium verified upload/reload and persistence after API and database restart. A three-second URL fuzz run after the query parsing fix passed with 290,454 executions.
 
@@ -41,11 +42,24 @@ The redesigned frontend keeps the same evidence workflow and protected download.
 
 Independent verification of checkpoint 09 passed with matching file hashes and `GOFLAGS=-mod=readonly make test-integration`. V010 and V011 are resolved. The verifier also found V012, where an invalid cursor could leave the findings page without an in-app recovery action. Checkpoint 10 restores the First page control after errors. The final Chromium test reproduced the invalid-cursor response and verified that the control returns to the original persisted rows. Source, formatting, build and browser checks passed on the final combined implementation. The verifier independently ran `GOFLAGS=-mod=readonly make test-e2e` against checkpoint 10 at matching hashes. Both browser phases passed and V012 is resolved. No scoped review findings remain open.
 
-The scoped changes are in the coordination checkpoints. Review conclusions are recorded separately in `docs/coordination/review.md`. Genuine lab acceptance and Compose startup remain separate gates.
+The scoped changes and review conclusions are recorded in the [coordination log](coordination/status.md) and [independent verification log](coordination/review.md).
+
+## Current continuation and CI
+
+- The root and layer guides now link to the actual guides, contract and status files. Checkpoint 11 independently verified all 13 relative links.
+- [GitHub Actions](../.github/workflows/ci.yml) configures Ubuntu 24.04 checks with pinned actions and tools. It runs formatting, lint, type checking, backend and frontend tests, generated-file consistency, the frontend build, and separate disposable PostgreSQL and Chromium suites. The workflow references no real secrets or scans and keeps PostgreSQL under a non-root user.
+- `actionlint` 1.7.7, `sh -n scripts/install-test-postgres.sh`, `GOFLAGS=-mod=readonly make check`, and `npm run build --prefix frontend` exited 0. The PostgreSQL 15.19 release archive matched its pinned SHA-256 and built and installed to a temporary prefix. Both `GOFLAGS=-mod=readonly make test-integration` under the race detector and `GOFLAGS=-mod=readonly make test-e2e` passed using that installation. The suite checked migrations 1 through 4, the readiness outage response and both Chromium phases. The browser run used local execution with loopback binding enabled after the default sandbox rejected `socket.bind`.
+- Independent checkpoint 12 found V013. Checkpoint 13 independently verified the fix, including the pinned sqlc and goose checks with ripgrep absent from PATH. A hosted Ubuntu run remains unverified. No run was dispatched.
+
+## Container startup fixes
+
+- The original frontend image denied write access to `node_modules` as its non-root runtime user. Vite reproduced the cache write error in a disposable checkout. With the build and application files owned by `node`, the same image probe passed as that runtime user with networking disabled.
+- With both Compose networks marked internal, Docker reported no effective host ports for the API or frontend even after both health checks passed. The app now uses a project-local bridge for loopback publishing. PostgreSQL and migrations remain on the separate internal storage network, with no database port exposed. The Compose smoke test checks the effective configuration and the actual host bindings.
+- The passing smoke run used project `diploma-smoke-667b49d98d434dbab875`, disposable credentials and a fresh volume. Docker Desktop on Apple Silicon was the observed ARM64 environment. AMD64 and emulated Compose engines are outside the supported configuration.
 
 ## Synthetic fixture and artifact hashes
 
-The URL validation follow-up passed `make check`, `make test-integration` and `make test-e2e`. The regression test first reproduced acceptance of percent-decoded NUL and invalid UTF-8 query names. The fixed parser returned `422 validation_failed` at the instance URI pointer for both cases. The integration test verified zero import, finding and observation rows after each rejected request. The same bounded URL fuzz command above passed again with 288,782 executions. 
+The URL validation follow-up passed `make check`, `make test-integration` and `make test-e2e`. The regression test first reproduced acceptance of percent-decoded NUL and invalid UTF-8 query names. The fixed parser returned `422 validation_failed` at the instance URI pointer for both cases. The integration test verified zero import, finding and observation rows after each rejected request. The same bounded URL fuzz command above passed again with 288,782 executions.
 
 The browser and PostgreSQL tests used authored data and observed **5 observations**, **4 findings**, **1 unlocated alert**, and an unknown severity warning. The fixture's run involved no scanner. Scan authorization, times, versions and sanitized hashes for genuine data are unavailable. See [fixture provenance](fixture-provenance.md).
 
@@ -56,4 +70,4 @@ The browser and PostgreSQL tests used authored data and observed **5 observation
 | `backend/internal/store/sqlc/imports.sql.go` | `ff1c65eee2854d201d7fe4a2ad62a72fec9c256aca454f60b191f40234e28714` |
 | `frontend/src/api/schema.d.ts` | `2d9aa5630be8a3c631cbea8e286a8189a33e92893bd426d1de5f5d69f9c900e3` |
 
-For the open M1 gate, a genuine existing report from an authorized local Juice Shop lab must be paired with its provenance and sanitized derivative. Compare fixture-derived counts and fingerprints with rows persisted by the API, then inspect those rows in the browser after restart. The root contract requires explicit named lab authorization and verified network isolation before any scan. The current scope is offline import.
+The checkout, Git history and the local Downloads, Documents and Desktop searches yielded only the repository’s labeled synthetic fixture. M1 acceptance needs the path to an existing genuine ZAP Traditional JSON report from an authorized local Juice Shop lab and its provenance record. Preserve the original bytes, record the sanitization and derivative digest, derive the expected counts and fingerprints independently, and verify persisted browser rows after restart. The current scope is offline import.

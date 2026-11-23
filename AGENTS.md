@@ -4,7 +4,9 @@ Project: **Development of a Context-Aware Web Application Vulnerability Assessme
 
 ## 0. Status, authority, and operating rules
 
-This document is an **implementation plan and contract**, not evidence of implemented software. At authoring time (2026-11-23), this directory contained two unrelated QR images and no application source, tests, dependency manifests, migrations, or running system. Leave those images untouched. Do not describe the planned tree below as existing. Do not mark a milestone complete without executable evidence.
+This document defines the implementation plan and contract. Check the current checkout and [implementation status](docs/status.md) for working features, pending work, and verification results. Preserve unrelated files, including any QR images. Mark a milestone complete only when its acceptance gates have executable evidence.
+
+Use the [frontend guide](frontend/FRONTEND.md) and [backend guide](backend/BACKEND.md) for layer-specific guidance. Review checkpoints and independent results live in [coordination status](docs/coordination/status.md) and the [verification log](docs/coordination/review.md).
 
 These instructions apply to coding agents working anywhere in this repository. Follow the user's current requirements and applicable nested instructions. Read the actual files and working tree before each task; preserve unrelated changes. Never infer implementation status from this document alone.
 

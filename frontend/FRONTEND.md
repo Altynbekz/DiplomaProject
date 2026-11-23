@@ -4,9 +4,9 @@
 
 ## 1. Read this first
 
-Read [AGENTS.md](AGENTS.md) before changing code. It defines the project scope, API contracts, evidence rules, security requirements, and milestone gates. This guide adds frontend design decisions. For field names and response types, use the implemented `contracts/openapi.yaml` and its generated TypeScript types.
+Read [AGENTS.md](../AGENTS.md) before changing code. It defines the project scope, API contracts, evidence rules, security requirements, and milestone gates. This guide adds frontend design decisions. For field names and response types, use the [implemented OpenAPI contract](../contracts/openapi.yaml) and its generated TypeScript types.
 
-Before working, inspect the actual frontend and `docs/status.md` in the repository being edited. This local documentation workspace is not a synchronized checkout of the GitHub application. Do not infer current implementation status from this guide or replace working components merely to match the proposed folder tree.
+Before working, inspect the frontend in the current checkout and read the [implementation status](../docs/status.md). Keep working components that meet the requirements. The [backend guide](../backend/BACKEND.md) covers the API and persistence boundaries.
 
 **Design goal: a quiet, minimal workspace that makes the next useful action obvious.** Prioritize readable findings and a short import flow. Show a control only when it has a working purpose on that screen.
 

@@ -60,7 +60,8 @@ services:
       retries: 20
 networks:
   storage: {internal: true}
-  app: {internal: true}
+  # The API and frontend publish their ports on host loopback.
+  app: {driver: bridge}
 volumes:
   pgdata:
 secrets:

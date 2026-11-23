@@ -4,9 +4,9 @@
 
 ## 1. Read this first
 
-Read [AGENTS.md](AGENTS.md) before changing code. It contains the authoritative domain model, exact planned API interfaces, database requirements, safety rules, research method, and milestone acceptance gates. [FRONTEND.md](FRONTEND.md) defines the intended user experience.
+Read [AGENTS.md](../AGENTS.md) before changing code. It contains the authoritative domain model, exact planned API interfaces, database requirements, safety rules, research method, and milestone acceptance gates. [FRONTEND.md](../frontend/FRONTEND.md) defines the intended user experience.
 
-Inspect the actual backend, migrations, OpenAPI, tests, and `docs/status.md` in the repository being edited. This local documentation workspace is not a synchronized checkout of the GitHub application. Preserve working code and applied migrations. Add features only for the active milestone.
+Inspect the backend, migrations, [OpenAPI contract](../contracts/openapi.yaml), and tests in the current checkout. Read the [implementation status](../docs/status.md) for observed results and remaining gates. Preserve working code and applied migrations. Add features only for the active milestone.
 
 **Backend goal: a small, reliable service that preserves evidence and explains every assessment.** Keep uncertainty visible. Never manufacture a score, verification result, classification, or successful scan.
 
