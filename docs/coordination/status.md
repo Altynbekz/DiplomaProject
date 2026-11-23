@@ -2,9 +2,9 @@
 
 Role: main implementation agent. Scope: M0 and M1.
 
-Current milestone: M0/M1. Hosted CI passed for `5a1cd74`. The host foundation and synthetic offline workflow have prior independent verification. Genuine-report acceptance still needs an authorized report and provenance.
+Current milestone: M0/M1. Hosted CI passed for `4d0240c`. The new Python test wiring awaits hosted verification after publication. Genuine-report acceptance still needs an authorized report and provenance.
 
-Current checkout baseline: `5a1cd7427fbfca196d3dc59bea65555a256046e6`. No application files are under edit. See checkpoint 16 for the frozen CI record and fixture preflight, and `review.md` for independent results. Earlier checkpoints preserve the implementation history.
+Current checkout baseline: `4d0240c4f50559b0e21feeeead7348c03cd74a7f`. No application files are under edit. See checkpoint 17 for the frozen test wiring and CI evidence, and `review.md` for independent results. Earlier checkpoints preserve the implementation history.
 
 ## Checkpoint 1 — M0 foundation — READY FOR REVIEW
 
@@ -279,3 +279,27 @@ b018f4e806965bcea6c1872d8ccd47a887b72f3f1af23cf9c74affd1ed9298be  README.md
 ```
 
 Checkpoint 16 passed independent verification at all five frozen hashes. The verifier repeated the original V014 command, checked unknown-option and missing-argument diagnostics, and ran all nine tests. V014 is resolved and no new findings were reported. The only remaining acceptance gate requires the genuine authorized report and provenance. [Independent verification](review.md#independent-verification--m1-20261123-16)
+
+## M0-20261123-17 — Python tests in the default verification path — READY FOR VERIFICATION
+
+Baseline commit: `4d0240c4f50559b0e21feeeead7348c03cd74a7f`. GitHub `main` matched this baseline and no local changes were present at the start. The five files below are frozen.
+
+Behavior: `make test-scripts` runs the existing standard-library `unittest` suite. Both `make test` and `make check` require it. The existing hosted `make check` step picks up the tests after setting up CPython 3.14.3 with a full action commit pin. The Go, frontend, disposable PostgreSQL and Chromium commands remain in the workflow. Host verification requires Python 3.11 or newer.
+
+Hosted evidence: run `45168962574`, attempt 1, went from `in_progress` to `completed` with conclusion `success` for the exact baseline. Job `137673174362` and all 15 listed steps succeeded. GitHub listed one run for that commit, last updated `2026-11-23T11:54:53Z`. The run tested the committed baseline and predates this Python wiring. [GitHub Actions run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45168962574)
+
+Local checks on Python 3.14.3: `make test-scripts`, `GOFLAGS=-mod=readonly make test` and `GOFLAGS=-mod=readonly make check` exited 0. Nine Python tests, Go tests, three Vitest tests, lint, formatting, strict TypeScript and byte-identical generation passed. In a temporary Git archive with one deliberately failing Python assertion, `make test` and `make check` each exited 2 with the expected failure. The working-tree test was untouched.
+
+`npm run build --prefix frontend`, `GOFLAGS=-mod=readonly make test-integration`, and `GOFLAGS=-mod=readonly make test-e2e` exited 0. Disposable migrations reached revision 4, PostgreSQL integration passed under the race detector, and both Chromium phases and outage checks passed. `actionlint` 1.7.7, `git diff --check`, the tool manifest JSON check and a 12-link Markdown check exited 0. The upstream tag resolves to the pinned action hash and the official tool versions manifest lists Python 3.14.3 for Ubuntu 24.04 x64.
+
+Remaining gates: independent review of this checkpoint, a hosted run of the Python wiring after publication, and genuine-report acceptance. The repository, history and documented artifact locations contained only the labeled synthetic fixture. The missing input is the local path to the genuine authorized Juice Shop ZAP Traditional JSON report and its provenance record.
+
+```text
+407b914f10f6d1eb3edf63f66d347860d1db2ba6d1baf590f695cdea3c8f2697  .github/workflows/ci.yml
+c129bd59fd47488da92d7158f95e61d69b1e8eab074e0a8b84a16422a04bc7a6  Makefile
+072f65f621e5ce9a38f796d978c744f50edc8d4fcd1502ab78213cbfc4551809  README.md
+80f8843031065e4ed4713fc6dc76fc31bbf01bdea46c9a81820fca2ed6089b10  docs/status.md
+d8ac3e8710c4b12586cc73fd35edc5351ca113aeaee4debe72f6f10f93411fb2  tools.versions.json
+```
+
+Checkpoint 17 passed independent verification at all five frozen hashes. The verifier ran all three Make targets in a separate archive, confirmed the deliberate failure exits from `make test` and `make check`, and checked the Python and action pins. The observed hosted success applies to the baseline only. No findings remain open. [Independent verification](review.md#independent-verification--m0-20261123-17)

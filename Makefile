@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 export GOCACHE ?= /tmp/diploma-go-cache
-.PHONY: setup dev dev-local migrate-up generate fmt fmt-check lint test test-integration test-e2e check generate-check tools-check
+.PHONY: setup dev dev-local migrate-up generate fmt fmt-check lint test test-scripts test-integration test-e2e check generate-check tools-check
 setup:
 	python3 scripts/setup-local.py
 	cd frontend && npm ci
@@ -39,9 +39,12 @@ lint:
 	cd backend && go vet ./...
 	cd frontend && npm run lint
 
-test:
+test: test-scripts
 	cd backend && go test ./...
 	cd frontend && npm test
+
+test-scripts:
+	cd scripts && python3 -B -m unittest -v test_check_zap_fixture
 
 test-integration:
 	./scripts/test-integration.sh

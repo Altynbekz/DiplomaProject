@@ -1,10 +1,10 @@
 # M0 and M1 implementation status
 
-Updated 2026-11-23, Asia/Almaty. This status covers the foundation and offline import. This continuation started from `5a1cd7427fbfca196d3dc59bea65555a256046e6`, which matched GitHub `main`.
+Updated 2026-11-23, Asia/Almaty. This status covers the foundation and offline import. This continuation started from `4d0240c4f50559b0e21feeeead7348c03cd74a7f`, which matched GitHub `main`.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
-| M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `5a1cd74`. [GitHub Actions run 45166744371](https://github.com/Altynbekz/DiplomaProject/actions/runs/45166744371) |
+| M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `4d0240c`. The new Python test wiring requires publication before a hosted run can verify it. [GitHub Actions run 45168962574](https://github.com/Altynbekz/DiplomaProject/actions/runs/45168962574) |
 | M1 | Offline Traditional JSON import, immutable original bytes, SHA-256, typed provenance, duplicate handling, normalized findings and observations, audited private downloads, filtered and paged UI | Executed using the labeled synthetic fixture. Acceptance is blocked by the absence of a genuine, provenance-backed Juice Shop report and its sanitized derivative. |
 | M2–M6 | Planned | No implementation started. |
 
@@ -47,10 +47,19 @@ The scoped changes and review conclusions are recorded in the [coordination log]
 ## Current continuation and CI
 
 - The root and layer guides now link to the actual guides, contract and status files. Checkpoint 11 independently verified all 13 relative links.
-- [GitHub Actions](../.github/workflows/ci.yml) configures Ubuntu 24.04 checks with pinned actions and tools. It runs formatting, lint, type checking, backend and frontend tests, generated-file consistency, the frontend build, and separate disposable PostgreSQL and Chromium suites. The workflow references no real secrets or scans and keeps PostgreSQL under a non-root user.
+- [GitHub Actions](../.github/workflows/ci.yml) configures Ubuntu 24.04 checks with pinned actions and tools. It runs formatting, lint, type checking, unit tests, generated-file consistency, the frontend build, and separate disposable PostgreSQL and Chromium suites. The workflow references no real secrets or scans and keeps PostgreSQL under a non-root user.
 - `actionlint` 1.7.7, `sh -n scripts/install-test-postgres.sh`, `GOFLAGS=-mod=readonly make check`, and `npm run build --prefix frontend` exited 0. The PostgreSQL 15.19 release archive matched its pinned SHA-256 and built and installed to a temporary prefix. Both `GOFLAGS=-mod=readonly make test-integration` under the race detector and `GOFLAGS=-mod=readonly make test-e2e` passed using that installation. The suite checked migrations 1 through 4, the readiness outage response and both Chromium phases. The browser run used local execution with loopback binding enabled after the default sandbox rejected `socket.bind`.
 - Independent checkpoint 12 found V013. Checkpoint 13 independently verified the fix, including the pinned sqlc and goose checks with ripgrep absent from PATH.
 - GitHub marked run `45166744371`, attempt 1, `completed` with conclusion `success` for `5a1cd7427fbfca196d3dc59bea65555a256046e6` on `main`. The last run update was `2026-11-23T11:42:06Z`. The `check` job and all listed steps succeeded, including pinned tool installation, generated-file comparison, frontend build, isolated PostgreSQL migrations and integration tests, and the Chromium suite. GitHub listed one run for this commit and no failures. No CI fix or rerun was needed. [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45166744371)
+- GitHub marked run `45168962574`, attempt 1, `completed` with conclusion `success` for `4d0240c4f50559b0e21feeeead7348c03cd74a7f` on `main`. The last run update was `2026-11-23T11:54:53Z`. Job `137673174362` and all 15 listed steps passed, including isolated PostgreSQL integration and Chromium. GitHub listed one run for this exact commit. The baseline's workflow did not run the Python unit tests. [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45168962574)
+
+## Python script tests in normal verification
+
+`make test-scripts` runs the nine synthetic fixture preflight tests with standard-library `unittest`. `make test` depends on it and `make check` includes it through `make test`. Host verification uses Python 3.11 or newer. The updated workflow pins CPython 3.14.3 with a commit-pinned setup action, and uses the existing `make check` step to run the suite.
+
+Locally on Python 3.14.3, `make test-scripts`, `GOFLAGS=-mod=readonly make test` and `GOFLAGS=-mod=readonly make check` exited 0. Generation produced identical files, Go tests passed, and all three Vitest tests passed. In a temporary copy of the checkout, one intentionally failing Python assertion made both `make test` and `make check` exit 2. `actionlint` 1.7.7, the tool manifest JSON check and `git diff --check` exited 0.
+
+`npm run build --prefix frontend`, `GOFLAGS=-mod=readonly make test-integration` and `GOFLAGS=-mod=readonly make test-e2e` exited 0. Disposable PostgreSQL applied migrations through revision 4 and passed the synthetic integration suite under the Go race detector. Both Chromium phases and the database outage check passed. Hosted verification of the updated workflow awaits publication.
 
 ## Container startup fixes
 
@@ -73,6 +82,6 @@ The browser and PostgreSQL tests used authored data and observed **5 observation
 
 ## Genuine-report acceptance readiness
 
-The search covered the checkout, Git history and the documented `artifacts/` and `backend/testdata/zap/` locations. The only report found was the labeled synthetic fixture. M1 acceptance needs the local path to a genuine ZAP Traditional JSON report from an authorized Juice Shop lab and its provenance, including the authorization reference, scan time and any recorded scanner, target or scan plan details.
+The current checkout, Git history and the documented `artifacts/` and `backend/testdata/zap/` locations contain only the labeled synthetic fixture. M1 acceptance needs the local path to a genuine ZAP Traditional JSON report from an authorized Juice Shop lab and its provenance, including the authorization reference, scan time and any recorded scanner, target or scan plan details.
 
 `python3 -B -m unittest discover -s scripts -p 'test_check_zap_fixture.py' -v` exited 0 with nine tests for the offline preflight. They use synthetic inputs to check digest agreement, structure and source positions, required provenance, rejection of the repository's synthetic fixture, and preservation of both input files. The verifier found V014, an argument error that exposed an unexpected path. The revised CLI uses a fixed diagnostic, and the regression test checks that the path stays private. Candidate-specific sanitization, expected fingerprints, integration coverage and browser restart await the genuine input. [Acceptance checklist](fixture-provenance.md)
