@@ -3,7 +3,7 @@
   "info": {
     "title": "Diploma offline evidence API",
     "version": "0.1.0",
-    "description": "Local evidence import, human verification and reviewed OWASP classification. CVSS is absent."
+    "description": "Local evidence import, human verification, reviewed OWASP classification, and target context history. CVSS is absent."
   },
   "security": [
     {
@@ -2210,6 +2210,460 @@
           }
         }
       }
+    },
+    "/api/v1/targets/{id}/contexts": {
+      "get": {
+        "operationId": "listContexts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContextPage"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createContext",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContextRevision"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContextInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/findings/{id}/resolved-context": {
+      "get": {
+        "operationId": "resolveContext",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedContext"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3504,6 +3958,334 @@
         "required": [
           "items",
           "next_cursor"
+        ]
+      },
+      "ContextSource": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "document_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "note": {
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 256
+              }
+            },
+            "required": [
+              "document_ref",
+              "sha256",
+              "note"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "source_pointer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "note": {
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 256
+              }
+            },
+            "required": [
+              "observation_id",
+              "source_pointer",
+              "note"
+            ]
+          }
+        ]
+      },
+      "ContextFactors": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "exposure": {
+            "type": "string",
+            "enum": [
+              "public",
+              "internal",
+              "restricted",
+              "unknown"
+            ]
+          },
+          "required_privileges": {
+            "type": "string",
+            "enum": [
+              "anonymous",
+              "user",
+              "admin",
+              "unknown"
+            ]
+          },
+          "data_sensitivity": {
+            "type": "string",
+            "enum": [
+              "public",
+              "internal",
+              "personal",
+              "highly_sensitive",
+              "unknown"
+            ]
+          },
+          "business_criticality": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "exposure",
+          "required_privileges",
+          "data_sensitivity",
+          "business_criticality"
+        ]
+      },
+      "ContextFactorNote": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContextSource"
+            },
+            "maxItems": 4
+          }
+        },
+        "required": [
+          "rationale",
+          "sources"
+        ]
+      },
+      "FactorProvenance": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "exposure": {
+            "$ref": "#/components/schemas/ContextFactorNote"
+          },
+          "required_privileges": {
+            "$ref": "#/components/schemas/ContextFactorNote"
+          },
+          "data_sensitivity": {
+            "$ref": "#/components/schemas/ContextFactorNote"
+          },
+          "business_criticality": {
+            "$ref": "#/components/schemas/ContextFactorNote"
+          }
+        },
+        "required": [
+          "exposure",
+          "required_privileges",
+          "data_sensitivity",
+          "business_criticality"
+        ]
+      },
+      "ContextInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "factors": {
+            "$ref": "#/components/schemas/ContextFactors"
+          },
+          "factor_provenance": {
+            "$ref": "#/components/schemas/FactorProvenance"
+          },
+          "expected_previous_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "method",
+          "path",
+          "factors",
+          "factor_provenance",
+          "expected_previous_id"
+        ]
+      },
+      "ContextRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "factors": {
+            "$ref": "#/components/schemas/ContextFactors"
+          },
+          "factor_provenance": {
+            "$ref": "#/components/schemas/FactorProvenance"
+          },
+          "actor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "target_id",
+          "method",
+          "path",
+          "revision",
+          "factors",
+          "factor_provenance",
+          "actor",
+          "created_at"
+        ]
+      },
+      "ContextPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContextRevision"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ]
+      },
+      "ResolvedContext": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "factors": {
+            "$ref": "#/components/schemas/ContextFactors"
+          },
+          "factor_provenance": {
+            "$ref": "#/components/schemas/FactorProvenance"
+          },
+          "source_revision_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "maxItems": 1
+          },
+          "resolver_version": {
+            "type": "string"
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "factors",
+          "factor_provenance",
+          "source_revision_ids",
+          "resolver_version",
+          "resolved_at"
         ]
       }
     }

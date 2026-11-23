@@ -1,4 +1,4 @@
-name: M0/M1 checks
+name: Diploma checks
 
 on:
   push:

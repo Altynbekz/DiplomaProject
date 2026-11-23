@@ -197,6 +197,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/targets/{id}/contexts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["listContexts"];
+    put?: never;
+    post: operations["createContext"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/findings/{id}/resolved-context": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["resolveContext"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -463,6 +495,72 @@ export interface components {
     ClassificationPage: {
       items: components["schemas"]["ClassificationRevision"][];
       next_cursor: string | null;
+    };
+    ContextSource:
+      | {
+          document_ref: string;
+          sha256: string;
+          note: string;
+        }
+      | {
+          /** Format: uuid */
+          observation_id: string;
+          source_pointer: string;
+          note: string;
+        };
+    ContextFactors: {
+      /** @enum {string} */
+      exposure: "public" | "internal" | "restricted" | "unknown";
+      /** @enum {string} */
+      required_privileges: "anonymous" | "user" | "admin" | "unknown";
+      /** @enum {string} */
+      data_sensitivity:
+        "public" | "internal" | "personal" | "highly_sensitive" | "unknown";
+      /** @enum {string} */
+      business_criticality: "low" | "medium" | "high" | "critical" | "unknown";
+    };
+    ContextFactorNote: {
+      rationale: string;
+      sources: components["schemas"]["ContextSource"][];
+    };
+    FactorProvenance: {
+      exposure: components["schemas"]["ContextFactorNote"];
+      required_privileges: components["schemas"]["ContextFactorNote"];
+      data_sensitivity: components["schemas"]["ContextFactorNote"];
+      business_criticality: components["schemas"]["ContextFactorNote"];
+    };
+    ContextInput: {
+      method: string | null;
+      path: string | null;
+      factors: components["schemas"]["ContextFactors"];
+      factor_provenance: components["schemas"]["FactorProvenance"];
+      expected_previous_id: string | null;
+    };
+    ContextRevision: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      target_id: string;
+      method: string | null;
+      path: string | null;
+      revision: number;
+      factors: components["schemas"]["ContextFactors"];
+      factor_provenance: components["schemas"]["FactorProvenance"];
+      actor: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    ContextPage: {
+      items: components["schemas"]["ContextRevision"][];
+      next_cursor: string | null;
+    };
+    ResolvedContext: {
+      factors: components["schemas"]["ContextFactors"];
+      factor_provenance: components["schemas"]["FactorProvenance"];
+      source_revision_ids: string[];
+      resolver_version: string;
+      /** Format: date-time */
+      resolved_at: string;
     };
   };
   responses: never;
@@ -1956,6 +2054,343 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ClassificationRevision"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  listContexts: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string;
+      };
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContextPage"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  createContext: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContextInput"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      201: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContextRevision"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  resolveContext: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ResolvedContext"];
         };
       };
       /** @description Problem response; see code and field errors */

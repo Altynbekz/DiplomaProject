@@ -53,16 +53,16 @@ Unlock → Select or create lab target → Import report → Read findings → R
 
 Keep the shared header small: project name on the left; `Lock workspace` on the right when unlocked. Use a plain title such as `Vulnerability assessment` rather than a promotional headline.
 
-Initial pages:
+Workspace pages:
 
 | Page | Purpose | Main action |
 | --- | --- | --- |
 | Unlock | Enter the local API token | Unlock |
 | Targets | Select a registered lab target | Create target, only when needed |
-| Target findings | Import a report and inspect its findings | Import report |
-| Finding detail | Read observations and provenance | Open source report details when needed |
+| Target findings | Import a report, inspect findings and manage application context | Import report or save a context revision |
+| Finding detail | Read evidence, record human review or classification, and inspect resolved context | Open the relevant disclosure |
 
-Keep later review, context, assessment, ranking, and scan controls absent until their milestones and APIs are implemented. Do not display inactive feature tiles or placeholder navigation.
+Keep assessment, ranking and scan controls absent until their milestones and APIs are implemented. Do not display inactive feature tiles or placeholder navigation.
 
 ## 4. Essential controls only
 

@@ -552,3 +552,57 @@ f80722ee5ec981cdeee1a8d5ee12a27cddb090124c8527bf6ca178c9553b49a6  frontend/src/f
 ```
 
 Checkpoint 27 passed independent review. V019 and V020 are resolved. The reviewer confirmed exact category shape, policy review metadata, and both database and browser behavior. [Independent recheck](review.md#independent-verification--m2-20261123-27)
+
+## M2-20261123-28 — Application context histories — READY FOR VERIFICATION
+
+Baseline 20c6a76536c3b2d921ef3a27a36b96b119c0af13. Migration 7, context API and UI deliver target-default and exact endpoint revisions, unknown explanations, typed document or same-target evidence, stale conflict recovery, audits and read-only resolution. The findings workflow still imports the genuine fixture and shows independent verification and classification.
+
+GOFLAGS=-mod=readonly make check, make test-integration, make test-e2e and npm run build --prefix frontend each exited 0 locally. Goose upgrades 6 to 7 as well as clean migration. The named context workflow ran under the Go race detector. Four Chromium cases passed, including keyboard disclosure, stale context draft preservation, mobile fit, exact provenance, both restart phases and readiness outage. git diff --check exited 0. Classification hosted CI is running for the exact baseline.
+
+Remaining gates: independent context review and hosted CI for published context code. Live A01 role/object evidence requires a separate authorized scenario. No scanner or live target was used.
+
+```text
+29e8822f22e138c027999abffcc52190bbb528d42da6a66c78d47676360fa03a  .github/workflows/ci.yml
+449e345d247a74d4462ffbb556d5f65427976a7c416ee99621e408344189cf87  README.md
+4807cfbc14d9b4f5a7ffb225f7a925c97467e5105f74d3a64b6c04cbe532f82b  backend/BACKEND.md
+6007e3c4725bb91c1faa906c57a3d8d39fbc3b71b41a6d1202a44744ea3b2ed1  backend/db/migrations/00007_context.sql
+7eb83d062fe59176d85049a62010f7bbf7ab22a0263ec9d92427e6b195aabe67  backend/db/queries/contexts.sql
+a2b23300e3d87b5a16f7e3a35a6e7b2c9633da7519fcef08f5c9baa7957273f1  backend/db/queries/imports.sql
+b7b2452192ec1d01e091f35c18b751c3bc98db73f4d1ce3590572b92169e5fac  backend/internal/httpapi/api.go
+f033820e3ecbbec2051b48ad11d6a1babc5bb117977fdb95d20ace1a8664363c  backend/internal/httpapi/context_integration_test.go
+d63217cb4044c07f4d706babc678939c837b1bb01f5792517947576c964fe7e6  backend/internal/httpapi/contexts.go
+0c2434f36019de1dffa53c40bf307617dbb0fe7d6c295e01911fc8a7e2473270  backend/internal/httpapi/genuine_test.go
+ef228d2e9a953d2c078908c16a5f12224140ee943fc69537c11181438abd93ad  backend/internal/service/contexts.go
+124820559dae9a49f86cd3dbfc73c8e18a63e8e943252efcecf6bb53ee4e2eea  backend/internal/store/sqlc/contexts.sql.go
+de325720c8d91fa3a8cff02f6b805dd58d62760ca52c39a101f2aacf85858222  backend/internal/store/sqlc/imports.sql.go
+57fe1acf48297b648bf781829e15879b5eb839680657c6f218294df5d1805c2b  backend/internal/store/sqlc/models.go
+f97a58d37712db315a8312b7b4a15a3a2c8f3e95687d54d3bc9868fd8f4b2f9f  contracts/openapi.yaml
+8c06e15ed28ec2dd223dc1e619a60d670b053b2045001781f98fbd65a7662fd2  docs/status.md
+a3a514fe5149df40357dbcf00d5933a1de2a02ee032ee3cb22170733a6226e83  frontend/FRONTEND.md
+b4df55e587c285a1e3401323523c963e58b22a48c757ce6d46617fec242932d7  frontend/src/api/schema.d.ts
+460b7339b2f48f61c9d05bd201ccbb69e05d619483dc973605bdbbe00daee0da  frontend/src/app/style.css
+72de19bd66740a0bae668817ec3e78ec90c039a459c36aa11b8beb696e67e771  frontend/src/features/context-panels.tsx
+d534aa8bec5d821e729c7e9793266ce0ddd88bc682af1b6fb06218291813a38e  frontend/src/features/evidence.tsx
+247aece688b1ce9ee8d3f1a6daa04c0f3d98f086b520bd82c6398646634f78f6  frontend/tests/browser/genuine.spec.ts
+5a2208119498c18b7909c62a8608e04e1d997519e215a75c8315a597e8c0fe06  scripts/test-integration.sh
+```
+
+## M2-20261123-29 — Context boundary and save regressions — READY FOR VERIFICATION
+
+Baseline 20c6a76536c3b2d921ef3a27a36b96b119c0af13. V021–V024 addressed. JSONB limit failure is 413, context scope controls and history selection are disabled during saves, HTTP tokens must be ASCII, and a fixed-size SHA-256 index key preserves uniqueness with full paths. Context resolution still compares exact path text. The unchanged checkpoint 28 files retain their hashes.
+
+GOFLAGS=-mod=readonly make check, make test-integration, ./scripts/test-e2e.sh genuine and npm run build --prefix frontend exited 0 after fixes. The PostgreSQL checks include 413 with no partial append, non-ASCII rejection, 3,841-byte exact path storage and duplicate uniqueness. Chromium delayed a POST and verified disabled editing, required evidence and restart persistence. git diff --check exited 0. [Classification baseline CI](https://github.com/Altynbekz/DiplomaProject/actions/runs/45195527459) completed successfully. Context CI awaits publication. Live A01 evidence remains external.
+
+```text
+fc18fe8c7c0ce6155c2b8b8f04ad31aaa0e223feb87234c8a7ad1b58494cd7c8  backend/db/migrations/00007_context.sql
+c143cf93c2dd7ffb8324fb5787176b971997fd35c6ec87b4d37e3638be930a4c  backend/internal/service/contexts.go
+900a21becfe9222dbc9c118ff9bc470396feb0428d56ca89a71fdcff1618f166  backend/internal/httpapi/context_integration_test.go
+6bdd6f81734a79d88bbd0bf70050ada40beb8d83e1c8fe47b46700dce85b6174  frontend/src/features/context-panels.tsx
+9105520ce38847f10f6d43aa9822b0d7300bd2def46916d9e2104b5811068e8f  frontend/src/app/style.css
+70bd6e82f8a1ea2a0605072f7f7d1922d94c12bdba7355173493e1d9ad28b81d  frontend/tests/browser/genuine.spec.ts
+f463ab98dc5db0dd196c5fa299373fcc24b03d8465e02c200841f5d3da9b725d  docs/status.md
+```
+
+Additional local checks. The disposable ARM64 `python3 -u scripts/test-compose.py` run on checkpoint 28 exited 0, covering new-stack migrations/readiness, synthetic import and duplicate IDs, and cleanup after persistence across restart. The run used its own project and volume. After the checkpoint 29 UI fixes, `GOFLAGS=-mod=readonly ./scripts/test-e2e.sh synthetic` also exited 0 for both Chromium phases and outage checks.
+
+Checkpoint 29 passed independent review and resolves V021–V024. The isolated archive passed formatting, lint, generation, unit tests, frontend build, PostgreSQL and all Chromium cases. Supplemental checks confirmed the 413 and no partial writes, delayed-save controls, HTTP method handling, and full-path uniqueness and exact resolution. [Independent recheck](review.md#independent-verification--m2-20261123-29)

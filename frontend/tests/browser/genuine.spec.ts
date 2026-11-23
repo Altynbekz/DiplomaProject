@@ -23,6 +23,107 @@ async function checkFindings(page: Page, state = "unreviewed") {
   ).toBeVisible();
 }
 
+async function checkRootContext(page: Page) {
+  await page
+    .getByRole("link", { name: "Content Security Policy (CSP) Header Not Set" })
+    .click();
+  await page.getByText("Resolved context", { exact: true }).click();
+  const context = page.getByRole("region", {
+    name: "Resolved context factors",
+  });
+  await expect(context.getByText("restricted", { exact: true })).toBeVisible();
+  await expect(
+    context.getByText("synthetic-browser-policy", { exact: false }),
+  ).toBeVisible();
+  await expect(context.getByText("unknown", { exact: true })).toHaveCount(3);
+}
+
+async function saveAndCheckContext(page: Page) {
+  const summary = page.getByText("Application context", { exact: true });
+  await summary.focus();
+  await page.keyboard.press("Enter");
+  const panel = summary.locator("xpath=..");
+  const scope = panel.getByLabel("Context scope");
+  const exposure = panel.getByRole("group", { name: "Exposure", exact: true });
+  for (const dimension of [
+    "Exposure",
+    "Required privileges",
+    "Data sensitivity",
+    "Business criticality",
+  ]) {
+    await panel
+      .getByRole("group", { name: dimension, exact: true })
+      .getByLabel("Rationale")
+      .fill("Unknown in the disposable browser test");
+  }
+  const save = panel.getByRole("button", { name: "Save context revision" });
+  const status = panel
+    .getByRole("status")
+    .filter({ hasText: "Context revision saved." });
+  let finishRequest!: () => void;
+  const delayed = new Promise<void>((resolve) => {
+    finishRequest = resolve;
+  });
+  const mutationPath = "**/api/v1/targets/*/contexts";
+  await page.route(mutationPath, async (route) => {
+    if (route.request().method() === "POST") await delayed;
+    await route.continue();
+  });
+  await save.click();
+  await expect(scope).toBeDisabled();
+  await expect(exposure.getByLabel("Rationale")).toBeDisabled();
+  finishRequest();
+  await expect(status).toBeVisible();
+  await page.unroute(mutationPath);
+  await expect(
+    panel.getByRole("heading", { name: "Target default · Revision 1" }),
+  ).toBeVisible();
+  await scope.selectOption("endpoint");
+  await scope.selectOption("default");
+  await exposure
+    .getByLabel("Rationale")
+    .fill("Retain this updated synthetic rationale");
+  await save.click();
+  await expect(panel.getByRole("alert")).toContainText(
+    "The current revision changed",
+  );
+  const prior = panel
+    .getByRole("article")
+    .filter({ hasText: "Target default · Revision 1" });
+  await prior.getByRole("button", { name: "Use this revision" }).click();
+  await expect(exposure.getByLabel("Rationale")).toHaveValue(
+    "Retain this updated synthetic rationale",
+  );
+  await save.click();
+  await expect(
+    panel.getByRole("heading", { name: "Target default · Revision 2" }),
+  ).toBeVisible();
+  await scope.selectOption("endpoint");
+  await panel.getByLabel("Endpoint path").fill("/");
+  await exposure.getByLabel("Value").selectOption("restricted");
+  await exposure
+    .getByLabel("Rationale")
+    .fill("Synthetic context value for browser verification");
+  await exposure.getByRole("button", { name: "Add lab document" }).click();
+  await exposure
+    .getByLabel("Lab document reference")
+    .fill("synthetic-browser-policy");
+  await exposure.getByLabel("Document SHA-256").fill("1".repeat(64));
+  await save.click();
+  await expect(
+    panel.getByRole("heading", { name: "GET / · Revision 1" }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(panel.getByLabel("Context scope")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await checkRootContext(page);
+  await page.getByRole("link", { name: "← Findings" }).click();
+}
+
 test("genuine report survives reload", async ({ page }) => {
   const external: string[] = [];
   page.on("request", (request) => {
@@ -65,6 +166,7 @@ test("genuine report survives reload", async ({ page }) => {
   ).toBeVisible();
   await page.reload();
   await unlock(page);
+  await saveAndCheckContext(page);
   await checkFindings(page);
   const stale = await page.context().newPage();
   await stale.goto(page.url());
@@ -179,4 +281,6 @@ test("genuine findings survive restart", async ({ page }) => {
       .getByRole("region", { name: "Verification history" })
       .getByText("Inspect the stored test observation"),
   ).toBeVisible();
+  await page.getByRole("link", { name: "← Findings" }).click();
+  await checkRootContext(page);
 });

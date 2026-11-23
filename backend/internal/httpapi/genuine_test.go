@@ -251,6 +251,7 @@ func TestIntegrationGenuineReport(t *testing.T) {
 		checkVerificationWorkflow(t, ctx, pool, request, path)
 	})
 	t.Run("classification workflow", func(t *testing.T) { checkClassificationWorkflow(t, ctx, pool, request, path, raw) })
+	t.Run("context workflow", func(t *testing.T) { checkContextWorkflow(t, ctx, pool, request, path) })
 }
 
 func decodeFixtureJSON(t *testing.T, data []byte, value any) {

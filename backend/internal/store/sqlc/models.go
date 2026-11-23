@@ -35,6 +35,21 @@ type ClassificationRevision struct {
 	CreatedAt           time.Time
 }
 
+type ContextRevision struct {
+	ID                   string
+	TargetID             string
+	Method               pgtype.Text
+	Path                 pgtype.Text
+	Revision             int32
+	Exposure             string
+	RequiredPrivileges   string
+	DataSensitivity      string
+	BusinessCriticality  string
+	FactorProvenanceJson []byte
+	Actor                string
+	CreatedAt            time.Time
+}
+
 type Finding struct {
 	ID                  string
 	TargetID            string

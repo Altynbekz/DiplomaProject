@@ -106,6 +106,9 @@ func (a *API) Handler() http.Handler {
 	m.HandleFunc("GET /api/v1/findings/{id}/verifications", a.wrap(a.verifications))
 	m.HandleFunc("POST /api/v1/findings/{id}/classifications", a.wrap(a.createClassification))
 	m.HandleFunc("GET /api/v1/findings/{id}/classifications", a.wrap(a.classifications))
+	m.HandleFunc("POST /api/v1/targets/{id}/contexts", a.wrap(a.createContext))
+	m.HandleFunc("GET /api/v1/targets/{id}/contexts", a.wrap(a.contexts))
+	m.HandleFunc("GET /api/v1/findings/{id}/resolved-context", a.wrap(a.resolvedContext))
 	m.HandleFunc("/", a.wrap(func(w http.ResponseWriter, r *http.Request) error {
 		return domain.Fail(404, "not_found", "", "Route not found")
 	}))

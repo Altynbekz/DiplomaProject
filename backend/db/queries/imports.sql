@@ -1,5 +1,5 @@
 -- name: Ready :one
-SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.classification_revisions') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready;
+SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.classification_revisions') IS NOT NULL AND to_regclass('public.context_revisions') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready;
 -- name: CreateTarget :one
 INSERT INTO targets (id,name,canonical_origin,lab_target_key,created_at) VALUES ($1,$2,$3,$4,$5)
 RETURNING id,name,canonical_origin,lab_target_key,created_at;

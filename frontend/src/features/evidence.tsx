@@ -18,6 +18,7 @@ import type { components } from "../api/schema";
 import { useToken } from "../app/main";
 import { VerificationPanel } from "./verification-panel";
 import { ClassificationPanel } from "./classification-panel";
+import { ContextPanel, ResolvedContextPanel } from "./context-panels";
 type Page<T> = { items: T[]; next_cursor: string | null };
 export function ErrorState({ error }: { error: unknown }) {
   return (
@@ -412,6 +413,7 @@ export function TargetPage() {
             )}
           </section>
           {reportID && <ImportCard key={reportID} id={reportID} />}
+          <ContextPanel key={t.data.id} targetID={t.data.id} token={token} />
           <section className="findings stack">
             <div className="toolbar">
               <h2 id="findings-title">Findings</h2>
@@ -681,6 +683,7 @@ function FindingDetail() {
             observations={o.data?.items ?? []}
             token={token}
           />
+          <ResolvedContextPanel findingID={f.data.id} token={token} />
           <details>
             <summary>
               Finding fingerprint ({f.data.fingerprint_version})

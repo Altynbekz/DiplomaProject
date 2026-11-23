@@ -131,7 +131,7 @@ The implemented `contracts/openapi.yaml` is the transport source of truth. Updat
 | Findings | `GET /api/v1/targets/{id}/findings`, `GET /api/v1/findings/{id}` | Filtered lists and finding detail |
 | Observations | `GET /api/v1/findings/{id}/observations` | Paged source observations |
 
-Review, context, assessment, ranking, export, and scan routes belong to their later milestones. Check actual implementation status before describing any route as available.
+Verification, classification and target context histories use the M2 routes in OpenAPI. Verification and classification appends lock the finding while comparing the predecessor. Context appends lock the target and compare the predecessor for the selected default or exact endpoint scope. Assessment, ranking, export and scan routes are planned.
 
 ### Request and response rules
 
