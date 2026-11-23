@@ -1,5 +1,15 @@
 #!/bin/sh
 set -eu
+if [ "$#" -eq 0 ]; then
+    "$0" synthetic
+    "$0" genuine
+    exit
+fi
+case "$1" in
+    synthetic) upload_case='synthetic report'; restart_case='persisted rows survive' ;;
+    genuine) upload_case='genuine report survives reload'; restart_case='genuine findings survive restart' ;;
+    *) echo "Expected synthetic or genuine suite" >&2; exit 2 ;;
+esac
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cluster=$(mktemp -d "${TMPDIR:-/tmp}/diploma-e2e.XXXXXX")
 ports=$(python3 -c 'import socket; a=[]; ss=[]
@@ -37,7 +47,7 @@ for port,path in [(sys.argv[1],'/readyz'),(sys.argv[2],'/')]:
   except OSError:time.sleep(.1)
  else:raise SystemExit('Test stack did not become ready')
 WAIT
-(cd "$root/frontend" && npm run test:e2e -- --grep 'synthetic report')
+(cd "$root/frontend" && npm run test:e2e -- --grep "$upload_case")
 # Prove database outage semantics while the API process remains live.
 pg_ctl -D "$cluster/data" -m fast -w stop >/dev/null
 python3 - "$api_port" <<'OUTAGE'
@@ -63,4 +73,4 @@ for attempt in range(100):
  except OSError:time.sleep(.1)
 else:raise SystemExit('Restart failed readiness')
 RESTART
-(cd "$root/frontend" && npm run test:e2e -- --grep 'persisted rows survive')
+(cd "$root/frontend" && npm run test:e2e -- --grep "$restart_case")

@@ -1,8 +1,18 @@
 # Fixture provenance
 
-The repository fixture [synthetic-traditional.json](../backend/testdata/zap/synthetic-traditional.json) was authored to exercise the Traditional JSON schema, grouping, unknown severity and escaped display. Its version field identifies it as synthetic. A genuine report and its sanitized derivative are held in private local lab artifacts. See [status](status.md) for the collection and verification results.
+The [synthetic fixture](../backend/testdata/zap/synthetic-traditional.json) exercises grouping, unknown severity and escaped display. The [genuine fixture](../backend/testdata/zap/juice-shop-traditional.json) is the reviewed derivative of an authorized passive Juice Shop session. The original and authorization record stay in private lab artifacts. See [status](status.md) for the collection and verification results.
 
-For the recorded local run, select `sanitized-traditional.json` from the private lab artifact directory on the target's import form. Paste the contents of the adjacent `provenance.json` into **Optional report provenance**. Preserve `original.json` separately as the untouched private export.
+Select the genuine fixture on the target's import form. Paste the contents of [juice-shop-provenance.json](../backend/testdata/zap/juice-shop-provenance.json) into **Optional report provenance**. Keep `original.json` as the untouched private export.
+
+With access to the private export, reproduce the exact derivative and validate both report digests and the source layout offline. Compare the completed plan digest separately against the private plan. To reproduce the independent oracle, use the fixed target UUID seeded in the disposable integration test. The Python derivation uses the documented fingerprint identity and reads no application or database state.
+
+```sh
+python3 -B scripts/zap-fixture.py sanitize "$ORIGINAL_REPORT" /tmp/reproduced-juice-shop.json
+cmp /tmp/reproduced-juice-shop.json backend/testdata/zap/juice-shop-traditional.json
+python3 -B scripts/check-zap-fixture.py "$ORIGINAL_REPORT" backend/testdata/zap/juice-shop-traditional.json backend/testdata/zap/juice-shop-provenance.json
+python3 -B scripts/zap-fixture.py groups backend/testdata/zap/juice-shop-traditional.json /tmp/reproduced-groups.json --target 00000000-0000-4000-8000-000000000001
+cmp /tmp/reproduced-groups.json backend/testdata/zap/juice-shop-expected.json
+```
 
 ## M1 acceptance checklist
 

@@ -16,5 +16,8 @@ goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up-to 1
 goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up-to 3
 goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up
 goose -dir "$root/backend/db/migrations" postgres "$TEST_DATABASE_URL" up
+createdb -h 127.0.0.1 -p "$port" -U diploma_migrate diploma_genuine
+export TEST_GENUINE_DATABASE_URL="postgres://diploma_migrate@127.0.0.1:$port/diploma_genuine?sslmode=disable"
+goose -dir "$root/backend/db/migrations" postgres "$TEST_GENUINE_DATABASE_URL" up
 cd "$root/backend"
 go test -race -count=1 -v ./internal/httpapi -run TestIntegration

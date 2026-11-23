@@ -2,7 +2,7 @@
 
 A local research prototype using React and TypeScript, Go `net/http`, sqlc and PostgreSQL. The app imports an existing [ZAP Traditional JSON report](https://www.zaproxy.org/docs/desktop/addons/report-generation/report-traditional-json/), records its original bytes and SHA-256, and displays normalized findings and their source observations. Scanner severity, confidence, OWASP classification, verification and CVSS are separate. M1 findings start unmapped and unreviewed, with both assessment fields null.
 
-The offline workflow has passed PostgreSQL and Chromium checks with the synthetic fixture and a genuine report from an authorized local Juice Shop session. The genuine report, its sanitized derivative and provenance are available in the private lab artifacts. See [status and verification](docs/status.md) for acceptance progress.
+The automated offline suites exercise both an authored test fixture and a reviewed derivative of a genuine report from an authorized local Juice Shop session. See [status and verification](docs/status.md) for the observed results.
 
 ## Start locally
 
@@ -25,13 +25,15 @@ The workspace uses a light interface with findings and evidence kept on separate
 The importer rejects decoded NUL characters in database-bound fields with a field pointer. Private data kept only in the original report is preserved byte for byte. Unlocated alerts keep their full decoded JSON as reversible text in a versioned envelope, so large numeric literals in extensions survive storage. Oversized stored provenance receives a size error and leaves the existing data intact.
 
 1. Unlock the workspace and create a Juice Shop target. The server supplies the registered origin.
-2. Open the target and select your existing genuine ZAP Traditional JSON report. Supply available metadata in the provenance JSON field. See [fixture provenance](docs/fixture-provenance.md) for the fields and the distinction between original and sanitized hashes.
+2. Open the target and select [the genuine Juice Shop fixture](backend/testdata/zap/juice-shop-traditional.json). Paste the contents of [its provenance file](backend/testdata/zap/juice-shop-provenance.json) into **Optional report provenance**. See [fixture provenance](docs/fixture-provenance.md) for the transformation and report hashes.
 3. Import the report. The UI shows its hash, parser version, finding and observation counts, unlocated-alert count, warnings and provenance. The report-declared ZAP version and parser-detected format appear separately from operator provenance. An identical upload reuses the existing import ID when provenance is omitted or matches the stored record. Different provenance receives a 409 conflict. Import provenance is immutable. For imports created before migration 4, the separately stored report version is unavailable and legacy provenance may include report-derived defaults. See [the provenance decision](docs/decisions/0001-immutable-import-provenance.md) for upgrade behavior.
 4. Filter findings by report ID, category, severity or verification and page through the results. New imports keep observations in report source order by assigning strictly increasing receipt timestamps. The recorded scan time is separate. Older observations keep their original timestamps. Open a finding to read source pointers, scanner confidence, descriptions and remediation. Private payloads stay behind explicit, audited download. CVSS displays “Not assessed.”
 
-The same import can be exercised with curl after setting `TARGET_ID` to the ID of the registered target and setting `REPORT` and `PROVENANCE` to private local files. This example passes the header through curl config on standard input so the token stays out of curl’s argument list.
+To import the same fixture from the repository root, set `TARGET_ID` to the ID of the registered target. This example passes the bearer header through standard input.
 
 ```sh
+REPORT=backend/testdata/zap/juice-shop-traditional.json
+PROVENANCE=backend/testdata/zap/juice-shop-provenance.json
 printf 'header = "Authorization: Bearer %s"\n' "$(cat .secrets/api_token)" |
   curl --fail-with-body --config - \
     --form "report=@${REPORT};type=application/json" \
@@ -39,7 +41,7 @@ printf 'header = "Authorization: Bearer %s"\n' "$(cat .secrets/api_token)" |
     "http://127.0.0.1:8080/api/v1/targets/${TARGET_ID}/imports/zap"
 ```
 
-The automated synthetic browser walkthrough observed five observations grouped into four findings, one unlocated alert and an unknown severity warning. Reload and API/database restart checks used persisted rows. These are test results for authored data. Genuine scan measurements are unavailable.
+The genuine fixture contains 21 observations, grouped into 17 findings with zero unlocated alerts. Both fixtures have separate Chromium reload and API/database restart checks.
 
 ## Verify and maintain
 

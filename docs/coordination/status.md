@@ -408,3 +408,40 @@ e581a400b7de2ab2648d39a84c10ef79ec2866075fdce8cd312dcf0017b77e27  artifacts/zap/
 Checkpoint 21 passed independent verification at all 17 frozen hashes. V016 is resolved. The verifier reran the disposable API, PostgreSQL and Chromium replay successfully. The reusable genuine repository fixture and repeatable coverage remain open. [Independent replay](review.md#independent-verification--m1-20261123-21)
 
 After the checkpoint closed, `docs/status.md` was updated to cite the verifier's result. Its refreshed SHA-256 is `77ecf347b33d8a0e7ee17e9c3f9b74440d1c72e912dc7c1a72eb9851bd07abcc`. The application, replay scripts and lab artifacts retain their checkpoint hashes.
+
+
+## M1-20261123-22 — Reusable genuine fixture — READY FOR VERIFICATION
+
+Baseline 5e90808ae4bc1fde6e3241df77313229f7e7ff4f matches GitHub main. Hosted baseline [run 45185756939](https://github.com/Altynbekz/DiplomaProject/actions/runs/45185756939) succeeded. It predates the reusable fixture.
+
+The public derivative is byte-identical to the reviewed private derivative. The provenance's reproduction command now points to the public offline sanitizer. Tests use disposable databases and no private originals, live targets or scanner. The independent Python oracle supplies 17 exact fingerprints and 21 ordered observation pointers for a fixed test target.
+
+Observed on macOS ARM64: the sanitizer reproduced the same bytes with cmp exit 0. python3 -B scripts/check-zap-fixture.py exited 0 with one site, eight alerts, 21 observations, zero unlocated. GOFLAGS=-mod=readonly make check and npm run build --prefix frontend exited 0. GOFLAGS=-mod=readonly make test-integration exited 0 under the race detector for both fixtures. GOFLAGS=-mod=readonly make test-e2e exited 0 for four Chromium cases on separate synthetic and genuine stacks, including both restarts and readiness outage checks. git diff --check exited 0.
+
+Remaining gates: independent review of this frozen slice and hosted CI for its published commit. Original and private authorization files remain ignored.
+
+```text
+6abc2912e49b7f2de72a02ae39a2f0675672657c30d423fa4d86a3b97dc2b864  README.md
+5faf37d1dd35ba8d72cf03314778a27ca9092f5e88804a16c6a01b4b5aeffb53  docs/status.md
+39a048d6204f02ec5c1dd647d2831bb9c2e53c4bc24dea9e93b79d15fbc8c80c  docs/fixture-provenance.md
+b1c7977dce34b6da35f17871021a11b2a8f0bf28913d3680cfa2d593757266b3  backend/testdata/zap/README.md
+036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7  backend/testdata/zap/juice-shop-traditional.json
+aca865a2e0cf333e6cc7f21a7cd1b3beb5670b7c5fa488e830add9bc6d3c525e  backend/testdata/zap/juice-shop-provenance.json
+fb48a29d966bba10aa5eb8cadd7007a5f7e8e8739b5225b6485abe461e6ebc22  backend/testdata/zap/juice-shop-expected.json
+69eb0c6405be653a6c9623bacd54e22827bfafd20e87a6d2216c53e7730b5e3f  backend/internal/httpapi/genuine_test.go
+38ef750f8197d1ba61a7d77f50d6899daed35e869bfacd104e82975e691345b4  frontend/tests/browser/genuine.spec.ts
+10ee8b914d0692b60ae72163d2cb3141f7876c657d4f3bcbe77985e473a173d8  scripts/zap-fixture.py
+edfc7decbd2ce76ef112642d04d84a75bd82137b8d2be165b64f902c3434a60b  scripts/test-integration.sh
+0243f7b9a737a46cd3f4faa4121bc08c526e6ae12e348f0a0bfd2469291f22a9  scripts/test-e2e.sh
+```
+
+## M1-20261123-23 — Preflight documentation correction — READY FOR VERIFICATION
+
+Baseline 5e90808ae4bc1fde6e3241df77313229f7e7ff4f. Checkpoint 22 passed independent archive format, lint, generation, build, race-mode integration and four Chromium cases. Only V017 remained. This documentation-only recheck records the two report digests checked by the CLI and points out the separate private plan digest check. All other frozen files in 22 retain their earlier hashes. git diff --check exited 0. Hosted verification still awaits publication.
+
+```text
+75a84aae59f15bd540ebeb3e99f07896d18952b10da02859ead1b038d326fb93  docs/status.md
+091a19ae0337a09ba019a0d6ba6684de4e48b0c2e4a7b395408e6ac14c79d440  docs/fixture-provenance.md
+```
+
+Checkpoint 23 passed independent review. V017 is resolved. All ten unchanged files from checkpoint 22 matched their prior hashes. [Independent recheck](review.md#independent-verification--m1-20261123-23)

@@ -302,3 +302,23 @@ Verified on 2026-11-23 at baseline `0c193d51c989866e8d49932454803853cb16df11`. A
 - Chromium selected the genuine derivative and its provenance, displayed the duplicate result, and showed all 17 rows and source evidence after page reload and after API and PostgreSQL restart. The browser checks observed no external page requests. During the database outage, health was 200, readiness 503, and the missing-bearer request 401. No scanner or lab target was started or contacted.
 
 **Verdict:** checkpoint 21 independently verified at the recorded hashes. No new findings. Genuine offline import and persistence passed locally. A reusable genuine repository integration fixture and automated coverage using it remain pending.
+
+## Independent verification — M1-20261123-22
+
+Verified on 2026-11-23 at baseline `5e90808ae4bc1fde6e3241df77313229f7e7ff4f`. All 12 frozen SHA-256 values matched in the checkout before and after the review and after overlaying them in an isolated Git archive. The archive included independent frontend dependencies and temporary database state and was removed after testing. No private artifacts were copied. All 24 local links and anchors resolved and `git diff --check` exited 0.
+
+- The repository fixture was byte-identical to the derivative reviewed at checkpoint 20 and to a fresh offline reproduction. The fixture preflight exited 0 with one site, eight alerts, 21 observations and zero unlocated alerts. The public provenance matched the private record except for the updated reproduction instruction. Independent hashing matched the original, derivative and plan. The private original and authorization paths remain ignored. The exact derivative and retained provenance passed the disclosure review.
+- Reproducing the oracle matched its bytes, and a second independent derivation matched all 17 target-specific fingerprints and all 21 ordered source pointers, including the pointer partition independently recorded in checkpoint 20.
+- In the archive, `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Formatting, vet, strict TypeScript, ESLint, byte-identical generation, Go unit tests, nine Python tests and three Vitest tests passed. `GOFLAGS=-mod=readonly make test-integration` exited 0 under the race detector with both the existing suite and `TestIntegrationGenuineReport` run. The genuine test checked one creation under four concurrent submissions, duplicate reuse, provenance conflict and persisted metadata, exact submitted bytes, all API and PostgreSQL fingerprint groups, and unreviewed findings with null assessment summaries.
+- `GOFLAGS=-mod=readonly make test-e2e` exited 0 with all four Chromium cases on two disposable stacks. The genuine browser case created an import using the fixture upload and provenance form, reused it on duplicate upload, and displayed all 17 findings with source evidence after reload and API/database restart. Both stacks passed the readiness outage check. No scanner or lab target was started or contacted.
+- **V017 (P3), open.** `docs/fixture-provenance.md:7` says the example validates three digests. The command hashes the original and sanitized report bytes and only validates the plan digest's syntax. The example supplies no plan file. Describe the two verified report digests or add a separate plan digest comparison. The actual plan digest was independently confirmed against the private file in this review.
+
+**Verdict:** the reusable genuine fixture, oracle, disclosure, API/database and browser behavior passed independent verification. V017 remains open in the documentation. The observed hosted success applies to the exact baseline, which predates the reusable fixture. [Hosted baseline run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45185756939)
+
+## Independent verification — M1-20261123-23
+
+Verified on 2026-11-23 at baseline `5e90808ae4bc1fde6e3241df77313229f7e7ff4f`. A fresh isolated Git archive matched both new documentation hashes and all ten unchanged checkpoint 22 hashes. The archive contained no private artifacts. All 15 local links and anchors in the two documents resolved. `git diff --check` exited 0.
+
+- **V017 resolved.** The fixture guide now describes checking the two report digests and source layout with the documented CLI. It directs readers to compare the completed plan digest separately against the private plan, consistent with the CLI's inputs and the independently verified plan digest from checkpoint 22.
+
+**Verdict:** checkpoint 23 independently verified at its recorded hashes. No new findings. The application and tests retain the hashes exercised at checkpoint 22. Hosted CI for the reusable fixture awaits publication.

@@ -1,0 +1,36 @@
+{
+  "schema_version": "report-provenance/v2",
+  "zap_version": "2.17.0",
+  "addon_versions": {
+    "automation": "0.62.0",
+    "callhome": "0.20.0",
+    "commonlib": "1.39.0",
+    "database": "0.9.0",
+    "diff": "18.0.0",
+    "gettingStarted": "20.0.0",
+    "help": "22.0.0",
+    "invoke": "17.0.0",
+    "network": "0.25.0",
+    "onlineMenu": "15.0.0",
+    "pscan": "0.6.0",
+    "pscanrules": "70.0.0",
+    "reports": "0.43.0",
+    "reveal": "10.0.0",
+    "tips": "16.0.0"
+  },
+  "report_template": "traditional-json",
+  "juice_shop_image": "bkimminich/juice-shop:v20.4.0@sha256:a462e147836cfe0d379e0fc02c59cdc5b5c6785cf4579e7bd3ea9882d49f8ae4",
+  "juice_shop_version": "20.4.0-SNAPSHOT",
+  "authorization_ref": "M1-20261123T132231Z-cef3083eaa",
+  "scan_time": "2026-11-23T13:25:43.520670Z",
+  "plan_sha256": "b0c2058b40f4655a885ac1ba96799a2c1efc74b3ca739da4b7618474bcd2e0ee",
+  "raw_sha256": "121e82b36df0b343f43015b9faed851e3bc8fc78c6dc91e3caed867ea8406bad",
+  "sanitized_sha256": "036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7",
+  "sanitization_steps": [
+    "Run python3 -B scripts/zap-fixture.py sanitize ORIGINAL OUTPUT to reproduce the derivative from the private original.",
+    "Replace each URI query value with the literal redacted. Preserve query names, order, duplicates and bare names.",
+    "Remove each instance nodeName, which can repeat the unsanitized URL.",
+    "Replace nonempty attack, evidence and otherinfo strings with [redacted]. Preserve empty fields and array order.",
+    "Preserve site identity, alert and instance positions, scanner codes, method, path and parameter identity. Serialize as UTF-8 JSON."
+  ]
+}
