@@ -39,6 +39,10 @@ const dimensions: {
     values: ["unknown", "low", "medium", "high", "critical"],
   },
 ];
+export const contextFactorLabels = dimensions.map(({ key, label }) => ({
+  key,
+  label,
+}));
 const unknown: Factors = {
   exposure: "unknown",
   required_privileges: "unknown",

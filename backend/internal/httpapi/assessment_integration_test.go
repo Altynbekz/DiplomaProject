@@ -138,6 +138,12 @@ func checkAssessmentWorkflow(t *testing.T, ctx context.Context, pool *pgxpool.Po
 	reviewID = &review.ID
 	var classification service.ClassificationRevision
 	post(path+"/classifications", map[string]any{
+		"status": "unmapped", "category": nil, "candidate_categories": []string{},
+		"rationale": decl, "evidence_refs": []service.EvidenceRef{ref}, "expected_previous_id": classID,
+	}, 201, &classification)
+	classID = &classification.ID
+	assertProblem(baseInput(true), 422, "/expected_classification_revision_id", "incomplete_assessment")
+	post(path+"/classifications", map[string]any{
 		"status": "mapped", "category": "A02:2025", "candidate_categories": []string{"A02:2025"},
 		"rationale": decl, "evidence_refs": []service.EvidenceRef{ref}, "expected_previous_id": classID,
 	}, 201, &classification)
@@ -149,6 +155,14 @@ func checkAssessmentWorkflow(t *testing.T, ctx context.Context, pool *pgxpool.Po
 	assertProblem(bad, 422, "/metric_rationales/AV", "incomplete_assessment")
 	badReasons["AV"] = service.MetricRationale{Reason: decl, EvidenceRefs: []service.EvidenceRef{{ObservationID: obs.ID, SourcePointer: "/wrong"}}, ContextFactorRefs: []string{}}
 	assertProblem(bad, 422, "/metric_rationales/AV/evidence_refs/0/source_pointer", "validation_failed")
+	var foreign service.EvidenceRef
+	if err := pool.QueryRow(ctx, `SELECT id,source_pointer FROM observations
+		WHERE target_id=$1 AND finding_id<>$2 ORDER BY id LIMIT 1`, target.ID, findingID).
+		Scan(&foreign.ObservationID, &foreign.SourcePointer); err != nil {
+		t.Fatal(err)
+	}
+	badReasons["AV"] = service.MetricRationale{Reason: decl, EvidenceRefs: []service.EvidenceRef{foreign}, ContextFactorRefs: []string{}}
+	assertProblem(bad, 422, "/metric_rationales/AV/evidence_refs/0/observation_id", "validation_failed")
 	stale := baseInput(true)
 	stale["expected_verification_review_id"] = nil
 	assertProblem(stale, 409, "/expected_verification_review_id", "conflict")
@@ -245,6 +259,15 @@ func checkAssessmentWorkflow(t *testing.T, ctx context.Context, pool *pgxpool.Po
 	beFromReplacement["base_assessment_id"] = replacement.ID
 	newBE := save(beFromReplacement)
 	assertScore(newBE, "BE", beCase.Vector, beCase.Score)
+	zeroCase := parity.Cases[1]
+	if zeroCase.Name != "zero base" || zeroCase.Score != 0 {
+		t.Fatal("expected the pinned zero Base case")
+	}
+	zeroInput := baseInput(true)
+	zeroInput["metrics"] = zeroCase.Base
+	zero := save(zeroInput)
+	get("/api/v1/assessments/"+zero.ID, &historic)
+	assertScore(historic, "B", zeroCase.Vector, zeroCase.Score)
 	post(path+"/verifications", reviewInput("inconclusive"), 201, &review)
 	get("/api/v1/assessments/"+replacement.ID, &historic)
 	if !historic.Stale || historic.Score == nil || *historic.Score != bCase.Score {
@@ -292,8 +315,8 @@ func checkAssessmentWorkflow(t *testing.T, ctx context.Context, pool *pgxpool.Po
 	var stored, audit int
 	if err := pool.QueryRow(ctx, `SELECT
 		(SELECT count(*) FROM assessment_snapshots WHERE finding_id=$1),
-		(SELECT count(*) FROM audit_events WHERE action='assessment.append')`, findingID).Scan(&stored, &audit); err != nil || stored != 6 || audit != stored {
-		t.Fatalf("failed append must leave only six snapshots and matching audits: %d %d %v", stored, audit, err)
+		(SELECT count(*) FROM audit_events WHERE action='assessment.append')`, findingID).Scan(&stored, &audit); err != nil || stored != 7 || audit != stored {
+		t.Fatalf("failed append must leave only seven snapshots and matching audits: %d %d %v", stored, audit, err)
 	}
 }
 

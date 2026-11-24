@@ -211,5 +211,5 @@ test("persisted rows survive API and database restart", async ({ page }) => {
     page
       .getByRole("region", { name: "Stored CVSS assessments" })
       .getByRole("article"),
-  ).toHaveCount(3);
+  ).toHaveCount(6);
 });

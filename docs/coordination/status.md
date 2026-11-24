@@ -875,3 +875,91 @@ ed6d4bfd6a26f4e7755480325fab33a6caacc1f6cede22e462a79dbc94d3871c  scripts/test-i
 ```
 
 Checkpoint 37 independently passed. All 52 archived file hashes and 47 inherited hashes matched. The verifier observed live refresh after verification, classification and context saves and both synthetic restart runs. V027 is closed. All software and research traceability criteria account for 95% of the foundation acceptance checklist. The remaining 5% is publication and successful hosted CI on the exact commit. [Independent verdict](review.md#independent-verification--m3-20261124-37)
+
+## Remaining M3 — acceptance checklist
+
+Started from `0cdf484759ed8f03253850ba213016311322f39f`. Local `main`, its upstream and GitHub `main` matched with a clean tree. Hosted run 45378616340 completed successfully for that commit and its check job passed all 17 steps. The calculator, snapshot API, storage and read-only history carry forward from checkpoints 34–37. [Baseline CI](https://github.com/Altynbekz/DiplomaProject/actions/runs/45378616340)
+
+| Weight | Evidence needed for the remaining slice | Status |
+| ---: | --- | --- |
+| 25% | Accessible Base editor with explicit missing values, metric rationales and same-finding evidence, with demonstrated draft and finalization behavior against the server | Independently verified at checkpoints 38–39 |
+| 25% | Exact Base parent selection, justified Environmental choices, all four factor dispositions and default/inherited values, with demonstrated draft and finalization behavior | Independently verified at checkpoints 38–39 |
+| 20% | Deliberate recovery from stale verification, classification, context and parent choices with retained inputs, append-only revisions and readable paired history | Independently verified at checkpoint 39 |
+| 20% | M3 acceptance audit, synthetic browser and database evidence, regression checks, independent frozen verification and research traceability | Independent audit and suites passed. V028–V030 closed at checkpoint 39. |
+| 10% | Reviewed publication and successful hosted CI on the exact pushed commit | Reviewed publication ready. Exact-commit hosted CI pending. |
+
+The remaining slice starts at 0% accepted. The earlier estimates of 65–75% of full M3 and 45–50% overall remain reasonable while the authoring, recovery and full acceptance evidence are pending. The initial time estimate is an uncertain 90–180 minutes, depending on workflow regressions, independent review and hosted checks. The live M2 A01 gate remains a separate evidence requirement.
+
+### Base editor local slice
+
+`npm run lint --prefix frontend`, `npm run build --prefix frontend`, `git diff --check` and `GOFLAGS=-mod=readonly ./scripts/test-e2e.sh synthetic` exited 0. The disposable Chromium workflow selected real same-finding observation IDs, displayed the server's missing-rationale response, saved a partial B with null vector and score, and retained metric values, rationales and references through a 409. It finalized against the stored reference fixture, checked the earlier draft remained unchanged, and read history after the API/PostgreSQL restart. The browser test used synthetic assessment data. Base editing has 25% local checklist evidence. Independent review follows the BE editor and the full acceptance audit.
+
+
+## M3-20261124-38 — Analyst authoring and acceptance — READY FOR VERIFICATION
+
+Baseline `0cdf484759ed8f03253850ba213016311322f39f`, identical to local and remote `main` at inspection. The accepted foundation's production Go, sqlc, migrations, OpenAPI and generated types are unchanged. FIRST scoring sources remain pinned at `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a` and the synthetic fixture digest is `c292463487db168c2d121067b8b9148d8a772c522a817a52fde95778ee853dd8`. Prior independent parity and calculator acceptance carry forward.
+
+- `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Format, lint, type, generated-file consistency, Go tests, nine Python tests, six Vitest cases and production build passed.
+- `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` exited 0. Disposable fresh, staged and populated migrations reached 8. Both race-mode import suites passed. The assessment case additionally rejected unmapped classification and an exact observation from another finding, and round-tripped the pinned zero Base case.
+- `GOFLAGS=-mod=readonly make test-e2e` exited 0. All four Chromium cases and both outage checks passed. The synthetic flow exercised unknown and incomplete B/BE, evidence, Environmental choices and dispositions, stale review/classification/context/parent, deliberate adoption and retention of the BE draft while replacing Base, exact FIRST vectors and scores, keyboard, open editor in the narrow viewport, pairing, staleness and restart. The genuine fixture continued to exercise import and M2.
+- `git diff --check` and a Python check of 189 local links and anchors in edited documentation passed. Evidence is indexed in ART-19. Completed test assessments are synthetic. The live M2 A01 evidence remains an independent open gate. No scan, ranking or research experiment ran.
+
+The remaining-slice checklist has evidence for all local gates. The first three criteria account for 70%, with independent review and the remaining 30% for the final evidence and publication gates pending. Progress for full M3 is roughly 85–95% locally implemented. Overall is approximately 45–55%, with an uncertain 20–60 minutes remaining for independent verification, publication and hosted results.
+
+Frozen files, SHA-256. Coordination logs are outside the overlay.
+
+```text
+983823382c9ce0b0fbcecef98a44912ae5ba92123c4703c6659422d437468351  README.md
+7acc5cd3396d39beb6fcf53a40a26adfc07d9740647a09f96b9faf2e6638b854  backend/internal/httpapi/assessment_integration_test.go
+4dee15aeca29ff7543778bdbb05c38bbe42a7b11cd35b3e163a6c20ef2cdee18  docs/research/README.md
+b5d7a53420db4143858fb0cbea43f4573070741c7112ebcd63ba842fe554868d  docs/research/artifact-register.md
+9a942e41d8a95798ebd24b4c67ddeddff043ecd24a4ac7a123e245d7a6914878  docs/research/claim-evidence-map.md
+a4711a2c2e78f16c741657a1b4e327565e002c80abdbff988acddb15aa43378d  docs/research/implementation-evidence.md
+81f0763e1c26757b0d26c573301d03ccc7e6174ae8cdd6f3fd48d2ea74a2b1a3  docs/research/limitations.md
+f9577e13ac514fb7434d41073110b36bf3a3730cd6d89052b5af8e35d116c6f6  docs/research/system-design.md
+2e1a3b22ca0aa21a50810075f9a8755639b0f9d686518fa6f57ddbc589abb575  docs/status.md
+a6e8d03bfa2a88c06749f685992babcb4f20a89f080a826a36ffdca092693118  frontend/src/features/assessment-draft.ts
+7b7eddebe5c81b39726d39befe78de98c51ad290bd747f4133d22719dc0bdd3d  frontend/src/features/assessment-editor.tsx
+186341bedbf0b613ee7f30800fadbb91656aa2bfb966b084c3827b9c1bd6cb64  frontend/src/features/assessment-panel.tsx
+a33405123c765230dcb1e330961bcbe8a8da98e1cce70a06e63dd98f43fea0da  frontend/src/features/context-panels.tsx
+0c00446f297cd40c517396d0d131a7648493be7aa4572ecaeac000b30f862c7e  frontend/src/features/evidence.tsx
+f00160ba994d239fd6c11ac38b7e26151e6a3b49bea27dfb06bb7045614829e7  frontend/tests/assessment-draft.test.tsx
+54ce510fd59851cc772d9ce2ad87a1b4d244d04afe2a78c10f91e6a5f8e08890  frontend/tests/browser/assessment-flow.ts
+c8bd9013a700f3fecdc8eb19cd5d7e7a4c308d0533cadd68d3d15dc12e6160d2  frontend/tests/browser/import.spec.ts
+```
+
+
+## M3-20261124-39 — Analyst workflow review corrections — READY FOR VERIFICATION
+
+Same baseline as checkpoint 38. This retest binds all 17 task files, including 11 inherited byte-identical overlays. The accepted production backend, calculator and contracts remain unchanged. The pinned FIRST sources and synthetic calibration artifact retain their checkpoint 38 digests. The PostgreSQL race and migration results carry forward for the unchanged backend tests.
+
+- V028 addressed. An isolated Chromium test with a second in-page verification reproduced the displayed/current adoption mismatch before the fix. The repaired editor requires the loaded IDs to match the displayed review, classification and applicable context at adoption. The updated browser test reloads and adopts the newly displayed verification, retains its inputs and asserts that the resulting Base references that exact ID.
+- V029 addressed. Off-page metric evidence exposes the observation ID with the pointer. A DOM regression proves that removing one of two selections at the same pointer removes the intended observation.
+- V030 addressed. MSC, MSI and MSA render Negligible for code `N`. A focused unit test checks their label, the unchanged Base label and Safety options. No scoring rules changed.
+- `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Formatting, vet, strict TypeScript, ESLint, generated-file consistency, Go tests, nine Python tests and eight Vitest cases passed. `GOFLAGS=-mod=readonly make test-e2e` exited 0 for four Chromium cases and two outage checks. The corrected flow passed separate synthetic replay and desktop/mobile visual inspection. `git diff --check` and 190 local Markdown links/anchors passed. No scanner or live lab activity ran.
+
+The first 70% of the remaining checklist has local pass evidence. This retest resolves the independent findings before review closure and exact-commit CI. Full M3 remains at approximately 85–95% pending those gates. Overall progress remains approximately 45–55%. The uncertain remaining time is 15–40 minutes, including the final hosted run and recording the acceptance result. Live A01 remains separate.
+
+Frozen files, SHA-256.
+
+```text
+983823382c9ce0b0fbcecef98a44912ae5ba92123c4703c6659422d437468351  README.md
+7acc5cd3396d39beb6fcf53a40a26adfc07d9740647a09f96b9faf2e6638b854  backend/internal/httpapi/assessment_integration_test.go
+4dee15aeca29ff7543778bdbb05c38bbe42a7b11cd35b3e163a6c20ef2cdee18  docs/research/README.md
+b5d7a53420db4143858fb0cbea43f4573070741c7112ebcd63ba842fe554868d  docs/research/artifact-register.md
+9a942e41d8a95798ebd24b4c67ddeddff043ecd24a4ac7a123e245d7a6914878  docs/research/claim-evidence-map.md
+a4711a2c2e78f16c741657a1b4e327565e002c80abdbff988acddb15aa43378d  docs/research/implementation-evidence.md
+81f0763e1c26757b0d26c573301d03ccc7e6174ae8cdd6f3fd48d2ea74a2b1a3  docs/research/limitations.md
+f9577e13ac514fb7434d41073110b36bf3a3730cd6d89052b5af8e35d116c6f6  docs/research/system-design.md
+f9d723f1a18872261dbaa2232fbebe287822c1a29a2541c426f9734e92c4a59e  docs/status.md
+6de648692e7d1e843697fc28e58c84c0e4b98aafaf5dd673a15738a6bab1be43  frontend/src/features/assessment-draft.ts
+a2ce143a4c7e1c9a1e19e601899fc80d82e49adabf6b1067ca9720fd31ca430d  frontend/src/features/assessment-editor.tsx
+4a6df36232e7d7065a780891a704275e81df36587f2ac4d15b0acd53c52edcc7  frontend/src/features/assessment-panel.tsx
+a33405123c765230dcb1e330961bcbe8a8da98e1cce70a06e63dd98f43fea0da  frontend/src/features/context-panels.tsx
+0c00446f297cd40c517396d0d131a7648493be7aa4572ecaeac000b30f862c7e  frontend/src/features/evidence.tsx
+5e4363c85fa05798201a441c84240adb9756d8e8f77b6bf22d892133ca552cbe  frontend/tests/assessment-draft.test.tsx
+d78ade76b0202744aa85b6d55b3ab778e7e6b722ceffae543dfe1386bb6ffef6  frontend/tests/browser/assessment-flow.ts
+c8bd9013a700f3fecdc8eb19cd5d7e7a4c308d0533cadd68d3d15dc12e6160d2  frontend/tests/browser/import.spec.ts
+```
+
+Checkpoint 39 independently passed. All 17 frozen hashes and 11 inherited hashes matched. V028, V029 and V030 are closed. The reviewer confirmed that the saved Base used the newly displayed review revision, same-pointer evidence selections remained distinct and the modified Environmental labels matched FIRST. The remaining-slice checklist is 90% accepted. Publication and successful exact-commit CI account for the remaining 10%. [Independent verdict](review.md#independent-verification--m3-20261124-39)

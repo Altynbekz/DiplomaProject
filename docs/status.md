@@ -1,13 +1,13 @@
 # Implementation status
 
-Updated 2026-11-24, Asia/Almaty. This status covers the foundation, offline import, M2 review workflow and the M3 assessment foundation.
+Updated 2026-11-24, Asia/Almaty. This status covers the foundation, offline import, M2 review workflow and the M3 assessment workflow.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
 | M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `94f431f`, including the Python tests in `make check`. [GitHub Actions run 45170314104](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) |
 | M1 | Offline Traditional JSON import, immutable evidence, provenance, duplicate handling, normalized observations, audited private downloads, filtered and paged UI, reusable genuine fixture | Acceptance passed, with synthetic and genuine automated suites passing locally, independently and in hosted CI for `f5712a49b5676badb05486b30c73e0d4b916146b`. [Independent verification](coordination/review.md#independent-verification--m1-20261123-22) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45187645541) |
 | M2 | Human verification, OWASP mapping and immutable context history | Software passed at reviewed baseline `817c0449bbb9f6c040ba847a41c6f125bbda7d97`. The later draft recovery repair and checks are recorded below. M2 acceptance remains open pending authorized A01 role/object evidence. [Independent baseline review](coordination/review.md#independent-verification--m2-20261124-30) · [Hosted baseline run 45260100347](https://github.com/Altynbekz/DiplomaProject/actions/runs/45260100347) |
-| M3 | Offline calculator, immutable assessment snapshots, creation and history API, read-only UI | Foundation tests passed locally. Independent checks are in the review log. Analyst-facing metric and rationale authoring remains planned. [M3 foundation](#m3-assessment-foundation) |
+| M3 | Offline scoring, analyst authoring, immutable assessments and paired evidence history | Foundation accepted at `0cdf484759ed8f03253850ba213016311322f39f`. Analyst workflow passed local acceptance checks. Independent verification and hosted CI for this workflow are tracked separately. [M3 workflow](#m3-analyst-workflow-and-acceptance) |
 | M4–M6 | Planned | No implementation started. |
 
 ## Recorded checks
@@ -178,9 +178,37 @@ Migration 8 adds append-only snapshots and a current staleness view. The API cap
 | `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` | Exit 0. Fresh and staged migrations reached 8. All seven populated M2 table snapshots matched across v7 to v8 and the new assessment history was empty. The normal and genuine report suites and the synthetic assessment suite passed under the race detector. Auditing failure rolled back the append. |
 | `GOFLAGS=-mod=readonly make test-e2e` | Exit 0. Four Chromium cases passed with both outage checks. The synthetic UI test used Node/FIRST parity values, opened history by keyboard, preserved incomplete and historical state and verified snapshots after restart. The genuine workflow remained unchanged. |
 
-These runs used disposable macOS arm64 resources with Go 1.27.1, Node 26.13.0, PostgreSQL 15.19, goose 3.30.1, Playwright 1.65.1 and Chromium 159.0.8154.6. All complete test assessments used explicitly authored synthetic data. The live A01 gate remains open. M3 still needs an analyst-facing form for metric choice, evidence and factor dispositions, with conflict recovery and a guided review of paired snapshots. No ranking or research experiment was run.
+These runs used disposable macOS arm64 resources with Go 1.27.1, Node 26.13.0, PostgreSQL 15.19, goose 3.30.1, Playwright 1.65.1 and Chromium 159.0.8154.6. All complete test assessments used explicitly authored synthetic data. The live A01 gate remains open. The foundation preceded analyst-facing authoring. No ranking or research experiment was run.
 
 
 ### Assessment history refresh follow-up
 
 Checkpoint 36 independently verified the calculator, migration and storage/API behavior, with V027 open for browser freshness. The API correctly reported historical status after a context or human review change. The open page still held the old query result. After a verification or classification save, the finding's open assessment history refetches. A new context revision refreshes the target's findings table. The synthetic Chromium regression confirmed that those views update without reloading them. `GOFLAGS=-mod=readonly make test-e2e` passed all four cases and both outage checks. `npm run --prefix frontend fmt:check`, `npm run --prefix frontend lint` and `npm run --prefix frontend build` exited 0. [Independent findings](coordination/review.md#independent-verification--m3-20261124-36)
+
+## M3 analyst workflow and acceptance
+
+The authoring slice starts from `0cdf484759ed8f03253850ba213016311322f39f`, which passed [hosted run 45378616340](https://github.com/Altynbekz/DiplomaProject/actions/runs/45378616340). It reuses the accepted offline calculator, HTTP contract, migrations and transaction logic. The browser sends choices, evidence and expected revisions. The server verifies eligibility, resolves context and creates a new snapshot.
+
+| M3 gate | Evidence on the authoring slice |
+| --- | --- |
+| FIRST parity and provenance | All 13 recorded parity cases carry forward, including boundaries, zero, modified-value inheritance, Environmental requirements, legal Safety values and ordering. The pinned source and adapter are unchanged. Checkpoints 34–37 established byte-identical regeneration and 4,096 independent comparisons. [Reference fixture](../backend/testdata/cvss/first-v4.json) · [Calculator review](coordination/review.md#independent-verification--m3-20261124-34) |
+| Explicit missing values and legal choices | Chromium selected supported values, saved unselected Base metrics as omissions and read null score and vector on incomplete B and BE. Unit tests verify omitted implicit Environmental defaults and retained explicit Not Defined rationale. Duplicate and unsupported inputs still fail at the server. |
+| Review, rationale, evidence and context | The browser rendered server rejection for missing rationale or factor dispositions and unknown BE context. Database tests rejected an unmapped current classification, a mismatched source pointer and a correctly addressed observation from another finding. |
+| Exact parent and factor dispositions | Chromium selected the Base parent by snapshot, checked inherited and default labels, supplied contextual and observation support and explained all four factors. The completed BE matched the pinned fixture and retained the selected parent's Base values and rationales. |
+| Stale inputs and immutable history | HTTP 409 recovery retained edits across verification, classification, context and Base-parent changes. Loading current revisions and selecting them are distinct actions. The browser kept the BE draft while revising Base. Completed and draft snapshots remained distinct, with unchanged vectors, scores and provenance after later changes. Runtime mutation remained denied and a failed audit append rolled back. |
+| Readable and accessible pair | Chromium used keyboard controls at narrow width, checked the open editor for page overflow, read historical labels and inspected the exact paired Base after later revisions. The read API and UI retained a score of zero as distinct from absent. The display uses the server result. |
+
+| Command | Local result |
+| --- | --- |
+| `GOFLAGS=-mod=readonly make check` | Exit 0. Go and Prettier formatting, vet, strict TypeScript and ESLint passed. sqlc and OpenAPI generation reproduced identical bytes. Go tests, nine Python tests and eight Vitest cases passed. |
+| `npm run build --prefix frontend` | Exit 0, production Vite build passed. |
+| `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` | Exit 0. Fresh, staged and populated PostgreSQL upgrades reached schema 8. Both import suites, M2 workflow subtests and M3 assessment regression passed under the race detector. |
+| `GOFLAGS=-mod=readonly make test-e2e` | Exit 0. Four Chromium cases and both outage checks passed. The synthetic authoring and genuine-report flows persisted across API/PostgreSQL restart. |
+
+The checks ran on macOS arm64 with Go 1.27.1, PostgreSQL 15.19, Node 26.13.0, Playwright 1.65.1 and Chromium 159.0.8154.6. The pinned FIRST fixture SHA-256 is `c292463487db168c2d121067b8b9148d8a772c522a817a52fde95778ee853dd8`. Completed assessments in these checks are synthetic. The M2 live A01 role/object evidence gate remains open. M4–M6 remain planned. [Demo walkthrough](../README.md#author-and-inspect-cvss-assessments)
+
+### Independent-review follow-up
+
+Checkpoint 38 isolated the accepted authoring flow and found three editor issues. V028 now requires the loaded revision IDs to match the visible current inputs before they can be adopted. Chromium reproduced the original race in a separate copy, then verified a fresh reload and adoption after a same-page verification change. The resulting Base pinned the newly displayed review ID. V029 now shows the stored observation ID on off-page selections. A DOM test removed the intended reference when two selections had the same source pointer. V030 labels `N` as Negligible for MSC, MSI and MSA, with Base labels and actual vector codes unchanged. A focused test checks those names and the scope of Safety. [Independent findings](coordination/review.md#independent-verification--m3-20261124-38) · [FIRST CVSS v4.0 specification, Table 15](https://www.first.org/cvss/v4.0/specification-document#Modified-Base-Metrics-and-Safety)
+
+The repaired snapshot passed `GOFLAGS=-mod=readonly make check`, `npm run build --prefix frontend` and `GOFLAGS=-mod=readonly make test-e2e`. Manual inspection of the synthetic editor's 390px and 1280px renders confirmed the neutral layout, legible labels and visible focus. Checkpoint 39 is the independent retest.

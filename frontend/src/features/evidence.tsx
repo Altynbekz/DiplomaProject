@@ -685,7 +685,19 @@ function FindingDetail() {
             token={token}
           />
           <ResolvedContextPanel findingID={f.data.id} token={token} />
-          <AssessmentPanel findingID={f.data.id} token={token} />
+          <AssessmentPanel
+            finding={f.data}
+            token={token}
+            evidence={{
+              observations: o.data?.items ?? [],
+              pending: o.isPending,
+              error: o.error,
+              next: o.data?.next_cursor ?? null,
+              active: !!cursor,
+              onNext: setCursor,
+              onFirst: () => setCursor(""),
+            }}
+          />
           <details>
             <summary>
               Finding fingerprint ({f.data.fingerprint_version})

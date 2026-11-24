@@ -48,28 +48,20 @@ printf 'header = "Authorization: Bearer %s"\n' "$(cat .secrets/api_token)" |
 
 The genuine fixture contains 21 observations, grouped into 17 findings with zero unlocated alerts. Both fixtures have separate Chromium reload and API/database restart checks.
 
-## Inspect assessment history
+## Author and inspect CVSS assessments
 
-Open **CVSS assessment history** on a finding. The read-only view shows saved B and BE snapshots, scores and vectors, incomplete states, historical status, evidence references, exact calculator provenance and resolved context. New imports start without scores. The API accepts analyst inputs and validates review, classification, evidence and context before scoring. Create and revise assessments through the API in this slice. A browser authoring form is the next M3 slice. [Assessment decision](docs/decisions/0002-cvss-v4-calculator.md) · [Context review aid](docs/assessment-context-policy.md)
+1. Open **CVSS assessment history** on a finding and choose **New CVSS-B assessment**. Unselected Base metrics display **Unknown / missing**. Use **Save incomplete assessment** to append a draft with a null score and vector. In a genuine demo with insufficient evidence, stop at this step.
+2. To complete Base, choose each metric, explain the choice and select observation evidence from that finding. The editor lists missing inputs. **Finalize CVSS-B** sends the choices and expected revisions to the server, which requires a confirmed review and mapped study classification as well as metric evidence.
+3. On the newest completed Base snapshot, choose **Start CVSS-BE from this Base**. Inspect its exact Base values and select **Use displayed context**. Choose supported Environmental metrics with evidence or contextual rationale. Explain all four factor dispositions, even when a factor justifies no metric change. A modified choice at **Not Defined** inherits its Base value. An unspecified Environmental requirement uses the CVSS default. Save incomplete or finalize against the current Base, review, classification and context.
+4. On a conflict, choose **Load current assessment inputs**, inspect the revisions, and explicitly choose **Use loaded revisions** when you want to adopt them. If the Base parent changed, select the current completed Base in history. You can work on a replacement Base and resume the unsaved Environmental draft in the same finding. **Revise as new snapshot** starts from saved inputs and preserves the previous record.
+5. Expand **Assessment evidence and provenance** to read stored metric justifications, the vector, context and calculator identity. The **Paired Base assessment** disclosure shows the exact parent's score, vector and evidence alongside BE. The history labels superseded evidence states as historical.
 
-To demonstrate a score-free Base draft, use a disposable local stack and set `FINDING_ID` to the UUID shown in the finding page URL. This gets the current review/classification references from the API and appends an incomplete snapshot. Reopen the finding after saving.
+CVSS is owned by FIRST and used by permission. [CVSS v4.0 specification](https://www.first.org/cvss/v4.0/specification-document) · [Calculator decision](docs/decisions/0002-cvss-v4-calculator.md) · [Context review aid](docs/assessment-context-policy.md)
+
+To rehearse a completed pair and the conflict paths with explicitly synthetic assessment data, run the browser flow in a disposable stack.
 
 ```sh
-api() {
-  printf 'header = "Authorization: Bearer %s"\n' "$(cat .secrets/api_token)" |
-    curl --fail-with-body --silent --show-error --config - "$@"
-}
-finding_url="http://127.0.0.1:8080/api/v1/findings/$FINDING_ID"
-draft=$(api "$finding_url" | python3 -c '
-import json, sys
-f = json.load(sys.stdin)
-print(json.dumps(dict(kind="B", finalize=False, base_assessment_id=None,
-    expected_verification_review_id=f["verification_review_id"],
-    expected_classification_revision_id=f["classification"]["revision_id"],
-    expected_context_revision_ids=[], metrics={}, metric_rationales={},
-    notes="Disposable demonstration draft")))
-')
-api -H 'Content-Type: application/json' --data "$draft" "$finding_url/assessments"
+GOFLAGS=-mod=readonly ./scripts/test-e2e.sh synthetic
 ```
 
 ## Verify and maintain
@@ -91,4 +83,4 @@ To exercise Compose on an ARM64 engine with Docker Compose 2.24.4 or newer, run 
 
 The CI workflow runs formatting, lint, type, generation, unit and frontend build checks on Ubuntu 24.04. It builds the checksum-pinned PostgreSQL 15.19 release for separate integration and Chromium runs under the non-root runner account. Hosted run `45170314104` passed for commit `94f431f`, including the Python preflight tests. [Workflow](.github/workflows/ci.yml) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) · [Implementation status](docs/status.md)
 
-[OpenAPI](contracts/openapi.yaml) lists implemented routes for imports and evidence, human verification, OWASP classification, context revisions and resolution, and CVSS assessment history. The [OWASP Top 10:2025](https://top10.owasp.org/) study categories are available as filter values. Browser assessment authoring, ranking, scanner orchestration and research evaluation are planned.
+[OpenAPI](contracts/openapi.yaml) lists implemented routes for imports and evidence, human verification, OWASP classification, context revisions and resolution, and CVSS assessment creation and history. The [OWASP Top 10:2025](https://top10.owasp.org/) study categories are available as filter values. Ranking, scanner orchestration and research evaluation are planned.
