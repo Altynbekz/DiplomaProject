@@ -504,3 +504,11 @@ Verified on 2026-11-24 at baseline `0cdf484759ed8f03253850ba213016311322f39f`, m
 - `GOFLAGS=-mod=readonly GOPROXY=off GOSUMDB=off make check` and `npm run build --prefix frontend` exited 0. Generated files matched byte for byte. Go tests, nine Python cases and eight Vitest cases passed with formatting, vet, strict TypeScript and lint. `GOFLAGS=-mod=readonly GOPROXY=off GOSUMDB=off make test-e2e` exited 0 on two disposable stacks, with all four Chromium phases and both outage checks passing. All 190 local links and anchors in the eight frozen Markdown files resolved and `git diff HEAD --check` passed.
 
 **Verdict:** checkpoint 39 passed independent verification. No open M3 authoring findings. Exact hosted CI on the eventual authoring commit remains pending. The live M2 A01 evidence gate and empirical evaluation remain separate. Only disposable local Diploma services received test traffic.
+
+## Independent verification — M3-20261124-40
+
+Verified on 2026-11-24 at baseline `a18b9899a867346e73225de6d209e50fa354edc1`. Manifest SHA-256 `8b3bca9ca354b9118cdc750833c3097409d6b53b694f3558477b412d1f22c607` and both frozen documentation hashes matched. All 17 checkpoint 39 files matched the exact published commit. All 88 repository links and anchors resolved and `git diff HEAD --check` passed.
+
+Public GitHub metadata independently confirmed that run `45384993237` matched the exact commit, started at 2026-11-24T11:31:43Z and completed successfully at 2026-11-24T11:36:30Z. Job `138413490022` ran on Ubuntu 24.04 and all 17 steps passed, including migration/integration and Chromium. The documents accurately attribute M3 acceptance to that commit and retain the distinction between synthetic software verification, the open M2 live A01 gate and future empirical evaluation. [Exact hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45384993237)
+
+**Verdict:** the M3 acceptance record passed independent verification. M3 software is complete at the cited commit, with no open findings. The software suite was unchanged and was not repeated for this documentation check.

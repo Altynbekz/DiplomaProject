@@ -24,6 +24,7 @@ Public GitHub run metadata was checked for each exact revision. Dates are run st
 | Reviewed classification | `20c6a76536c3b2d921ef3a27a36b96b119c0af13` | [45195527459](https://github.com/Altynbekz/DiplomaProject/actions/runs/45195527459), success | 2026-11-23T14:33:45Z |
 | Immutable context resolution | `da9844eabb14c6c14646b407c652864afc0012e9` | [45197471901](https://github.com/Altynbekz/DiplomaProject/actions/runs/45197471901), success | 2026-11-23T14:44:42Z |
 | Current M2 software baseline | `f1613e6fd5d64625dc239d2673cb019ecb964efd` | [45365896739](https://github.com/Altynbekz/DiplomaProject/actions/runs/45365896739), success | 2026-11-24T09:30:47Z |
+| M3 analyst workflow and full software acceptance | `a18b9899a867346e73225de6d209e50fa354edc1` | [45384993237](https://github.com/Altynbekz/DiplomaProject/actions/runs/45384993237), success | 2026-11-24T11:31:43Z |
 
 ## Reproducing software checks
 
@@ -56,3 +57,5 @@ ART-19 indexes the [editor](../../frontend/src/features/assessment-editor.tsx), 
 The synthetic Chromium flow saved incomplete B and BE snapshots, recovered stale verification, classification, context and parent references while retaining entered work, and finalized both kinds with exact FIRST fixture scores and vectors. It inspected the preserved Base pair and later historical status. PostgreSQL checks showed classification gating, foreign observation rejection, a true zero score round trip, immutable storage and atomic audit failure handling. The genuine-report regression verifies importer and M2 continuity. [Acceptance audit and commands](../status.md#m3-analyst-workflow-and-acceptance)
 
 These checks establish software behavior on the recorded inputs. The protocol remains proposed and independently judged project assessments are future research evidence. The live A01 gate remains open.
+
+Independent checkpoint 39 accepted the complete authoring workflow and verified all three review fixes. Hosted CI passed all 17 steps for the exact M3 software commit above. [Independent review](../coordination/review.md#independent-verification--m3-20261124-39) · [Hosted CI](https://github.com/Altynbekz/DiplomaProject/actions/runs/45384993237)

@@ -886,7 +886,7 @@ Started from `0cdf484759ed8f03253850ba213016311322f39f`. Local `main`, its upstr
 | 25% | Exact Base parent selection, justified Environmental choices, all four factor dispositions and default/inherited values, with demonstrated draft and finalization behavior | Independently verified at checkpoints 38–39 |
 | 20% | Deliberate recovery from stale verification, classification, context and parent choices with retained inputs, append-only revisions and readable paired history | Independently verified at checkpoint 39 |
 | 20% | M3 acceptance audit, synthetic browser and database evidence, regression checks, independent frozen verification and research traceability | Independent audit and suites passed. V028–V030 closed at checkpoint 39. |
-| 10% | Reviewed publication and successful hosted CI on the exact pushed commit | Reviewed publication ready. Exact-commit hosted CI pending. |
+| 10% | Reviewed publication and successful hosted CI on the exact pushed commit | Passed at `a18b9899a867346e73225de6d209e50fa354edc1`. [Hosted run 45384993237](https://github.com/Altynbekz/DiplomaProject/actions/runs/45384993237) |
 
 The remaining slice starts at 0% accepted. The earlier estimates of 65–75% of full M3 and 45–50% overall remain reasonable while the authoring, recovery and full acceptance evidence are pending. The initial time estimate is an uncertain 90–180 minutes, depending on workflow regressions, independent review and hosted checks. The live M2 A01 gate remains a separate evidence requirement.
 
@@ -963,3 +963,16 @@ c8bd9013a700f3fecdc8eb19cd5d7e7a4c308d0533cadd68d3d15dc12e6160d2  frontend/tests
 ```
 
 Checkpoint 39 independently passed. All 17 frozen hashes and 11 inherited hashes matched. V028, V029 and V030 are closed. The reviewer confirmed that the saved Base used the newly displayed review revision, same-pointer evidence selections remained distinct and the modified Environmental labels matched FIRST. The remaining-slice checklist is 90% accepted. Publication and successful exact-commit CI account for the remaining 10%. [Independent verdict](review.md#independent-verification--m3-20261124-39)
+
+## M3-20261124-40 — Published acceptance record — READY FOR VERIFICATION
+
+Baseline `a18b9899a867346e73225de6d209e50fa354edc1`. The software and all tests are byte-identical to that baseline and independently accepted at checkpoint 39. Public GitHub Actions metadata matched the exact SHA and completed/success conclusion for run 45384993237. All 17 steps passed, including disposable PostgreSQL and Chromium. This documents observed M3 acceptance. [Hosted CI](https://github.com/Altynbekz/DiplomaProject/actions/runs/45384993237) · [Authoring review](review.md#independent-verification--m3-20261124-39)
+
+`git diff --check` and a structural check of 88 local links and anchors passed. The remaining-slice checklist is 100% accepted and full M3 is complete. Overall project progress is roughly 50–55%. An uncertain 5–15 minutes remain to review and publish this documentation record and follow its hosted CI. Live M2 A01 remains an outstanding evidence gate. No software, study claims or fixtures changed in this checkpoint.
+
+Frozen files, SHA-256.
+
+```text
+a1b2a94649e0cd591f7ff7b7d679a10ace2c7b9d216a2d1f42de5c84c721afe6  docs/research/implementation-evidence.md
+e3b0e7c7977ee312fd302e9ea6efa57bb4effb9997279a9c0144561f172fc7e9  docs/status.md
+```
