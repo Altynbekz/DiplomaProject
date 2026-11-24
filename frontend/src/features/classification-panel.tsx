@@ -74,6 +74,7 @@ export function ClassificationPanel({
       setNotice("Classification saved.");
       void client.invalidateQueries({ queryKey: key });
       void client.invalidateQueries({ queryKey: ["finding", finding.id] });
+      void client.invalidateQueries({ queryKey: ["assessments", finding.id] });
       void client.invalidateQueries({
         queryKey: ["findings", finding.target_id],
       });

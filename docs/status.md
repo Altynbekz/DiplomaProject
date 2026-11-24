@@ -1,13 +1,14 @@
 # Implementation status
 
-Updated 2026-11-24, Asia/Almaty. This status covers the foundation, offline import, and M2 review workflow.
+Updated 2026-11-24, Asia/Almaty. This status covers the foundation, offline import, M2 review workflow and the M3 assessment foundation.
 
 | Milestone | Implementation | Verification and remaining gates |
 | --- | --- | --- |
 | M0 | Go, React and PostgreSQL startup, four goose migrations, least-privilege database login, sqlc, OpenAPI types, local secrets, pinned CI and reproducible setup | The host setup and M0 behavioral gates passed, including disposable Compose startup and restart on ARM64. Hosted CI passed for `94f431f`, including the Python tests in `make check`. [GitHub Actions run 45170314104](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) |
 | M1 | Offline Traditional JSON import, immutable evidence, provenance, duplicate handling, normalized observations, audited private downloads, filtered and paged UI, reusable genuine fixture | Acceptance passed, with synthetic and genuine automated suites passing locally, independently and in hosted CI for `f5712a49b5676badb05486b30c73e0d4b916146b`. [Independent verification](coordination/review.md#independent-verification--m1-20261123-22) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45187645541) |
 | M2 | Human verification, OWASP mapping and immutable context history | Software passed at reviewed baseline `817c0449bbb9f6c040ba847a41c6f125bbda7d97`. The later draft recovery repair and checks are recorded below. M2 acceptance remains open pending authorized A01 role/object evidence. [Independent baseline review](coordination/review.md#independent-verification--m2-20261124-30) · [Hosted baseline run 45260100347](https://github.com/Altynbekz/DiplomaProject/actions/runs/45260100347) |
-| M3–M6 | Planned | No implementation started. |
+| M3 | Offline calculator, immutable assessment snapshots, creation and history API, read-only UI | Foundation tests passed locally. Independent checks are in the review log. Analyst-facing metric and rationale authoring remains planned. [M3 foundation](#m3-assessment-foundation) |
+| M4–M6 | Planned | No implementation started. |
 
 ## Recorded checks
 
@@ -162,3 +163,24 @@ The working-tree audit started from `817c0449bbb9f6c040ba847a41c6f125bbda7d97`, 
 `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Go and frontend formatting, vet, strict TypeScript, ESLint, byte-identical generation, Go unit tests, nine Python tests and four Vitest tests passed. `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` exited 0 under the race detector. Fresh and staged migrations reached revision 7. Concurrent classification writes with a shared predecessor produced one 201 and one 409. The runtime role received SQLSTATE 42501 for `UPDATE`, `DELETE` and `TRUNCATE` on classification history.
 
 `GOFLAGS=-mod=readonly make test-e2e` exited 0. All four Chromium cases and both outage checks passed. The genuine workflow kept a conflicting draft on its endpoint, saved it as the next revision, and recovered a separate classification draft by keyboard. Both classification revisions were present after restart. Tests used disposable application stacks and the checked-in sanitized report. No live A01 checks ran.
+
+
+## M3 assessment foundation
+
+The initial baseline is `3dedfa8d45554844c421f263e6db3ce7efe0dbeb`. The adapter uses unmodified FIRST scoring files at `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a` and the pinned pure-Go Goja engine `v0.0.0-20261122185237-35fdc4b88e39`. Thirteen Node-generated reference cases passed offline, including defined and inherited Environmental metrics, Safety, zero and rounding regressions. The verifier separately reproduced 4,096 vectors and scores and ran concurrent evaluations with the race detector. [Calculator decision](decisions/0002-cvss-v4-calculator.md) · [Independent calculator review](coordination/review.md#independent-verification--m3-20261124-34)
+
+Migration 8 adds append-only snapshots and a current staleness view. The API captures review, classification, exact Base parent and context links. It validates expected revisions, evidence, justification and all four BE dispositions before calculating. Failed checks persist no score. An incomplete save persists a new snapshot with null vector, score and calculator. The latest finding summary retains an incomplete newest snapshot. The frontend can inspect histories, metric rationales, vectors and provenance. [API contract](../contracts/openapi.yaml) · [Context policy](assessment-context-policy.md)
+
+| Command | Local result |
+| --- | --- |
+| `GOFLAGS=-mod=readonly make check` | Exit 0. Go/Prettier formatting, vet, TypeScript, ESLint, byte-identical generation, Go tests, nine Python and four Vitest cases passed. |
+| `npm run build --prefix frontend` | Exit 0. TypeScript and production build passed. |
+| `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` | Exit 0. Fresh and staged migrations reached 8. All seven populated M2 table snapshots matched across v7 to v8 and the new assessment history was empty. The normal and genuine report suites and the synthetic assessment suite passed under the race detector. Auditing failure rolled back the append. |
+| `GOFLAGS=-mod=readonly make test-e2e` | Exit 0. Four Chromium cases passed with both outage checks. The synthetic UI test used Node/FIRST parity values, opened history by keyboard, preserved incomplete and historical state and verified snapshots after restart. The genuine workflow remained unchanged. |
+
+These runs used disposable macOS arm64 resources with Go 1.27.1, Node 26.13.0, PostgreSQL 15.19, goose 3.30.1, Playwright 1.65.1 and Chromium 159.0.8154.6. All complete test assessments used explicitly authored synthetic data. The live A01 gate remains open. M3 still needs an analyst-facing form for metric choice, evidence and factor dispositions, with conflict recovery and a guided review of paired snapshots. No ranking or research experiment was run.
+
+
+### Assessment history refresh follow-up
+
+Checkpoint 36 independently verified the calculator, migration and storage/API behavior, with V027 open for browser freshness. The API correctly reported historical status after a context or human review change. The open page still held the old query result. After a verification or classification save, the finding's open assessment history refetches. A new context revision refreshes the target's findings table. The synthetic Chromium regression confirmed that those views update without reloading them. `GOFLAGS=-mod=readonly make test-e2e` passed all four cases and both outage checks. `npm run --prefix frontend fmt:check`, `npm run --prefix frontend lint` and `npm run --prefix frontend build` exited 0. [Independent findings](coordination/review.md#independent-verification--m3-20261124-36)

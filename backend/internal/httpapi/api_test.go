@@ -488,6 +488,9 @@ func TestIntegrationImport(t *testing.T) {
 	if err == nil {
 		t.Fatal("cross-target observation accepted")
 	}
+	t.Run("synthetic assessment workflow", func(t *testing.T) {
+		checkAssessmentWorkflow(t, ctx, pool, call, target, groupedFindingID)
+	})
 	if strings.Contains(logs.String(), testToken) || strings.Contains(logs.String(), "synthetic-private-value") {
 		t.Fatal("secret in logs")
 	}

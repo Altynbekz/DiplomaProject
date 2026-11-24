@@ -2,7 +2,7 @@
 
 **Paper title** — Development of a Context-Aware Web Application Vulnerability Assessment System with OWASP Top 10 Risk Prioritization
 
-The implemented baseline is `f1613e6fd5d64625dc239d2673cb019ecb964efd`. M1 genuine-report acceptance is complete. The M2 software is independently verified and its live A01 role/object evidence gate remains open. CVSS scoring, ranking, scanner orchestration and research evaluation are planned. The research question, **RQ-01**, asks whether contextual CVSS-BE ranking agrees more closely with independent reference prioritization than CVSS-B ranking in the studied scenarios. Current artifacts support writing about the system and its verification. The comparative outcome is unknown. [Implementation status](../status.md) · [Independent software review](../coordination/review.md#independent-verification--m2-20261124-31)
+The M0–M2 evidence baseline is `f1613e6fd5d64625dc239d2673cb019ecb964efd`. M1 genuine-report acceptance is complete. The M2 software is independently verified and its live A01 role/object evidence gate remains open. The M3 foundation adds offline scoring and immutable assessment history. Browser assessment authoring, ranking, scanner orchestration and research evaluation are planned. The research question, **RQ-01**, asks whether contextual CVSS-BE ranking agrees more closely with independent reference prioritization than CVSS-B ranking in the studied scenarios. Current artifacts support writing about the system and its verification. The comparative outcome is unknown. [Implementation status](../status.md) · [Independent software review](../coordination/review.md#independent-verification--m2-20261124-31)
 
 ## Ready for writing
 
@@ -24,7 +24,7 @@ The implemented baseline is `f1613e6fd5d64625dc239d2673cb019ecb964efd`. M1 genui
 | Stage | Record needed |
 | --- | --- |
 | Open M2 gate | Authorized, independently reviewable observed A01 role/object decisions for the documented fixture and policy. Keep standalone scenarios separate from the existing Juice Shop CORS assertion. [Operator checklist](../../lab/scenarios/a01-role-object.md#evidence-to-supply) |
-| M3 | Pinned licensed calculator, FIRST reference commit and parity fixtures, human metric justifications and complete paired B/BE assessments |
+| M3 | Human metric justifications and authorized paired B/BE assessments. The pinned calculator and reference fixtures are recorded in the implementation evidence. |
 | M4 | Frozen cohort with candidate and excluded IDs, paired assessment IDs, tie groups, cutoffs and a sanitized export manifest |
 | M5 | Applicable approved lab scope, isolation and lifecycle records if using newly collected scanner data. Keep scanner orchestration outside the current application. |
 | M6 | Reviewed protocol, frozen calibration/evaluation split, independent blinded judgments and disagreements, replayable analysis outputs and limitations |

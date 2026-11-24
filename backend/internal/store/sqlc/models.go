@@ -10,6 +10,43 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AssessmentSnapshot struct {
+	ID                       string
+	FindingID                string
+	TargetID                 string
+	Kind                     string
+	Status                   string
+	BaseAssessmentID         pgtype.UUID
+	VerificationReviewID     pgtype.UUID
+	ClassificationRevisionID pgtype.UUID
+	ContextRevisionID        pgtype.UUID
+	ContextSnapshotJson      []byte
+	MetricsJson              []byte
+	MetricRationalesJson     []byte
+	FactorDispositionsJson   []byte
+	Notes                    string
+	Vector                   pgtype.Text
+	Score                    pgtype.Numeric
+	CalculatorJson           []byte
+	SchemaVersion            string
+	PolicyVersion            string
+	Actor                    string
+	CreatedAt                time.Time
+	ParentKind               pgtype.Text
+	ParentStatus             pgtype.Text
+}
+
+type AssessmentStatus struct {
+	ID        string
+	FindingID string
+	Kind      string
+	Status    string
+	Score     pgtype.Numeric
+	Vector    pgtype.Text
+	CreatedAt time.Time
+	Stale     pgtype.Bool
+}
+
 type AuditEvent struct {
 	ID                   string
 	RequestID            string

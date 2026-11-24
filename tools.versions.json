@@ -29,6 +29,11 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "prettier": "3.10.1"
   },
+  "cvss": {
+    "first_reference_commit": "c5b0d409ae9f57c44264c6ce5f27d89298e1d32a",
+    "goja": "v0.0.0-20261122185237-35fdc4b88e39",
+    "fixture": "first-cvss-v4/v1"
+  },
   "compose": "5.5.1",
   "image_platform": "linux/arm64"
 }

@@ -340,12 +340,22 @@ SELECT f.id,f.target_id,f.fingerprint_version,f.fingerprint,f.plugin_id,f.method
  coalesce(c.id::text,'')::text AS classification_id,coalesce(c.category,'')::text AS classification_category,
  coalesce(c.mapping_version,'')::text AS classification_version,
  coalesce(c.candidate_categories,ARRAY[]::text[])::text[] AS classification_candidates,
+ coalesce(to_jsonb(b), 'null'::jsonb)::jsonb AS latest_base,
+ coalesce(to_jsonb(be), 'null'::jsonb)::jsonb AS latest_environmental,
  (SELECT count(*) FROM observations n WHERE n.finding_id=f.id AND ($1::text='' OR n.report_import_id::text=$1)) AS observation_count
 FROM findings f
 JOIN LATERAL (SELECT ob.id,ob.scanner_severity FROM observations ob WHERE ob.finding_id=f.id AND ($1::text='' OR ob.report_import_id::text=$1) ORDER BY ob.created_at DESC,ob.id DESC LIMIT 1) o ON true
 LEFT JOIN LATERAL (SELECT vr.id,vr.state FROM verification_reviews vr WHERE vr.finding_id=f.id ORDER BY vr.created_at DESC,vr.id DESC LIMIT 1) v ON true
 LEFT JOIN LATERAL (SELECT cr.id,cr.status,cr.category,cr.candidate_categories,cr.mapping_version
  FROM classification_revisions cr WHERE cr.finding_id=f.id ORDER BY cr.created_at DESC,cr.id DESC LIMIT 1) c ON true
+LEFT JOIN LATERAL (
+ SELECT s.id,s.kind,s.status,s.score,s.vector,s.stale,s.created_at FROM assessment_status s
+ WHERE s.finding_id=f.id AND s.kind='B' ORDER BY s.created_at DESC,s.id DESC LIMIT 1
+) b ON true
+LEFT JOIN LATERAL (
+ SELECT s.id,s.kind,s.status,s.score,s.vector,s.stale,s.created_at FROM assessment_status s
+ WHERE s.finding_id=f.id AND s.kind='BE' ORDER BY s.created_at DESC,s.id DESC LIMIT 1
+) be ON true
 WHERE f.target_id=$2 AND f.id::text>$3::text
  AND ($4::text='' OR f.id::text=$4)
  AND ($5::text='' OR o.scanner_severity=$5)
@@ -387,6 +397,8 @@ type ListFindingsRow struct {
 	ClassificationCategory   string
 	ClassificationVersion    string
 	ClassificationCandidates []string
+	LatestBase               []byte
+	LatestEnvironmental      []byte
 	ObservationCount         int64
 }
 
@@ -430,6 +442,8 @@ func (q *Queries) ListFindings(ctx context.Context, arg ListFindingsParams) ([]L
 			&i.ClassificationCategory,
 			&i.ClassificationVersion,
 			&i.ClassificationCandidates,
+			&i.LatestBase,
+			&i.LatestEnvironmental,
 			&i.ObservationCount,
 		); err != nil {
 			return nil, err
@@ -553,7 +567,7 @@ func (q *Queries) LockTarget(ctx context.Context, id string) (string, error) {
 }
 
 const ready = `-- name: Ready :one
-SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.classification_revisions') IS NOT NULL AND to_regclass('public.context_revisions') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready
+SELECT to_regclass('public.observations') IS NOT NULL AND to_regclass('public.verification_reviews') IS NOT NULL AND to_regclass('public.classification_revisions') IS NOT NULL AND to_regclass('public.context_revisions') IS NOT NULL AND to_regclass('public.assessment_snapshots') IS NOT NULL AND to_regclass('public.assessment_status') IS NOT NULL AND to_regclass('public.report_imports') IS NOT NULL AND has_column_privilege(current_user,'public.report_imports','report_declared_version','SELECT') AND has_column_privilege(current_user,'public.targets','name','UPDATE') AND NOT has_table_privilege(current_user,'public.observations','UPDATE,DELETE') AS ready
 `
 
 func (q *Queries) Ready(ctx context.Context) (pgtype.Bool, error) {

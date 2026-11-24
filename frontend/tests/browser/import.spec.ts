@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { resolve } from "node:path";
 import { mkdir, readFile } from "node:fs/promises";
+import {
+  checkAssessmentHistory,
+  openSyntheticFinding,
+} from "./assessment-flow";
 async function capture(page: import("@playwright/test").Page, name: string) {
   const dir = process.env.E2E_SCREENSHOTS;
   if (!dir) return;
@@ -185,6 +189,7 @@ test("synthetic report persists, deduplicates and renders safely after reload", 
   await page.getByRole("button", { name: "First page" }).click();
   await expect(page).toHaveURL(new URL(targetPath, filteredURL).href);
   await expect(rows).toHaveCount(4);
+  await checkAssessmentHistory(page, token);
   await page.getByRole("button", { name: "Lock workspace" }).click();
   await expect(page.getByLabel("API token")).toHaveValue("");
   expect(unexpected).toEqual([]);
@@ -198,4 +203,13 @@ test("persisted rows survive API and database restart", async ({ page }) => {
   await page.getByRole("button", { name: "Unlock", exact: true }).click();
   await page.getByRole("link", { name: "Synthetic browser lab" }).click();
   await expect(page.locator("tbody tr")).toHaveCount(4);
+  await openSyntheticFinding(page);
+  await page
+    .getByText("CVSS assessment history", { exact: true })
+    .press("Enter");
+  await expect(
+    page
+      .getByRole("region", { name: "Stored CVSS assessments" })
+      .getByRole("article"),
+  ).toHaveCount(3);
 });

@@ -8,7 +8,7 @@ Accessed 2026-11-24 (Asia/Almaty). Versions below identify the cited edition or 
 | --- | --- | --- | --- |
 | SRC-01 | OWASP Top 10, OWASP Foundation | 2025 edition | The category names and identifiers for [A01 Broken Access Control](https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/), [A02 Security Misconfiguration](https://top10.owasp.org/2025/A02_2025-Security_Misconfiguration/) and [A05 Injection](https://top10.owasp.org/2025/A05_2025-Injection/). [Release](https://top10.owasp.org/2025/) |
 | SRC-02 | Common Vulnerability Scoring System version 4.0 Specification Document, FIRST | CVSS 4.0, document v1.2 | Required metrics, Base and Environmental semantics, and CVSS-B/CVSS-BE nomenclature. [Specification](https://www.first.org/cvss/v4.0/specification-document) |
-| SRC-03 | CVSS v4.0 User Guide and CVSS v4.0 calculator, FIRST | CVSS 4.0 | Scoring guidance and planned reference parity. Calculator commit selection is pending M3. [User guide](https://www.first.org/cvss/v4.0/user-guide) · [Reference calculator](https://github.com/FIRSTdotorg/cvss-v4-calculator) |
+| SRC-03 | CVSS v4.0 User Guide and CVSS v4.0 calculator, FIRST | CVSS 4.0 | Scoring guidance and planned reference parity. The M3 adapter uses the exact commit recorded in ART-16. [User guide](https://www.first.org/cvss/v4.0/user-guide) · [Reference calculator](https://github.com/FIRSTdotorg/cvss-v4-calculator) |
 | SRC-04 | Traditional JSON Report, ZAP Dev Team | Traditional JSON template documentation | Site, alert and instance hierarchy and report-declared metadata. [Template and example](https://www.zaproxy.org/docs/desktop/addons/report-generation/report-traditional-json/) |
 | SRC-05 | Passive Scan, ZAP Dev Team | Desktop documentation | Passive analysis of proxied traffic and its distinction from active scanning. [Passive scan](https://www.zaproxy.org/docs/desktop/start/features/pscan/) |
 | SRC-06 | OWASP Juice Shop, OWASP Foundation | Project page | Training application and suitability as a controlled security lab fixture. The exact capture build comes from ART-03. [Project page](https://owasp.org/projects/juice-shop) |
@@ -40,3 +40,11 @@ Accessed 2026-11-24 (Asia/Almaty). Versions below identify the cited edition or 
 ## Project-specific decisions
 
 The study category subset, alert-to-category rules, canonical fingerprint, allowable context values, historical revision and audit policy, and research cohort and evaluation rules are project choices. Cite their exact revisions when discussing the implementation. OWASP category definitions and FIRST metric semantics are external authority. Access authorization, observed behavior, containment and research outcomes require project evidence. [Project contract](../../AGENTS.md) · [Reviewed mapping and evidence](implementation-evidence.md) · [Proposed protocol](../research-protocol.md)
+
+
+## M3 source pins
+
+| ID | Title and organization | Version, access date and topic |
+| --- | --- | --- |
+| SRC-21 | FIRST CVSS v4 calculator, FIRST, Red Hat and contributors | Commit `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a`, checked 2026-11-24. BSD-2-Clause scoring sources and attribution. [Exact upstream tree](https://github.com/FIRSTdotorg/cvss-v4-calculator/tree/c5b0d409ae9f57c44264c6ce5f27d89298e1d32a) |
+| SRC-22 | Goja, Goja contributors | Commit `35fdc4b88e393df269ccbfb4183c5490558eafe9`, checked 2026-11-24. MIT-licensed pure-Go ECMAScript execution. [Exact upstream tree](https://github.com/dop251/goja/tree/35fdc4b88e393df269ccbfb4183c5490558eafe9) |

@@ -29,7 +29,7 @@ The importer rejects decoded NUL characters in database-bound fields with a fiel
 1. Unlock the workspace and create a Juice Shop target. The server supplies the registered origin.
 2. Open the target and select [the genuine Juice Shop fixture](backend/testdata/zap/juice-shop-traditional.json). Paste the contents of [its provenance file](backend/testdata/zap/juice-shop-provenance.json) into **Optional report provenance**. See [fixture provenance](docs/fixture-provenance.md) for the transformation and report hashes.
 3. Import the report. The UI shows its hash, parser version, finding and observation counts, unlocated-alert count, warnings and provenance. The report-declared ZAP version and parser-detected format appear separately from operator provenance. An identical upload reuses the existing import ID when provenance is omitted or matches the stored record. Different provenance receives a 409 conflict. Import provenance is immutable. For imports created before migration 4, the separately stored report version is unavailable and legacy provenance may include report-derived defaults. See [the provenance decision](docs/decisions/0001-immutable-import-provenance.md) for upgrade behavior.
-4. Filter findings by report ID, category, severity or verification and page through the results. New imports keep observations in report source order by assigning strictly increasing receipt timestamps. The recorded scan time is separate. Older observations keep their original timestamps. Open a finding to read source pointers, scanner confidence, descriptions and remediation. Private payloads stay behind explicit, audited download. CVSS displays “Not assessed.”
+4. Filter findings by report ID, category, severity or verification and page through the results. New imports keep observations in report source order by assigning strictly increasing receipt timestamps. The recorded scan time is separate. Older observations keep their original timestamps. Open a finding to read source pointers, scanner confidence, descriptions and remediation. Private payloads stay behind explicit, audited download. Findings without assessments display “Not assessed.”
 5. Open **Human verification** on a finding. Select its source observations and record what you reviewed and what remains uncertain. For the passive report demo, use **Inconclusive** when the scanner evidence is insufficient to establish the result. For a stale draft, load the latest verification, review the preserved draft, and save when ready. The history shows each saved review with its source pointers, operator and time.
 6. Open **OWASP classification** to see the current mapping, matched rule sources, and history. A manual revision records its categories, rationale and selected evidence independently of the human review.
 7. On the target page, open **Application context** and save a target default or an exact method and path. Give each factor a rationale and attach a source for each known value. Open **Resolved context** on a finding to see the selected revision and unknown values. Open context history to inspect or revise an earlier scope. [Access-control evidence protocol](lab/scenarios/a01-role-object.md)
@@ -47,6 +47,30 @@ printf 'header = "Authorization: Bearer %s"\n' "$(cat .secrets/api_token)" |
 ```
 
 The genuine fixture contains 21 observations, grouped into 17 findings with zero unlocated alerts. Both fixtures have separate Chromium reload and API/database restart checks.
+
+## Inspect assessment history
+
+Open **CVSS assessment history** on a finding. The read-only view shows saved B and BE snapshots, scores and vectors, incomplete states, historical status, evidence references, exact calculator provenance and resolved context. New imports start without scores. The API accepts analyst inputs and validates review, classification, evidence and context before scoring. Create and revise assessments through the API in this slice. A browser authoring form is the next M3 slice. [Assessment decision](docs/decisions/0002-cvss-v4-calculator.md) · [Context review aid](docs/assessment-context-policy.md)
+
+To demonstrate a score-free Base draft, use a disposable local stack and set `FINDING_ID` to the UUID shown in the finding page URL. This gets the current review/classification references from the API and appends an incomplete snapshot. Reopen the finding after saving.
+
+```sh
+api() {
+  printf 'header = "Authorization: Bearer %s"\n' "$(cat .secrets/api_token)" |
+    curl --fail-with-body --silent --show-error --config - "$@"
+}
+finding_url="http://127.0.0.1:8080/api/v1/findings/$FINDING_ID"
+draft=$(api "$finding_url" | python3 -c '
+import json, sys
+f = json.load(sys.stdin)
+print(json.dumps(dict(kind="B", finalize=False, base_assessment_id=None,
+    expected_verification_review_id=f["verification_review_id"],
+    expected_classification_revision_id=f["classification"]["revision_id"],
+    expected_context_revision_ids=[], metrics={}, metric_rationales={},
+    notes="Disposable demonstration draft")))
+')
+api -H 'Content-Type: application/json' --data "$draft" "$finding_url/assessments"
+```
 
 ## Verify and maintain
 
@@ -67,4 +91,4 @@ To exercise Compose on an ARM64 engine with Docker Compose 2.24.4 or newer, run 
 
 The CI workflow runs formatting, lint, type, generation, unit and frontend build checks on Ubuntu 24.04. It builds the checksum-pinned PostgreSQL 15.19 release for separate integration and Chromium runs under the non-root runner account. Hosted run `45170314104` passed for commit `94f431f`, including the Python preflight tests. [Workflow](.github/workflows/ci.yml) · [Hosted run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45170314104) · [Implementation status](docs/status.md)
 
-[OpenAPI](contracts/openapi.yaml) lists implemented routes for imports and evidence, human verification, OWASP classification, context revisions and resolution. The [OWASP Top 10:2025](https://top10.owasp.org/) study categories are available as filter values. CVSS scoring, ranking, scanning and research evaluation are planned.
+[OpenAPI](contracts/openapi.yaml) lists implemented routes for imports and evidence, human verification, OWASP classification, context revisions and resolution, and CVSS assessment history. The [OWASP Top 10:2025](https://top10.owasp.org/) study categories are available as filter values. Browser assessment authoring, ranking, scanner orchestration and research evaluation are planned.

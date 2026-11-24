@@ -3,7 +3,7 @@
   "info": {
     "title": "Diploma offline evidence API",
     "version": "0.1.0",
-    "description": "Local evidence import, human verification, reviewed OWASP classification, and target context history. CVSS is absent."
+    "description": "Local evidence import, human verification, reviewed OWASP classification, target context history, and immutable CVSS v4 assessments."
   },
   "security": [
     {
@@ -2664,6 +2664,470 @@
           }
         }
       }
+    },
+    "/api/v1/findings/{id}/assessments": {
+      "get": {
+        "operationId": "listAssessments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentPage"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List immutable assessment snapshots, newest first"
+      },
+      "post": {
+        "operationId": "createAssessment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentSnapshot"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              },
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Snapshot URI"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid or incomplete assessment; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentInput"
+              }
+            }
+          }
+        },
+        "summary": "Append a draft or finalize a new assessment",
+        "description": "The server validates references, captures context and calculates complete vectors. Incomplete drafts have null vector, score and calculator."
+      }
+    },
+    "/api/v1/assessments/{id}": {
+      "get": {
+        "operationId": "getAssessment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "description": "Invalid values are replaced by a generated identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentSnapshot"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Request correlation identifier"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            }
+          },
+          "default": {
+            "description": "Problem response",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Problem response; see code and field errors",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Read an immutable assessment and its current stale status"
+      }
     }
   },
   "components": {
@@ -2699,6 +3163,7 @@
               "validation_failed",
               "unsupported_report",
               "out_of_scope",
+              "incomplete_assessment",
               "not_ready",
               "internal_error"
             ]
@@ -4286,6 +4751,439 @@
           "source_revision_ids",
           "resolver_version",
           "resolved_at"
+        ]
+      },
+      "MetricRationale": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceRef"
+            },
+            "maxItems": 20
+          },
+          "context_factor_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "exposure",
+                "required_privileges",
+                "data_sensitivity",
+                "business_criticality"
+              ]
+            },
+            "maxItems": 4,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "reason",
+          "evidence_refs",
+          "context_factor_refs"
+        ]
+      },
+      "FactorDisposition": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 3,
+              "pattern": "^[A-Z]{2,3}$"
+            },
+            "maxItems": 14,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "reason",
+          "metrics"
+        ]
+      },
+      "CalculatorProvenance": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "source_commit": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40}$"
+          },
+          "specification_version": {
+            "type": "string"
+          },
+          "specification_document_version": {
+            "type": "string"
+          },
+          "reference_commit": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40}$"
+          },
+          "fixture_version": {
+            "type": "string"
+          },
+          "engine_version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "source_commit",
+          "specification_version",
+          "specification_document_version",
+          "reference_commit",
+          "fixture_version",
+          "engine_version"
+        ]
+      },
+      "AssessmentInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "B",
+              "BE"
+            ]
+          },
+          "finalize": {
+            "type": "boolean"
+          },
+          "base_assessment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected_verification_review_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected_classification_revision_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected_context_revision_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "maxItems": 1
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 1,
+              "minLength": 1
+            },
+            "maxProperties": 14,
+            "propertyNames": {
+              "type": "string",
+              "maxLength": 3,
+              "pattern": "^[A-Z]{2,3}$"
+            },
+            "description": "B accepts only Base choices. BE accepts only Environmental choices."
+          },
+          "metric_rationales": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MetricRationale"
+            },
+            "maxProperties": 14,
+            "propertyNames": {
+              "type": "string",
+              "maxLength": 3,
+              "pattern": "^[A-Z]{2,3}$"
+            }
+          },
+          "factor_dispositions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FactorDisposition"
+            },
+            "maxProperties": 4,
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "exposure",
+                "required_privileges",
+                "data_sensitivity",
+                "business_criticality"
+              ]
+            },
+            "description": "Four reviewed dispositions required when finalizing BE."
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "kind",
+          "finalize",
+          "base_assessment_id",
+          "expected_verification_review_id",
+          "expected_classification_revision_id",
+          "expected_context_revision_ids",
+          "metrics",
+          "metric_rationales",
+          "notes"
+        ]
+      },
+      "AssessmentSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "B",
+              "BE"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "incomplete",
+              "complete"
+            ]
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finding_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "base_assessment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verification_review_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "classification_revision_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "context_snapshot": {
+            "$ref": "#/components/schemas/ResolvedContext"
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 1,
+              "minLength": 1
+            },
+            "maxProperties": 25,
+            "propertyNames": {
+              "type": "string",
+              "maxLength": 3,
+              "pattern": "^[A-Z]{2,3}$"
+            },
+            "description": "BE includes inherited Base choices and every optional Environmental choice, including X."
+          },
+          "metric_rationales": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MetricRationale"
+            },
+            "maxProperties": 25,
+            "propertyNames": {
+              "type": "string",
+              "maxLength": 3,
+              "pattern": "^[A-Z]{2,3}$"
+            }
+          },
+          "factor_dispositions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FactorDisposition"
+            },
+            "maxProperties": 4,
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "exposure",
+                "required_privileges",
+                "data_sensitivity",
+                "business_criticality"
+              ]
+            }
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "calculator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalculatorProvenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "type": "string",
+            "enum": [
+              "assessment-snapshot/v1"
+            ]
+          },
+          "policy_version": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "score",
+          "vector",
+          "stale",
+          "created_at",
+          "finding_id",
+          "target_id",
+          "base_assessment_id",
+          "verification_review_id",
+          "classification_revision_id",
+          "context_snapshot",
+          "metrics",
+          "metric_rationales",
+          "factor_dispositions",
+          "notes",
+          "calculator",
+          "schema_version",
+          "policy_version",
+          "actor"
+        ]
+      },
+      "AssessmentPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentSnapshot"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
         ]
       }
     }

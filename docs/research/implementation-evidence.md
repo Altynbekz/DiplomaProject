@@ -36,4 +36,15 @@ env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make
 GOFLAGS=-mod=readonly make test-e2e
 ```
 
-Commands, passes and platform limits are recorded in the status and review logs. Tool versions come from ART-14. M3–M6 scoring, ranking, orchestration and comparison results are planned. [Local verification](../status.md#draft-recovery-follow-up) · [Protocol proposal](../research-protocol.md)
+Commands, passes and platform limits are recorded in the status and review logs. Tool versions come from ART-14. The M3 foundation evidence is recorded below. M4–M6 and comparative results remain planned. [Local verification](../status.md#draft-recovery-follow-up) · [Protocol proposal](../research-protocol.md)
+
+
+## M3 foundation
+
+| Slice | Implementation and evidence |
+| --- | --- |
+| Offline CVSS-B and CVSS-BE | [Adapter](../../backend/internal/cvss/cvss.go) and ART-16. Unmodified BSD-2-Clause FIRST reference at `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a`; pinned Goja executes only that source with validated values. Separate Node fixture generation and byte-for-byte regeneration. Thirteen curated parity cases and independent 4,096-vector comparison passed. [ADR](../decisions/0002-cvss-v4-calculator.md) · [Independent review](../coordination/review.md#independent-verification--m3-20261124-34) |
+| Immutable evidence and context snapshots | [Migration 8](../../backend/db/migrations/00008_assessments.sql), [queries](../../backend/db/queries/assessments.sql), [service](../../backend/internal/service/assessments.go) and ART-17. M2 rows matched before and after a populated upgrade. Tests exercise current verified/mapped evidence, exact parent inheritance, context/factor requirements, stale conflict, immutability and atomic audit rollback. |
+| API and read-only UI | [Routes](../../backend/internal/httpapi/assessments.go), [contract](../../contracts/openapi.yaml), [application history](../../frontend/src/features/assessment-panel.tsx) and [synthetic Chromium flow](../../frontend/tests/browser/assessment-flow.ts). Drafts preserve null scores, and completed B/BE test snapshots show calculator provenance and historical status after restart. Genuine imports remain unassessed until separately reviewed. |
+
+These results describe the assessment foundation for RQ-01. The analyst-facing metric and rationale editor is a later M3 slice. Independent verification and exact hosted run status are recorded separately. [Local checks](../status.md#m3-assessment-foundation) · [Review log](../coordination/review.md)

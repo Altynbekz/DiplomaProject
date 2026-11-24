@@ -284,11 +284,23 @@ func (s *Service) Raw(ctx context.Context, id, request string) ([]byte, error) {
 
 type FindingFilter struct{ TargetID, ImportID, Category, Verification, Severity string }
 
-func finding(v db.ListFindingsRow) Finding {
+func finding(v db.ListFindingsRow) (Finding, error) {
 	title, _ := Redact(v.Title)
 	path, _ := Redact(v.Path)
 	param, _ := Redact(v.ParameterName)
-	return Finding{ID: v.ID, TargetID: v.TargetID, Title: title, Method: v.Method, Origin: v.CanonicalOrigin, Path: path, Parameter: param, QueryNames: v.QueryParameterNames, ObservationCount: v.ObservationCount, Severity: v.ScannerSeverity, SeverityObservationID: v.SeverityObservationID, Verification: v.Verification, ReviewID: optionalString(v.VerificationID), Classification: Classification{RevisionID: optionalString(v.ClassificationID), Status: v.ClassificationStatus, Category: optionalString(v.ClassificationCategory), Candidates: v.ClassificationCandidates, MappingVersion: optionalString(v.ClassificationVersion)}, PluginID: v.PluginID, FingerprintVersion: v.FingerprintVersion, Fingerprint: v.Fingerprint, CreatedAt: v.CreatedAt.UTC()}
+	result := Finding{ID: v.ID, TargetID: v.TargetID, Title: title, Method: v.Method, Origin: v.CanonicalOrigin, Path: path, Parameter: param, QueryNames: v.QueryParameterNames, ObservationCount: v.ObservationCount, Severity: v.ScannerSeverity, SeverityObservationID: v.SeverityObservationID, Verification: v.Verification, ReviewID: optionalString(v.VerificationID), Classification: Classification{RevisionID: optionalString(v.ClassificationID), Status: v.ClassificationStatus, Category: optionalString(v.ClassificationCategory), Candidates: v.ClassificationCandidates, MappingVersion: optionalString(v.ClassificationVersion)}, PluginID: v.PluginID, FingerprintVersion: v.FingerprintVersion, Fingerprint: v.Fingerprint, CreatedAt: v.CreatedAt.UTC()}
+	if err := json.Unmarshal(v.LatestBase, &result.Base); err != nil {
+		return Finding{}, err
+	}
+	if err := json.Unmarshal(v.LatestEnvironmental, &result.Environmental); err != nil {
+		return Finding{}, err
+	}
+	for _, assessment := range []*Assessment{result.Base, result.Environmental} {
+		if assessment != nil {
+			assessment.CreatedAt = assessment.CreatedAt.UTC()
+		}
+	}
+	return result, nil
 }
 func (s *Service) Findings(ctx context.Context, f FindingFilter, limit int, raw string) (Page[Finding], error) {
 	p := Page[Finding]{Items: []Finding{}}
@@ -318,7 +330,11 @@ func (s *Service) Findings(ctx context.Context, f FindingFilter, limit int, raw 
 			p.Next = s.Next(Cursor{ID: vs[i-1].ID, Filter: filter})
 			break
 		}
-		p.Items = append(p.Items, finding(v))
+		item, err := finding(v)
+		if err != nil {
+			return p, err
+		}
+		p.Items = append(p.Items, item)
 	}
 	return p, nil
 }
@@ -335,7 +351,7 @@ func (s *Service) Finding(ctx context.Context, id string) (Finding, error) {
 	if len(vs) == 0 {
 		return Finding{}, pgx.ErrNoRows
 	}
-	return finding(vs[0]), nil
+	return finding(vs[0])
 }
 func (s *Service) Observations(ctx context.Context, id string, limit int, raw string) (Page[Observation], error) {
 	p := Page[Observation]{Items: []Observation{}}

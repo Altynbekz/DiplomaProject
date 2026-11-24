@@ -691,3 +691,187 @@ Same baseline as checkpoint 32. This checkpoint supersedes 32 for the protocol t
 ```text
 0284588ec110bfc3b998040f1020db2efb4430d090ee20c45d5638927820ee89  docs/research-protocol.md
 ```
+
+## M3 foundation — acceptance checklist
+
+Starting at `3dedfa8d45554844c421f263e6db3ce7efe0dbeb`. Baseline has an assessment summary contract and empty CVSS display slots. It has no calculator, assessment storage or assessment routes. M1 is complete and M2 software is verified. Live A01 evidence remains pending and is outside this slice.
+
+| Weight | Acceptance evidence required | Status |
+| ---: | --- | --- |
+| 30% | Pinned licensed calculator, explicit decision, bounded validation, canonical B/BE vectors and offline parity against a pinned FIRST revision | Independently verified at checkpoints 34–35 |
+| 20% | New migration and immutable storage, fresh and populated upgrade, scoped references and runtime permission tests | Independently verified at checkpoint 36 |
+| 25% | Bounded create/read/paged API, server-side evidence and context gates, atomic audit, conflict handling and preserved B/BE parents | Independently verified at checkpoint 36 |
+| 10% | Accessible read-only history and provenance UI, generated contract types and browser/regression checks | Independently verified at checkpoint 37 |
+| 10% | Frozen independent verification and research traceability | Independent checks passed at checkpoints 34–37 and V027 closed |
+| 5% | Reviewed change pushed and CI successful for the exact commit | Reviewed files ready to publish. Hosted result must match the publication SHA. |
+
+Starting estimate is 0% accepted foundation, roughly 0–5% of full M3 because only contract placeholders exist, and roughly 40–45% overall based on the earlier project estimate. Full M3 still includes analyst-facing assessment authoring and explanations beyond this foundation. Overall progress is a broad milestone estimate, not the sum of foundation weights. Initial remaining time is an uncertain 2–4 hours, dependent on reference fixture provenance, integration fixes, independent review and CI. Review-pending work earns no independent-verification credit.
+
+## M3-20261124-34 — Reference calculator adapter — READY FOR VERIFICATION
+
+Baseline `3dedfa8d45554844c421f263e6db3ce7efe0dbeb`. Frozen scope is the calculator, vendored license/source, parity generator and fixture, version pins, and ADR. Storage and the API are separate. FIRST scoring files are unchanged from `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a` with BSD-2-Clause notice. Goja runs pinned at `v0.0.0-20261122185237-35fdc4b88e39`. Go-CVSS v0.6.4 failed the preliminary independent differential and was rejected.
+
+`GOCACHE=/tmp/diploma-go-cache GOFLAGS=-mod=readonly go test -v ./internal/cvss` exited 0 with 13 Node/FIRST parity cases, metric rejection and incomplete-state checks. `node scripts/generate-cvss-parity.mjs "$FIRST_REFERENCE_CHECKOUT" | cmp - backend/testdata/cvss/first-v4.json` exited 0 with the exact clean FIRST checkout. `git diff --check` exited 0. Independent review is pending for the delivered adapter.
+
+```text
+95c19e77f6ca07595c9fd031fb8eb6f4b4bc203d3b837159cdd758e86cf7a427  backend/go.mod
+94dd361b7d17443ed49bf2dcad5c622f00fd4f676c3c6f1dfde1aa7693cd2401  backend/go.sum
+735bd5310e55fa42a9da6f4bb729c2cd3f56ae31ef29a71d110759f6ebfbc50d  go.work.sum
+6c6783c9581accaa750117df9096a07d38a3f0510132f7d2a1101e7be869f66d  backend/Dockerfile
+c098a67e99ef21c3899b8238d178895b7b89ab4bbcff35ff040475db1da21d74  backend/internal/cvss/cvss.go
+f5e90a10539db3168c4e6ef8550871172f5d6ee549a7da9b674ce9b49b9ab8f5  backend/internal/cvss/cvss_test.go
+8a1266c1dd7d22027455bea83b92087f606c8d5fc701b269a8411f008ed49a99  backend/internal/cvss/LICENSE-goja
+5d672639189da9bda914dd8c847069cc6959135000b17c45262bb742e5d3b392  backend/internal/cvss/first/LICENSE
+d533fe625d95e15b7b488a4bf93dab5f7df16b7e38b0c8ee01281d7b31a8165e  backend/internal/cvss/first/cvss_lookup.js
+453ce6767b5c3939b51d1f21315f2649e47b5abeca674be287e94b524472a1bc  backend/internal/cvss/first/cvss_score.js
+be707cc82c17993a04a84e47b1a8aaa1d0d212b56852254659ce77fd7d959f63  backend/internal/cvss/first/max_composed.js
+f838ecb41bfd5114456e7fa7df8a8449ca2735c176867886fa34bd011dee0b24  backend/internal/cvss/first/max_severity.js
+99ee2643587071bf744cd090c4bb2db58d523ed0276efd809871b00a12985a4c  backend/internal/cvss/first/metrics.js
+c292463487db168c2d121067b8b9148d8a772c522a817a52fde95778ee853dd8  backend/testdata/cvss/first-v4.json
+98a653ad3e685963c88f7f603722b97929d9946715b90a6e215ff86971a2ae49  scripts/generate-cvss-parity.mjs
+8006c18d03ce57974708eb1244e9467b28cbb9908e9a2c152b9b04f2876274b9  tools.versions.json
+37fea7dedf8b9aad1f9b5023dcf034e81054bf869e6aa06075f6f33d6c8c7bf8  docs/decisions/0002-cvss-v4-calculator.md
+```
+
+## M3-20261124-35 — ADR scope — READY FOR VERIFICATION
+
+Same baseline as checkpoint 34. V026 addressed. The ADR distinguishes the verified calculator from its proposed snapshot and API contract. Other calculator hashes and the independent parity evidence carry forward. `git diff --check` exited 0.
+
+```text
+5ed3611f1a3ca864bcc867a1409814c326d2f30df713be86258cdbef17cf796c  docs/decisions/0002-cvss-v4-calculator.md
+```
+
+## M3-20261124-36 — Assessment storage, API and history — READY FOR VERIFICATION
+
+Baseline `3dedfa8d45554844c421f263e6db3ce7efe0dbeb`. This checkpoint combines the independently reviewed calculator from 34–35 with migration 8, immutable B/BE snapshots, the gated draft/finalization API, read-only assessment history and research traceability. It binds 50 files by SHA-256. The implementation and verification coordination logs sit outside the overlay. FIRST scoring sources and BSD-2-Clause notice match `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a`. Goja runs at `v0.0.0-20261122185237-35fdc4b88e39` with its MIT notice. The documented clean FIRST checkout reproduces the 13 synthetic fixture cases byte for byte. Independent reviews 34–35 resolved V026 and reproduced 4,096 additional scores and vectors.
+
+- `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Go format/vet, Prettier/ESLint/TypeScript, sqlc and OpenAPI byte-identical generation, Go unit tests, nine Python tests, four Vitest tests and the production build passed.
+- `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` exited 0. Fresh, staged and populated PostgreSQL migrations reached schema 8. All seven recorded M2 tables matched across the populated upgrade. Both import suites and the synthetic assessment subtests passed with the race detector, including append-only runtime grants, scope and Base constraints, staleness and transactional audit rollback.
+- `GOFLAGS=-mod=readonly make test-e2e` exited 0. Four Chromium cases and two outage checks passed. The synthetic assessment history exercised keyboard disclosure and persistence after restart, plus draft nulls, calculator provenance and historical labels. The genuine import regression passed on its existing fixture.
+- `node scripts/generate-cvss-parity.mjs "$FIRST_REFERENCE_CHECKOUT" | cmp - backend/testdata/cvss/first-v4.json`, `git diff --check` and a Python check of 38 new repository-relative links and anchors exited 0. The tests used isolated local application stacks and no scanner. Hosted CI for the checkpoint awaits publication.
+
+Checkpoint progress. Local acceptance evidence covers 85% of the foundation checklist. The independently accepted portion is 30% and a separate verifier is reviewing the remaining software and research evidence. Full M3 is roughly 55–65% and overall project progress roughly 45–50%. Independent findings, publication and the exact hosted run are estimated at an uncertain 30–75 minutes. Analyst-facing authoring and assessment explanations remain part of full M3. The live A01 role/object evidence gate remains open and separate.
+
+Frozen files, SHA-256.
+
+```text
+477fe54f466736c5b197ff14b356a1d9610289233804f83082c047bebe2e502c  README.md
+6c6783c9581accaa750117df9096a07d38a3f0510132f7d2a1101e7be869f66d  backend/Dockerfile
+5cefc11c3ba4da62bc90749b32bd7f3ae3a58add64e71efee2e3299383a51fa7  backend/db/migrations/00008_assessments.sql
+3b82a41ff197a5d870b02ae484d4a9af50366ad98e8a532af7f96158dc05bc74  backend/db/queries/assessments.sql
+b4db98556a55d8c96af9b03492396bf548988b25a3561103725e87cedfba12e9  backend/db/queries/imports.sql
+95c19e77f6ca07595c9fd031fb8eb6f4b4bc203d3b837159cdd758e86cf7a427  backend/go.mod
+94dd361b7d17443ed49bf2dcad5c622f00fd4f676c3c6f1dfde1aa7693cd2401  backend/go.sum
+8a1266c1dd7d22027455bea83b92087f606c8d5fc701b269a8411f008ed49a99  backend/internal/cvss/LICENSE-goja
+c098a67e99ef21c3899b8238d178895b7b89ab4bbcff35ff040475db1da21d74  backend/internal/cvss/cvss.go
+f5e90a10539db3168c4e6ef8550871172f5d6ee549a7da9b674ce9b49b9ab8f5  backend/internal/cvss/cvss_test.go
+5d672639189da9bda914dd8c847069cc6959135000b17c45262bb742e5d3b392  backend/internal/cvss/first/LICENSE
+d533fe625d95e15b7b488a4bf93dab5f7df16b7e38b0c8ee01281d7b31a8165e  backend/internal/cvss/first/cvss_lookup.js
+453ce6767b5c3939b51d1f21315f2649e47b5abeca674be287e94b524472a1bc  backend/internal/cvss/first/cvss_score.js
+be707cc82c17993a04a84e47b1a8aaa1d0d212b56852254659ce77fd7d959f63  backend/internal/cvss/first/max_composed.js
+f838ecb41bfd5114456e7fa7df8a8449ca2735c176867886fa34bd011dee0b24  backend/internal/cvss/first/max_severity.js
+99ee2643587071bf744cd090c4bb2db58d523ed0276efd809871b00a12985a4c  backend/internal/cvss/first/metrics.js
+08d87b0fb06dcc7aab9446db9fd81ab37afaddaf013a12fe5f3dd070ca5d9910  backend/internal/httpapi/api.go
+4933f99296535953e469925878a55f5165a2cf6495aee57ab24384720557f1dd  backend/internal/httpapi/api_test.go
+b75a3dc1bd006d5b81654e325e43584914401a31d3f92fa80362b1a74719d420  backend/internal/httpapi/assessment_integration_test.go
+e36622db7c8753c59a3fbecdd57cd47cc35dc4a734ebb136641595c8cf7258f2  backend/internal/httpapi/assessments.go
+27a1239802c07deaa8c77b24ec34e52ab37a3dbded803c911ec3123f3642f116  backend/internal/service/assessment_input.go
+eac08d197f0d61e9250cd1bbc7d313c3520f3a0a4bc0eeba0a3cfa0088ddceae  backend/internal/service/assessments.go
+980290c7bea95a07a9622d83592cd877d5b1d86c4ad3aa8e7b00fefb6f5cb9dd  backend/internal/service/contexts.go
+109a65e93dafca106bddc205c76b1e647aee50828b0d5128befa5d4e34567a8d  backend/internal/service/service.go
+a2b6147f28e0ad4cc7074edb99dc1081bf9735dd0cf9ed8f8ce108dab03a15e8  backend/internal/store/sqlc/assessments.sql.go
+e8b5b34a1f2aa1123ead9feba370ef93a7f2f06997c31586d240c3187c5c13fe  backend/internal/store/sqlc/imports.sql.go
+9b3c27837570af90aaf06bf0a85b97516c95ceb3761a62ce238e0e33728599a3  backend/internal/store/sqlc/models.go
+c292463487db168c2d121067b8b9148d8a772c522a817a52fde95778ee853dd8  backend/testdata/cvss/first-v4.json
+030398f6f7f0753f937a9b449436e816c81ae1336318de9fc47c1f42492976ce  backend/testdata/cvss/upgrade-v7.sql
+1abb0a6c647ffd0b6d6776a1447d0786d045c5744dd0fd47f6dfebe6b4769d77  contracts/openapi.yaml
+065663005c039707e52c8ecb7105c5d5ac51fa7dea3209748a255532854b0fdc  docs/assessment-context-policy.md
+5ed3611f1a3ca864bcc867a1409814c326d2f30df713be86258cdbef17cf796c  docs/decisions/0002-cvss-v4-calculator.md
+8087eddd1a23f454b91ea0b84080800647a67857b83031855ba6022e90e13236  docs/research/README.md
+49a8c4561413b0b87988c48da000019a3387af5c0ad527c3da688b6efa3f5460  docs/research/artifact-register.md
+922829f141b49cca66b4e19ce47f0dae0e2a80ac8bead7b8188cc4b18f3614f6  docs/research/claim-evidence-map.md
+5570f3051d55660232adb4e477f64a7bff0aa5ccd5b55383dfe9c46f54682f74  docs/research/implementation-evidence.md
+8fa2a44ca5fccf405ce35687baf452f7392e99452a745572cb16b95556bb52f2  docs/research/limitations.md
+4d2b1f3a3820a65604fcc534fdf59227a4cbff0ab50049e80f8044c2e3c71eaa  docs/research/sources.md
+0027ba48c7bb25709b7c86355f795cd48c1ec79e0b8f9457ef201e0684a7e670  docs/research/system-design.md
+9e52a26451e6dc31a4901d5d71d314e208d4ef8c4a755980286f84e7429c425b  docs/status.md
+d9d521b2bc4c428fd3cda5001af91416144cfdd4af9a3ce6619b52e5296a281d  frontend/src/api/schema.d.ts
+dc409294063c970f892ac272c35c967f2c7515cd0bedf7dead10f5ac05826a48  frontend/src/features/assessment-panel.tsx
+d838c58967d7f4cc645552c630643518f4d4ef46e5ded3c399fb0c6db0c04086  frontend/src/features/context-panels.tsx
+b97a129eb93493ddeb9fd479c2482454987dbc6232c299a81a62d3593fc70996  frontend/src/features/evidence.tsx
+5d333c795b7b890ef948cc1f0f5a7d19f81560d68280e903efc70f3c55e6cb35  frontend/tests/browser/assessment-flow.ts
+63fc6d4242da3057b9b4aa5146e05d84e51b95ec98624b693b8d722a6550be86  frontend/tests/browser/import.spec.ts
+735bd5310e55fa42a9da6f4bb729c2cd3f56ae31ef29a71d110759f6ebfbc50d  go.work.sum
+98a653ad3e685963c88f7f603722b97929d9946715b90a6e215ff86971a2ae49  scripts/generate-cvss-parity.mjs
+ed6d4bfd6a26f4e7755480325fab33a6caacc1f6cede22e462a79dbc94d3871c  scripts/test-integration.sh
+8006c18d03ce57974708eb1244e9467b28cbb9908e9a2c152b9b04f2876274b9  tools.versions.json
+```
+
+## M3-20261124-37 — Live assessment status refresh — READY FOR VERIFICATION
+
+Baseline `3dedfa8d45554844c421f263e6db3ce7efe0dbeb`. Supersedes checkpoint 36 for five files. The other 47 hashes and all independently verified calculator, migration, storage, API and research evidence carry forward. The new overlay binds all 52 task files. V027 addressed. Verification and classification saves invalidate the finding's assessment pages. Context saves invalidate all affected pages of that target's findings. The read-only UI shows fresh historical status in the already mounted form workflow.
+
+- With the regression test in a separate copy of checkpoint 36, `GOFLAGS=-mod=readonly ./scripts/test-e2e.sh synthetic` exited 1 after the verification save, and a separate replay exited 1 after the context save. Each still displayed the previous assessment status. Independent Chromium also reproduced both stale-view behaviors.
+- After the fix, `npm run --prefix frontend fmt:check`, `npm run --prefix frontend lint`, `npm run --prefix frontend build` and `git diff --check` exited 0. The isolated synthetic browser replay exited 0. `GOFLAGS=-mod=readonly make test-e2e` on this workspace exited 0 for all four cases and both outage checks. The new regressions verified immediate refresh of the open Base history and target's BE summary. Genuine import and restart still passed. No backend or contract file changed after the independently reviewed checkpoint 36.
+- The calculator still uses unchanged FIRST source at `c5b0d409ae9f57c44264c6ce5f27d89298e1d32a` with BSD-2-Clause notice and exact Goja MIT-licensed pin `v0.0.0-20261122185237-35fdc4b88e39`. No score or study evidence changed.
+
+Checkpoint progress. The calculator, storage and API account for 75% of the checklist with independent acceptance. The verifier also confirmed the research traceability. The UI fix passed locally, and a focused independent recheck and hosted CI remain. Full M3 is roughly 55–65% and overall project progress 45–50%. Remaining review, staging and hosted checks are estimated at an uncertain 15–35 minutes. The authoring UI and live A01 evidence remain separate gates.
+
+Frozen files, SHA-256. This list includes all unchanged files from checkpoint 36.
+
+```text
+477fe54f466736c5b197ff14b356a1d9610289233804f83082c047bebe2e502c  README.md
+6c6783c9581accaa750117df9096a07d38a3f0510132f7d2a1101e7be869f66d  backend/Dockerfile
+5cefc11c3ba4da62bc90749b32bd7f3ae3a58add64e71efee2e3299383a51fa7  backend/db/migrations/00008_assessments.sql
+3b82a41ff197a5d870b02ae484d4a9af50366ad98e8a532af7f96158dc05bc74  backend/db/queries/assessments.sql
+b4db98556a55d8c96af9b03492396bf548988b25a3561103725e87cedfba12e9  backend/db/queries/imports.sql
+95c19e77f6ca07595c9fd031fb8eb6f4b4bc203d3b837159cdd758e86cf7a427  backend/go.mod
+94dd361b7d17443ed49bf2dcad5c622f00fd4f676c3c6f1dfde1aa7693cd2401  backend/go.sum
+8a1266c1dd7d22027455bea83b92087f606c8d5fc701b269a8411f008ed49a99  backend/internal/cvss/LICENSE-goja
+c098a67e99ef21c3899b8238d178895b7b89ab4bbcff35ff040475db1da21d74  backend/internal/cvss/cvss.go
+f5e90a10539db3168c4e6ef8550871172f5d6ee549a7da9b674ce9b49b9ab8f5  backend/internal/cvss/cvss_test.go
+5d672639189da9bda914dd8c847069cc6959135000b17c45262bb742e5d3b392  backend/internal/cvss/first/LICENSE
+d533fe625d95e15b7b488a4bf93dab5f7df16b7e38b0c8ee01281d7b31a8165e  backend/internal/cvss/first/cvss_lookup.js
+453ce6767b5c3939b51d1f21315f2649e47b5abeca674be287e94b524472a1bc  backend/internal/cvss/first/cvss_score.js
+be707cc82c17993a04a84e47b1a8aaa1d0d212b56852254659ce77fd7d959f63  backend/internal/cvss/first/max_composed.js
+f838ecb41bfd5114456e7fa7df8a8449ca2735c176867886fa34bd011dee0b24  backend/internal/cvss/first/max_severity.js
+99ee2643587071bf744cd090c4bb2db58d523ed0276efd809871b00a12985a4c  backend/internal/cvss/first/metrics.js
+08d87b0fb06dcc7aab9446db9fd81ab37afaddaf013a12fe5f3dd070ca5d9910  backend/internal/httpapi/api.go
+4933f99296535953e469925878a55f5165a2cf6495aee57ab24384720557f1dd  backend/internal/httpapi/api_test.go
+b75a3dc1bd006d5b81654e325e43584914401a31d3f92fa80362b1a74719d420  backend/internal/httpapi/assessment_integration_test.go
+e36622db7c8753c59a3fbecdd57cd47cc35dc4a734ebb136641595c8cf7258f2  backend/internal/httpapi/assessments.go
+27a1239802c07deaa8c77b24ec34e52ab37a3dbded803c911ec3123f3642f116  backend/internal/service/assessment_input.go
+eac08d197f0d61e9250cd1bbc7d313c3520f3a0a4bc0eeba0a3cfa0088ddceae  backend/internal/service/assessments.go
+980290c7bea95a07a9622d83592cd877d5b1d86c4ad3aa8e7b00fefb6f5cb9dd  backend/internal/service/contexts.go
+109a65e93dafca106bddc205c76b1e647aee50828b0d5128befa5d4e34567a8d  backend/internal/service/service.go
+a2b6147f28e0ad4cc7074edb99dc1081bf9735dd0cf9ed8f8ce108dab03a15e8  backend/internal/store/sqlc/assessments.sql.go
+e8b5b34a1f2aa1123ead9feba370ef93a7f2f06997c31586d240c3187c5c13fe  backend/internal/store/sqlc/imports.sql.go
+9b3c27837570af90aaf06bf0a85b97516c95ceb3761a62ce238e0e33728599a3  backend/internal/store/sqlc/models.go
+c292463487db168c2d121067b8b9148d8a772c522a817a52fde95778ee853dd8  backend/testdata/cvss/first-v4.json
+030398f6f7f0753f937a9b449436e816c81ae1336318de9fc47c1f42492976ce  backend/testdata/cvss/upgrade-v7.sql
+1abb0a6c647ffd0b6d6776a1447d0786d045c5744dd0fd47f6dfebe6b4769d77  contracts/openapi.yaml
+065663005c039707e52c8ecb7105c5d5ac51fa7dea3209748a255532854b0fdc  docs/assessment-context-policy.md
+5ed3611f1a3ca864bcc867a1409814c326d2f30df713be86258cdbef17cf796c  docs/decisions/0002-cvss-v4-calculator.md
+8087eddd1a23f454b91ea0b84080800647a67857b83031855ba6022e90e13236  docs/research/README.md
+49a8c4561413b0b87988c48da000019a3387af5c0ad527c3da688b6efa3f5460  docs/research/artifact-register.md
+922829f141b49cca66b4e19ce47f0dae0e2a80ac8bead7b8188cc4b18f3614f6  docs/research/claim-evidence-map.md
+5570f3051d55660232adb4e477f64a7bff0aa5ccd5b55383dfe9c46f54682f74  docs/research/implementation-evidence.md
+8fa2a44ca5fccf405ce35687baf452f7392e99452a745572cb16b95556bb52f2  docs/research/limitations.md
+4d2b1f3a3820a65604fcc534fdf59227a4cbff0ab50049e80f8044c2e3c71eaa  docs/research/sources.md
+0027ba48c7bb25709b7c86355f795cd48c1ec79e0b8f9457ef201e0684a7e670  docs/research/system-design.md
+626356aa0dfb8791076199f569b2682b4ae965492507f202ad66d471a05774f2  docs/status.md
+d9d521b2bc4c428fd3cda5001af91416144cfdd4af9a3ce6619b52e5296a281d  frontend/src/api/schema.d.ts
+dc409294063c970f892ac272c35c967f2c7515cd0bedf7dead10f5ac05826a48  frontend/src/features/assessment-panel.tsx
+a050e32272f65d4b0c4fbabda5f013c09702683b2425dc40f6d223aeb41cda15  frontend/src/features/classification-panel.tsx
+c75b674965020005721fe67f8ea5aa5dd3e8d56221214aef9b3c2b922aa7876d  frontend/src/features/context-panels.tsx
+b97a129eb93493ddeb9fd479c2482454987dbc6232c299a81a62d3593fc70996  frontend/src/features/evidence.tsx
+e6dcb46f0dfdbdfad372fa1ba96faa91afe0a177c197b3a25457ee8b897954f1  frontend/src/features/verification-panel.tsx
+f4d438ad23574fdf2ce329e72c8164e65f5e09506924b5ae3d6089d8f5933ecc  frontend/tests/browser/assessment-flow.ts
+63fc6d4242da3057b9b4aa5146e05d84e51b95ec98624b693b8d722a6550be86  frontend/tests/browser/import.spec.ts
+735bd5310e55fa42a9da6f4bb729c2cd3f56ae31ef29a71d110759f6ebfbc50d  go.work.sum
+98a653ad3e685963c88f7f603722b97929d9946715b90a6e215ff86971a2ae49  scripts/generate-cvss-parity.mjs
+ed6d4bfd6a26f4e7755480325fab33a6caacc1f6cede22e462a79dbc94d3871c  scripts/test-integration.sh
+8006c18d03ce57974708eb1244e9467b28cbb9908e9a2c152b9b04f2876274b9  tools.versions.json
+```
+
+Checkpoint 37 independently passed. All 52 archived file hashes and 47 inherited hashes matched. The verifier observed live refresh after verification, classification and context saves and both synthetic restart runs. V027 is closed. All software and research traceability criteria account for 95% of the foundation acceptance checklist. The remaining 5% is publication and successful hosted CI on the exact commit. [Independent verdict](review.md#independent-verification--m3-20261124-37)

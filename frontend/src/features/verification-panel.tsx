@@ -122,6 +122,7 @@ export function VerificationPanel({
       setNotice("Verification saved.");
       void client.invalidateQueries({ queryKey: historyKey });
       void client.invalidateQueries({ queryKey: ["finding", finding.id] });
+      void client.invalidateQueries({ queryKey: ["assessments", finding.id] });
       void client.invalidateQueries({
         queryKey: ["findings", finding.target_id],
       });

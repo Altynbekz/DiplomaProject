@@ -307,7 +307,11 @@ func (s *Service) ResolvedContext(ctx context.Context, findingID string) (Resolv
 	if err != nil {
 		return ResolvedContext{}, err
 	}
-	row, err := s.Store.Q.ResolveContext(ctx, db.ResolveContextParams{TargetID: endpoint.TargetID, Method: endpoint.Method, Path: endpoint.Path})
+	return s.resolveContext(ctx, s.Store.Q, endpoint)
+}
+
+func (s *Service) resolveContext(ctx context.Context, q *db.Queries, endpoint db.FindingEndpointRow) (ResolvedContext, error) {
+	row, err := q.ResolveContext(ctx, db.ResolveContextParams{TargetID: endpoint.TargetID, Method: endpoint.Method, Path: endpoint.Path})
 	result := ResolvedContext{SourceRevisionIDs: []string{}, ResolverVersion: contextResolverVersion, ResolvedAt: s.Now().UTC()}
 	if errors.Is(err, pgx.ErrNoRows) {
 		result.Factors = ContextFactors{}

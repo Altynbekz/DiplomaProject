@@ -229,6 +229,44 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/findings/{id}/assessments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List immutable assessment snapshots, newest first */
+    get: operations["listAssessments"];
+    put?: never;
+    /**
+     * Append a draft or finalize a new assessment
+     * @description The server validates references, captures context and calculates complete vectors. Incomplete drafts have null vector, score and calculator.
+     */
+    post: operations["createAssessment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/assessments/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read an immutable assessment and its current stale status */
+    get: operations["getAssessment"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -248,6 +286,7 @@ export interface components {
         | "validation_failed"
         | "unsupported_report"
         | "out_of_scope"
+        | "incomplete_assessment"
         | "not_ready"
         | "internal_error";
       detail: string;
@@ -561,6 +600,92 @@ export interface components {
       resolver_version: string;
       /** Format: date-time */
       resolved_at: string;
+    };
+    MetricRationale: {
+      reason: string;
+      evidence_refs: components["schemas"]["EvidenceRef"][];
+      context_factor_refs: (
+        | "exposure"
+        | "required_privileges"
+        | "data_sensitivity"
+        | "business_criticality"
+      )[];
+    };
+    FactorDisposition: {
+      reason: string;
+      metrics: string[];
+    };
+    CalculatorProvenance: {
+      name: string;
+      version: string;
+      source_commit: string;
+      specification_version: string;
+      specification_document_version: string;
+      reference_commit: string;
+      fixture_version: string;
+      engine_version: string;
+    };
+    AssessmentInput: {
+      /** @enum {string} */
+      kind: "B" | "BE";
+      finalize: boolean;
+      base_assessment_id: string | null;
+      expected_verification_review_id: string | null;
+      expected_classification_revision_id: string | null;
+      expected_context_revision_ids: string[];
+      /** @description B accepts only Base choices. BE accepts only Environmental choices. */
+      metrics: {
+        [key: string]: string;
+      };
+      metric_rationales: {
+        [key: string]: components["schemas"]["MetricRationale"];
+      };
+      /** @description Four reviewed dispositions required when finalizing BE. */
+      factor_dispositions?: {
+        [key: string]: components["schemas"]["FactorDisposition"];
+      };
+      notes: string;
+    };
+    AssessmentSnapshot: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      kind: "B" | "BE";
+      /** @enum {string} */
+      status: "incomplete" | "complete";
+      score: number | null;
+      vector: string | null;
+      stale: boolean;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: uuid */
+      finding_id: string;
+      /** Format: uuid */
+      target_id: string;
+      base_assessment_id: string | null;
+      verification_review_id: string | null;
+      classification_revision_id: string | null;
+      context_snapshot: components["schemas"]["ResolvedContext"];
+      /** @description BE includes inherited Base choices and every optional Environmental choice, including X. */
+      metrics: {
+        [key: string]: string;
+      };
+      metric_rationales: {
+        [key: string]: components["schemas"]["MetricRationale"];
+      };
+      factor_dispositions: {
+        [key: string]: components["schemas"]["FactorDisposition"];
+      };
+      notes: string;
+      calculator: components["schemas"]["CalculatorProvenance"] | null;
+      /** @enum {string} */
+      schema_version: "assessment-snapshot/v1";
+      policy_version: string;
+      actor: string;
+    };
+    AssessmentPage: {
+      items: components["schemas"]["AssessmentSnapshot"][];
+      next_cursor: string | null;
     };
   };
   responses: never;
@@ -2391,6 +2516,345 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ResolvedContext"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  listAssessments: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string;
+      };
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssessmentPage"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  createAssessment: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AssessmentInput"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      201: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          /** @description Snapshot URI */
+          Location?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssessmentSnapshot"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Invalid or incomplete assessment; see code and field errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response; see code and field errors */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+      /** @description Problem response */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": components["schemas"]["Problem"];
+        };
+      };
+    };
+  };
+  getAssessment: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Invalid values are replaced by a generated identifier. */
+        "X-Request-ID"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          /** @description Request correlation identifier */
+          "X-Request-ID"?: string;
+          /** @description no-store */
+          "Cache-Control"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssessmentSnapshot"];
         };
       };
       /** @description Problem response; see code and field errors */

@@ -9,6 +9,8 @@ WORKDIR /app
 COPY --from=build /api /app/api
 COPY --from=build /go/bin/goose /usr/local/bin/goose
 COPY db/migrations /app/migrations
+COPY internal/cvss/first/LICENSE /app/licenses/first-cvss.txt
+COPY internal/cvss/LICENSE-goja /app/licenses/goja.txt
 COPY docker-entrypoint.sh /app/entrypoint.sh
 USER 65532:65532
 ENTRYPOINT ["/app/entrypoint.sh"]

@@ -52,7 +52,7 @@ const empty: Provenance = {
   business_criticality: { rationale: "", sources: [] },
 };
 
-function FactorsView({
+export function FactorsView({
   factors,
   provenance,
 }: {
@@ -219,6 +219,7 @@ export function ContextPanel({
       setNotice("Context revision saved.");
       void client.invalidateQueries({ queryKey: key });
       void client.invalidateQueries({ queryKey: ["resolved-context"] });
+      void client.invalidateQueries({ queryKey: ["findings", targetID] });
     },
   });
   const recoveringConflict =
