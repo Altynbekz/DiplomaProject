@@ -8,6 +8,8 @@ This document defines the implementation plan and contract. Check the current ch
 
 Use the [frontend guide](frontend/FRONTEND.md) and [backend guide](backend/BACKEND.md) for layer-specific guidance. Review checkpoints and independent results live in [coordination status](docs/coordination/status.md) and the [verification log](docs/coordination/review.md).
 
+Use the [research artifact index](docs/research/README.md) to locate evidence for the diploma paper, disclose limitations and preserve versioned experiment records.
+
 These instructions apply to coding agents working anywhere in this repository. Follow the user's current requirements and applicable nested instructions. Read the actual files and working tree before each task; preserve unrelated changes. Never infer implementation status from this document alone.
 
 Work in small, runnable vertical slices. Implement only the current milestone and its prerequisites, then report what runs, what was tested, and what remains. If a required tool, real report, reviewer judgment, or authorization is missing, identify that specific gap; do not generate evidence to conceal it. A mock, synthetic fixture, illustrative screenshot, or predicted result is never a real lab measurement.

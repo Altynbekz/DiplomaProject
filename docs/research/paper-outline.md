@@ -1,0 +1,16 @@
+# Diploma paper outline
+
+**Development of a Context-Aware Web Application Vulnerability Assessment System with OWASP Top 10 Risk Prioritization**
+
+Use the [artifact register](artifact-register.md) and [claim map](claim-evidence-map.md) to check each factual sentence. Keep figures and demo states separate from evaluation results.
+
+| Section | Write with current evidence | Still needed |
+| --- | --- | --- |
+| 1. Introduction and research problem | Distinguish scanner evidence, verification, classification, CVSS severity and contextual priorities. State RQ-01 as a hypothesis and explain the local academic scope. CL-01, CL-08, CL-11, SRC-01–SRC-03, ART-13. | Supervisor review of research question, scope and final contribution wording. |
+| 2. Related work and standards | Describe the 2025 OWASP subset, FIRST CVSS nomenclature, Traditional JSON and the passive training fixture. SRC-01–SRC-10. Separate standards from the project mapping. | A reviewed literature comparison with closely related prioritization studies. Bibliographic register additions should be verified primary sources. |
+| 3. Requirements and design | Explain evidence lineage, identities, scope and API/storage boundaries. Review the threat controls and distinct future components. [Design](system-design.md), [security and ethics](security-and-ethics.md), ART-10, ART-14, CL-01, CL-04, CL-06. | Update component diagrams after verified M3–M5 implementations if included in the final paper. |
+| 4. Implementation | Describe import, reviewed policy, append-only review/classification/context, and reproducibility. [Implementation evidence](implementation-evidence.md), ART-02–ART-04, ART-09–ART-11, FIG-01–FIG-06. | Keep future components described as planned until supported code, parity, exports and checks exist. |
+| 5. Research methodology | Outline the paired CVSS-B/BE cohort, exclusions, independent blinded review, disagreement handling and metrics. [Proposal](../research-protocol.md), [record template](experiment-record-template.md), ART-13, SRC-02, SRC-03, SRC-19, SRC-20. | Approved and frozen protocol, scenario corpus/split, approved collection and disclosure, assessment and reviewer procedures with actual execution records. |
+| 6. Results | Report engineering verification at exact commits. Report the genuine import counts and provenance, the M2 software checks, and the open A01 gate. ART-01–ART-05, ART-11, CL-02, CL-03, CL-08. | Comparative results table awaits a frozen export, independent reference judgments, exclusions and independently reproducible M6 outputs. The present result set has no CVSS ranks or comparative score. |
+| 7. Discussion and limitations | Explain limited lab and passive coverage, mapping uncertainty, and why demo/automated checks cannot establish real-world efficacy. [Limitations](limitations.md), ART-01, ART-05, ART-10, CL-09–CL-12. | Interpret paired differences and rater disagreement once data exist. Discuss negative or undefined per-scenario results and uncertainty. |
+| 8. Conclusion | Conclude only that the specified offline import and M2 workflows were implemented and verified for the tested fixture and conditions. CL-01–CL-08. | Answer RQ-01 only after analysis. Scope any conclusion to the studied cohort and disclose missing or unfavorable evidence. |

@@ -647,3 +647,47 @@ f1977df3ae74afc5315667552bf410a420a31c04f7196376511ad2774dd47736  docs/status.md
 ```
 
 Open gate. The scoped artifact inventory found no observed role/object decisions. The private attempt record shows automatic approval review stopped the authorized fixture run before execution, leaving zero live requests. No blocked activity was retried. The operator's existing evidence needs independent review against the fixture and policy, with the Juice Shop CORS assertion kept separate. [Evidence checklist](../../lab/scenarios/a01-role-object.md#evidence-to-supply)
+
+## RESEARCH-20261124-32 — Paper artifact packet — READY FOR VERIFICATION
+
+Baseline `f1613e6fd5d64625dc239d2673cb019ecb964efd`, identical to GitHub `main` at inspection. The packet indexes evidence, sources and supported paper claims, describes M0–M2 behavior and limitations, proposes a pre-evaluation protocol, and adds six real interface captures from existing disposable demo rows. The frozen files contain documentation or images. Application code, tooling, workflows and historical observations are baseline bytes.
+
+- `git diff --check` exited 0. Inline Python checks resolved 182 repository-relative links/anchors, validated 53 stable IDs, matched 13 shareable file digests and six private digest references, and inspected six PNGs for embedded text or EXIF. All six figures were inspected visually for readability and disclosure.
+- Primary standards, implementation references and research bibliography were checked on 2026-11-24. Public GitHub metadata matched all six cited run IDs to their exact SHAs and successful conclusions. The current software baseline passed run 45365896739. [Hosted baseline](https://github.com/Altynbekz/DiplomaProject/actions/runs/45365896739)
+- Chromium 159.0.8154.6 read the previously seeded demo at baseline. It reported 17 findings and 21 observations, verified the existing UI states and captured the six registered PNGs. The browser reached only loopback and the capture stack shut down. This was documentation capture with no new experiment or scan. No software checks were needed for a source change.
+
+Frozen files, SHA-256.
+
+```text
+d8d6d918bfbbfb7cc7d68d9a7ac4fbe4b77e933585b1f418857c2b17ba52d1ec  AGENTS.md
+f4c5b00d8103fb056a7ef0cc9dad03af440671c4b194edfafc4821d9e872b039  README.md
+e4de1f79c8ca09fcaecb8b7c51ce7fe69ba8ffc28fd8079f687fe301a4436abb  docs/research-protocol.md
+87c8d434fa36f4b93d5e6a6c865b914de96f936fedd9556db13fd93a122f3070  docs/research/README.md
+5f5e5603a38b44e66ef94a96095e45fb90cf373ee4fc563caea5ecb5ced1e2a2  docs/research/artifact-register.md
+c23ec967dd7dc7436995201c56025c9ce2d91063be9ac0cbc69eda5488241433  docs/research/claim-evidence-map.md
+8651e142b310e6f416a862dc7d3d364f74683a3ce57015da12460b7551d57eab  docs/research/experiment-record-template.md
+289f0045b7c0086f984d839ae18022e9fc0a15c9f3501b0000e9f87a7f5f206f  docs/research/implementation-evidence.md
+0b93a64c0dea60a3227465bb3761af536f9daf7c79662626734aa91b9f2a2d99  docs/research/limitations.md
+6d7330554ac0e8e6b6d2408d08e55ccb5fc2fa593bf2eec0916eff7f34d592fa  docs/research/paper-outline.md
+fdb10721e5b8f756f43eb0fe7446cc742aa4cefafae66af6afd374f569904cc8  docs/research/security-and-ethics.md
+5332f91a379baceb8e4e1ddfdbaf1052d0387dbf06eeb06169f5bb1cc37728cf  docs/research/sources.md
+437f9f9d0d0f9c7ad228e6488e4614ddb713f0d3b658b3ecc3b046d2b67c7987  docs/research/system-design.md
+ff5194c910172cc94f7a85f674a686c9de2d2c9768d13da52fe4edf4bb3da5b1  docs/research/figures/classification-history.png
+1c024f3ff8dca3a4a357f2abb2c5b6c0b9ebe8490852cceba7d0c118dcf4972f  docs/research/figures/finding-and-source-observation.png
+fad666ba6dd9baf08f4de890df93d31f17762c8a1e113df847d0c2af3a2d538c  docs/research/figures/genuine-import-and-provenance.png
+34724d7c9ad58226cd5130ea9819a57cd00da5350d321c4a923cbf47c31349c0  docs/research/figures/resolved-endpoint-context.png
+faff1845f7ebad8978bc9fcdff31b164e3b40de300eed8ae80f074ea63c7082c  docs/research/figures/target-default-and-exact-context.png
+3fb2141fb04608675c3659341c1e1f673ec2a2bbcf9e03d390cd85373b15e691  docs/research/figures/verification-history.png
+```
+
+Open work. Observed A01 role/object evidence is missing. The research protocol is proposed and needs independent human review before freezing. Paired CVSS assessments, exports, blinded judgments and M6 evaluation are future work. Publication CI is pending.
+
+## RESEARCH-20261124-33 — Frozen replay inputs — READY FOR VERIFICATION
+
+Same baseline as checkpoint 32. This checkpoint supersedes 32 for the protocol text and retains all other file hashes. V025 addressed. The proposed export now requires full sanitized frozen review, classification and resolved context records, evidence provenance references and the separately frozen reference file's SHA-256. Replay compares the digest, IDs, cohort and assessment parentage.
+
+`git diff --check` exited 0 and the six protocol links and anchors resolved. The checkpoint 32 disclosure, figure, source and file checks carry forward for the unchanged files. The protocol remains a proposal and the evidence gates listed at checkpoint 32 remain open.
+
+```text
+0284588ec110bfc3b998040f1020db2efb4430d090ee20c45d5638927820ee89  docs/research-protocol.md
+```

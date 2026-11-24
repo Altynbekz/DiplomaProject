@@ -4,6 +4,8 @@ A local research prototype using React and TypeScript, Go `net/http`, sqlc and P
 
 The automated offline suites exercise both an authored test fixture and a reviewed derivative of a genuine report from an authorized local Juice Shop session. The M2 software checks passed. M2 acceptance remains open pending a separately authorized role/object test record with observed access decisions. [Acceptance checklist](docs/status.md#m2-acceptance-audit)
 
+The paper's artifact register, implementation evidence, proposed protocol and application figures are indexed in [Diploma research artifacts](docs/research/README.md).
+
 ## Start locally
 
 The host path was verified on macOS arm64. Install Go 1.27.1, Node 26.13.0, npm 12.2.1, PostgreSQL 15.19 with its server binaries on PATH, goose 3.30.1, Python 3.11 or newer, Make and ripgrep. Use sqlc 1.31.1 for generation. Frontend dependencies are locked in `frontend/package-lock.json`. Exact direct dependencies and tool versions are in `tools.versions.json`.
