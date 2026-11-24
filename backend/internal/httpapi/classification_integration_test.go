@@ -138,9 +138,33 @@ func checkClassificationWorkflow(t *testing.T, ctx context.Context, pool *pgxpoo
 	if err := pool.QueryRow(ctx, "SELECT count(*) FROM audit_events WHERE action='classification.append' AND entity_id=$1 AND actor='fixture-operator'", manual.ID).Scan(&audits); err != nil || audits != 1 {
 		t.Fatalf("manual classification audit missing: %v", err)
 	}
-	_, err := pool.Exec(ctx, "UPDATE classification_revisions SET rationale='modified'")
-	var failure *pgconn.PgError
-	if !errors.As(err, &failure) || failure.Code != "42501" {
-		t.Fatalf("classification runtime mutation permission expected to fail: %v", err)
+	for _, statement := range []string{
+		"UPDATE classification_revisions SET rationale='modified'",
+		"DELETE FROM classification_revisions",
+		"TRUNCATE classification_revisions",
+	} {
+		_, err := pool.Exec(ctx, statement)
+		var failure *pgconn.PgError
+		if !errors.As(err, &failure) || failure.Code != "42501" {
+			t.Fatalf("classification runtime mutation permission expected to fail: %v", err)
+		}
+	}
+	body := requestBody(manual.ID, manual.EvidenceRefs)
+	results := make(chan int, 2)
+	for range 2 {
+		go func() {
+			results <- request("POST", path, "application/json", body, false).Code
+		}()
+	}
+	counts := map[int]int{}
+	for range 2 {
+		counts[<-results]++
+	}
+	if counts[201] != 1 || counts[409] != 1 {
+		t.Fatalf("concurrent classification revisions did not serialize: %v", counts)
+	}
+	history = getHistory()
+	if len(history) != 4 || history[0].ID == manual.ID || history[1].ID != manual.ID {
+		t.Fatal("concurrent classification revisions changed prior history or appended twice")
 	}
 }

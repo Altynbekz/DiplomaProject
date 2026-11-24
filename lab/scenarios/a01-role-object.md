@@ -15,13 +15,17 @@ The proposed policy allows each ordinary user to read only objects they own. Use
 | Anonymous, A | Deny |
 | Authorized administrator, A | Follow the documented administrator policy |
 
-## Scope and records
+## Evidence to supply
 
-1. **Authorize the fixture.** Identify the exact origin, build digest, policy reference, identities and objects, supported operations, operator and UTC start and expiry. Seed accounts and objects through the fixture's documented setup on a disposable stack. The previous passive authorization is expired and applies only to that capture.
-2. **Constrain traffic.** The proposed live observation scope is ordinary sign-in and read-only owner views of A and B at the named fixture origin, using the documented interface. Use the fixture owner's authorization-policy test record for the other matrix decisions. Bind the client to an isolated internal lab network with egress limited to the pinned fixture address and port. Verify scope and redirect enforcement with controlled sinks before target traffic. Stop on isolation failure, expiry, unexpected destination or unexpected changes to the fixture. Cap the live observation at 5 minutes and 60 total requests, whichever comes first. Use fresh accounts and browser sessions without retries outside the named window.
-3. **Preserve evidence.** Keep the private authorization, scope and isolation result, fixture version, UTC time window, operator procedure and original logs in ignored `artifacts/a01/<run-id>/`. Record each policy decision with the role and object aliases, expected and observed outcomes, UTC time and a SHA-256 digest of the policy log or response record. A denial or an unperformed case has its own outcome. Keep credentials, sessions and private payloads outside Git. Review and hash any shareable derivative separately.
-4. **Close the run.** Stop the dedicated lab services and verify they stopped. End the disposable sessions and retain evidence privately. Before linking the result to a finding, match the tested policy and object operation to that finding's target, endpoint and observation reference. Record unrelated policy results as a standalone scenario. A correct denial is a valid result. Record an inconclusive review if the evidence is insufficient to confirm the finding.
+For independent review, place an existing, legitimately obtained record under ignored `artifacts/a01/<run-id>/` or provide its private local path. Include the following items.
+
+- The fixture origin and build digest, documented policy and procedure, disposable role and object aliases, and object ownership.
+- The operator and authorization reference, allowed operations and limits, UTC validity window and actual run times, isolation results, and shutdown record.
+- Expected and observed decisions per applicable case, including any unperformed case. Include UTC timestamps, policy log or response references, and SHA-256 hashes. A correct denial is a valid result.
+- The original and redacted record hashes and a description of redactions. Keep authorization records, credentials, sessions, private originals and payloads outside Git.
+
+Link an observed result to a finding only when the tested target, policy and operation substantiate its exact observation. Keep results from an unrelated fixture in a standalone record.
 
 ## Observed results
 
-No live role/object result was collected for this project run. The previous authorization covered a single passive browser session and expired. The reviewed CORS mapping classifies a scanner assertion under A01 without confirming access by any role.
+The passive Juice Shop session captured CORS scanner assertions. A later authorized standalone fixture attempt was blocked by automatic approval review before Docker started. Both the primary run and independent replay remained unstarted, with zero live requests and no observed decisions. The passed in-memory handler test exercised fictional cases. The independent reviewer determined that this leaves the role/object evidence gate open. The Juice Shop CORS finding remains separate.

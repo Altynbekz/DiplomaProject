@@ -626,3 +626,24 @@ f7281eb14a2979a7d39cbd54305124db7f2a1aff45b65d1ae00015917a2f739d  README.md
 ```
 
 Open gate. Obtain a separately authorized record from the fixture operator with the exact target/build and documented policy, decisions and evidence hashes for the disposable role/object cases, isolation and chronology. Review whether it substantiates a particular finding or represents a standalone test.
+
+## M2-20261124-31 — Scope-safe draft recovery and evidence handoff — READY FOR VERIFICATION
+
+Baseline `817c0449bbb9f6c040ba847a41c6f125bbda7d97`, identical to GitHub `main` at inspection. Before the fix, `GOFLAGS=-mod=readonly ./scripts/test-e2e.sh genuine` exited 1. The conflicting endpoint draft changed from `endpoint` to `default` when the user selected a target-default history row. Recovery now accepts matching scopes only and retains the draft. The classification workflows gain keyboard recovery and concurrent append coverage. The A01 handoff lists exactly what the operator needs to supply.
+
+- `GOFLAGS=-mod=readonly make check` and `npm run build --prefix frontend` exited 0. Format, lint, type checks, generation consistency, Go tests, nine Python tests, four Vitest tests and the production build passed.
+- `env -u TEST_DATABASE_URL -u TEST_GENUINE_DATABASE_URL GOFLAGS=-mod=readonly make test-integration` exited 0 under the race detector. Fresh and staged migrations reached 7. Both import suites and three M2 subtests passed. Concurrent classification requests produced one 201 and one 409, and runtime `UPDATE`, `DELETE` and `TRUNCATE` on classification history were denied.
+- `GOFLAGS=-mod=readonly make test-e2e` exited 0. Four Chromium cases and both outage checks passed. The genuine case prevented changing a conflicting draft's scope, saved the intended endpoint revision, recovered a classification draft using the keyboard, and read the resulting history after restart. The fixture digest is `036a4eb798d55fa68fa56a9389933b52b2bc3fefe86fd35eff741bb15efebdf7`.
+- `git diff --check` and a Python check of 14 relative links and anchors exited 0. GitHub run `45260100347` completed successfully for the exact baseline. Checkpoint CI awaits publication. [Hosted baseline run](https://github.com/Altynbekz/DiplomaProject/actions/runs/45260100347)
+
+Frozen files, SHA-256.
+
+```text
+5881c615f1215eba7cb3ea95fef5e6a4be4ef5701bd660dad847339dd52059c5  backend/internal/httpapi/classification_integration_test.go
+3a53d9ebe35d0313abd373bf0c6901ff3631ef7d28b628ee92d2b4ed854c33b9  frontend/src/features/context-panels.tsx
+b76ed4a5a2b05cc5f33441ae55cd6e2b917236eda8223262862a727b2e8a9ea4  frontend/tests/browser/genuine.spec.ts
+aa84e9c1cacc2e57b1af24dbaa7be649d477cb0f1ee32105ed09569edf0569e6  lab/scenarios/a01-role-object.md
+f1977df3ae74afc5315667552bf410a420a31c04f7196376511ad2774dd47736  docs/status.md
+```
+
+Open gate. The scoped artifact inventory found no observed role/object decisions. The private attempt record shows automatic approval review stopped the authorized fixture run before execution, leaving zero live requests. No blocked activity was retried. The operator's existing evidence needs independent review against the fixture and policy, with the Juice Shop CORS assertion kept separate. [Evidence checklist](../../lab/scenarios/a01-role-object.md#evidence-to-supply)

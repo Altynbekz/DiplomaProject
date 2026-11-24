@@ -38,6 +38,25 @@ async function checkRootContext(page: Page) {
   await expect(context.getByText("unknown", { exact: true })).toHaveCount(3);
 }
 
+async function prepareClassification(
+  page: Page,
+  status: "unmapped" | "out_of_scope",
+  rationale: string,
+) {
+  const summary = page.getByText("OWASP classification", { exact: true });
+  await summary.press("Enter");
+  const panel = summary.locator("xpath=..");
+  await panel.getByLabel("Classification status").selectOption(status);
+  await panel.getByLabel("Classification rationale").fill(rationale);
+  const observation = panel
+    .getByRole("group", { name: "Source evidence" })
+    .getByRole("checkbox")
+    .first();
+  await observation.press("Space");
+  await expect(observation).toBeChecked();
+  return panel;
+}
+
 async function saveAndCheckContext(page: Page) {
   const summary = page.getByText("Application context", { exact: true });
   await summary.focus();
@@ -112,6 +131,33 @@ async function saveAndCheckContext(page: Page) {
   await save.click();
   await expect(
     panel.getByRole("heading", { name: "GET / · Revision 1" }),
+  ).toBeVisible();
+  await scope.selectOption("default");
+  await scope.selectOption("endpoint");
+  await exposure.getByLabel("Rationale").fill("Keep this endpoint draft");
+  await save.click();
+  await expect(panel.getByRole("alert")).toContainText(
+    "The current revision changed",
+  );
+  await expect(
+    panel
+      .getByRole("article")
+      .filter({ hasText: "Target default · Revision 2" })
+      .getByRole("button", { name: "Use this revision" }),
+  ).toBeDisabled();
+  await panel
+    .getByRole("article")
+    .filter({ hasText: "GET / · Revision 1" })
+    .getByRole("button", { name: "Use this revision" })
+    .click();
+  await expect(scope).toHaveValue("endpoint");
+  await expect(panel.getByLabel("Endpoint path")).toHaveValue("/");
+  await expect(exposure.getByLabel("Rationale")).toHaveValue(
+    "Keep this endpoint draft",
+  );
+  await save.click();
+  await expect(
+    panel.getByRole("heading", { name: "GET / · Revision 2" }),
   ).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(panel.getByLabel("Context scope")).toBeVisible();
@@ -231,26 +277,19 @@ test("genuine report survives reload", async ({ page }) => {
       .getByRole("region", { name: "Verification history" })
       .getByText("Check the scanner assertion independently"),
   ).toBeVisible();
-  await stale.close();
-  const classificationSummary = page.getByText("OWASP classification", {
-    exact: true,
-  });
-  await classificationSummary.click();
-  const classification = classificationSummary.locator("xpath=..");
-  await classification
-    .getByLabel("Classification status")
-    .selectOption("out_of_scope");
-  await classification
-    .getByLabel("Classification rationale")
-    .fill("Keep the classification history for the offline fixture");
-  await classification
-    .getByRole("group", { name: "Source evidence" })
-    .getByRole("checkbox")
-    .first()
-    .check();
+  const classification = await prepareClassification(
+    page,
+    "out_of_scope",
+    "Keep the classification history for the offline fixture",
+  );
+  const staleClassification = await prepareClassification(
+    stale,
+    "unmapped",
+    "Keep this classification draft after a conflict",
+  );
   await classification
     .getByRole("button", { name: "Save classification" })
-    .click();
+    .press("Enter");
   await expect(
     classification
       .getByRole("status")
@@ -261,6 +300,34 @@ test("genuine report survives reload", async ({ page }) => {
       .getByRole("region", { name: "Classification history" })
       .getByText("Keep the classification history for the offline fixture"),
   ).toBeVisible();
+  const saveClassification = staleClassification.getByRole("button", {
+    name: "Save classification",
+  });
+  await saveClassification.press("Enter");
+  await expect(staleClassification.getByRole("alert")).toContainText(
+    "The current revision changed",
+  );
+  await staleClassification
+    .getByRole("button", { name: "Load latest classification" })
+    .press("Enter");
+  await expect(
+    staleClassification
+      .getByRole("status")
+      .filter({ hasText: "Latest classification loaded." }),
+  ).toBeVisible();
+  await expect(
+    staleClassification.getByLabel("Classification rationale"),
+  ).toHaveValue("Keep this classification draft after a conflict");
+  await expect(
+    staleClassification.getByLabel("Classification status"),
+  ).toHaveValue("unmapped");
+  await saveClassification.press("Enter");
+  await expect(
+    staleClassification
+      .getByRole("region", { name: "Classification history" })
+      .getByText("Keep this classification draft after a conflict"),
+  ).toBeVisible();
+  await stale.close();
   expect(external).toEqual([]);
 });
 
@@ -274,6 +341,11 @@ test("genuine findings survive restart", async ({ page }) => {
     page
       .getByRole("region", { name: "Classification history" })
       .getByText("Keep the classification history for the offline fixture"),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Classification history" })
+      .getByText("Keep this classification draft after a conflict"),
   ).toBeVisible();
   await page.getByText("Human verification", { exact: true }).click();
   await expect(

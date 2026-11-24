@@ -221,6 +221,8 @@ export function ContextPanel({
       void client.invalidateQueries({ queryKey: ["resolved-context"] });
     },
   });
+  const recoveringConflict =
+    save.error instanceof APIError && save.error.problem.status === 409;
   function submit(event: FormEvent) {
     event.preventDefault();
     setNotice("");
@@ -238,17 +240,21 @@ export function ContextPanel({
       [key]: { ...previous[key], sources: next },
     }));
   }
-  function selectRevision(row: Revision, preserve: boolean) {
-    setScope(row.method === null ? "default" : "endpoint");
-    setMethod(row.method ?? "GET");
-    setPath(row.path ?? "");
-    if (!preserve) {
+  function matchesDraftScope(row: Revision) {
+    return row.method === scopeMethod && row.path === scopePath;
+  }
+  function selectRevision(row: Revision) {
+    if (recoveringConflict && !matchesDraftScope(row)) return;
+    if (!recoveringConflict) {
+      setScope(row.method === null ? "default" : "endpoint");
+      setMethod(row.method ?? "GET");
+      setPath(row.path ?? "");
       setFactors(row.factors);
       setProvenance(row.factor_provenance);
     }
     setExpected(row.id);
     setNotice(
-      preserve
+      recoveringConflict
         ? "Predecessor updated. Review your draft before saving."
         : "Saved scope loaded for revision.",
     );
@@ -416,26 +422,26 @@ export function ContextPanel({
           </form>
           {notice && <p role="status">{notice}</p>}
           {save.error && <ErrorState error={save.error} />}
-          {save.error instanceof APIError &&
-            save.error.problem.status === 409 && (
-              <div className="stack">
-                <p>
-                  Refresh history and use the latest revision for this scope to
-                  continue with your draft.
-                </p>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCursor("");
-                      void client.invalidateQueries({ queryKey: key });
-                    }}
-                  >
-                    Refresh context history
-                  </button>
-                </div>
+          {recoveringConflict && (
+            <div className="stack">
+              <p>
+                Refresh history and use the latest revision for this scope to
+                continue with your draft. For an endpoint, match the method and
+                path shown in history.
+              </p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCursor("");
+                    void client.invalidateQueries({ queryKey: key });
+                  }}
+                >
+                  Refresh context history
+                </button>
               </div>
-            )}
+            </div>
+          )}
           <section className="stack" aria-label="Context history">
             <h3>Context history</h3>
             {history.isPending && <p role="status">Loading context history…</p>}
@@ -468,14 +474,11 @@ export function ContextPanel({
                 <div>
                   <button
                     type="button"
-                    disabled={save.isPending}
-                    onClick={() =>
-                      selectRevision(
-                        row,
-                        save.error instanceof APIError &&
-                          save.error.problem.status === 409,
-                      )
+                    disabled={
+                      save.isPending ||
+                      (recoveringConflict && !matchesDraftScope(row))
                     }
+                    onClick={() => selectRevision(row)}
                   >
                     Use this revision
                   </button>
